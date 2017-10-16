@@ -7,9 +7,13 @@ import java.math.RoundingMode;
 import java.util.*;
 
 /**
- * Hello world!
+ * Code homework for the first lecture (14.10.2017).
  *
+ * Using BigIntegerMath.log2 func from com.google.common.math package.
+ * Measuring time for 10^6-1 BifIntegerMath.log2 calls and printing it.
+ * Using Java 8 and lambdas.
  */
+
 public class Main
 {
     private static final int MEASURE_COUNT = 1;
