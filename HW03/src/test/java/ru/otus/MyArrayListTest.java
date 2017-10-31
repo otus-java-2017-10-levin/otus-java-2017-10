@@ -51,16 +51,12 @@ public class MyArrayListTest
     }
 
     public void testConstructor() {
-        List<Integer> ints3 = new MyArrayList<>(Arrays.asList(0,1,2,3,4,5));
+        List<Integer> ints3 = createMyList(Arrays.asList(0,1,2,3,4,5));
         ints3.add(1);
 
         checkArray(ints3, "[0, 1, 2, 3, 4, 5, 1]",7);
-
         checkArray(createMyList(11), "[]", 0);
-
         checkArray(EMPTY_LIST, "[]", 0);
-
-
     }
 
     public void testCollectionsAddAll()
@@ -115,7 +111,7 @@ public class MyArrayListTest
     }
 
     public void testContains() {
-        List<Integer> ints = new MyArrayList<>(Arrays.asList(0, 1, 2, 3, null, 4, 5));
+        List<Integer> ints = createMyList(Arrays.asList(0, 1, 2, 3, null, 4, 5));
         Integer digit = 7;
 
         assertEquals(true, ints.contains(null));
@@ -125,7 +121,7 @@ public class MyArrayListTest
     }
 
     public void testToArray() {
-        List<Integer> ints = new MyArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        List<Integer> ints = createMyList(Arrays.asList(0, 1, 2, 3, 4, 5));
         Number[] result = {0, 1, 2, 3, 4, 5};
         Number[] a = new Number[1];
 
@@ -138,7 +134,7 @@ public class MyArrayListTest
     }
 
     public void testContainsAll() {
-        List<Integer> ints = new MyArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        List<Integer> ints = createMyList(Arrays.asList(0, 1, 2, 3, 4, 5));
         List<Integer> ints2 = Arrays.asList(1, 2, 3, 0);
         List<Integer> ints3 = Arrays.asList(1, 2, 7, 0);
 
@@ -147,7 +143,7 @@ public class MyArrayListTest
     }
 
     public void testIndexOf() {
-        List<Integer> ints = new MyArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 2));
+        List<Integer> ints = createMyList(Arrays.asList(0, 1, 2, 3, 4, 2));
 
         assertEquals(2, ints.indexOf(2));
         assertEquals(-1, ints.indexOf(null));
@@ -165,12 +161,7 @@ public class MyArrayListTest
             ints.add(i);
             ints.remove(new Integer(i)); // ints.remove(Object) calls ints.remove(i)
         }
-
-
         checkArray(ints, "[1, 1, 1]", 3);
-
-//        ints = createMyList();
-//        ints.remove(0);
     }
 
     public void testAddAll() {
@@ -203,8 +194,6 @@ public class MyArrayListTest
         assertEquals("[0, 1, 2, 3, 4, 5]", ints.toString());
         assertEquals(6, ints.size());
 
-
-        // adding to empty list
         ints = createMyList();
         for (int i=0; i < 10; i++) {
             ints.add(0, i);
@@ -215,7 +204,6 @@ public class MyArrayListTest
 
     public void testRemoveAll() {
         List<Integer> ints = createMyList(Arrays.asList(1,1, 2, 3));
-
         boolean res = ints.removeAll(Arrays.asList(1, 1));
 
         checkArray(ints, "[2, 3]", 2);
