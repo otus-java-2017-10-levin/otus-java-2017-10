@@ -4,11 +4,12 @@ import java.util.*;
 
 /**
  * Realization of ArrayList for educational purpose.
- * Not implemented optional methods and sublist class, concurrent access.
+ * Not implemented sublist class, concurrent access.
  *
  *
  * @param <T>
  */
+
 public class MyArrayList<T> implements List<T> {
     private static final int DEFAULT_CAPACITY = 10;
 
@@ -45,7 +46,7 @@ public class MyArrayList<T> implements List<T> {
     }
 
     private void checkBounds(int index) {
-        if (index < 0 || index >= arr.length)
+        if (index < 0 || index > arr.length)
             throw new IndexOutOfBoundsException();
     }
 
@@ -335,7 +336,12 @@ public class MyArrayList<T> implements List<T> {
      *                                       is not supported by this list
      */
     public boolean remove(Object o) {
-        return false;
+        int index = indexOf(o);
+
+        if (index > -1)
+            remove(index);
+
+        return index != -1;
     }
 
     /**
@@ -360,7 +366,14 @@ public class MyArrayList<T> implements List<T> {
      * @see #add(Object)
      */
     public boolean addAll(Collection<? extends T> c) {
-        return false;
+
+        if (c.size() == 0)
+            return false;
+
+        for (T o: c)
+            add(o);
+
+        return true;
     }
 
     /**
@@ -391,7 +404,26 @@ public class MyArrayList<T> implements List<T> {
      *                                       (<tt>index &lt; 0 || index &gt; size()</tt>)
      */
     public boolean addAll(int index, Collection<? extends T> c) {
-        return false;
+        checkBounds(index);
+        if (c.size() == 0)
+            return false;
+
+        Object[] tmp = new Object[size+c.size()];
+
+        System.arraycopy(arr, 0, tmp, 0, index);
+
+        int counter = 0;
+        for (T o: c) {
+            tmp[index + counter] = o;
+            counter++;
+        }
+
+        if (size != index)
+            System.arraycopy(arr, index, tmp, index+c.size(), size - index);
+        arr = tmp;
+        size += counter;
+
+        return true;
     }
 
     /**
@@ -413,7 +445,18 @@ public class MyArrayList<T> implements List<T> {
      * @see #contains(Object)
      */
     public boolean removeAll(Collection<?> c) {
-        return false;
+        int counter = 0;
+        if (size > 0) {
+            for (Object o : c) {
+                boolean isRemoved;
+                do {
+                    isRemoved = remove(o);
+                    counter++;
+                } while (isRemoved);
+            }
+        }
+
+        return counter != 0;
     }
 
     /**
@@ -437,6 +480,18 @@ public class MyArrayList<T> implements List<T> {
      * @see #contains(Object)
      */
     public boolean retainAll(Collection<?> c) {
+        List<Object> toRemove = new MyArrayList<>();
+        for (Object o: this) {
+            if (!c.contains(o)) {
+                toRemove.add(o);
+            }
+        }
+
+        if (toRemove.size() != 0) {
+            this.removeAll(toRemove);
+            return true;
+        }
+
         return false;
     }
 
@@ -498,7 +553,16 @@ public class MyArrayList<T> implements List<T> {
      *                                       (<tt>index &lt; 0 || index &gt; size()</tt>)
      */
     public void add(int index, T element) {
-        throw new UnsupportedOperationException();
+        checkBounds(index);
+
+        Object[] tmp = new Object[size+1];
+
+        System.arraycopy(arr, 0, tmp, 0, index);
+        tmp[index] = element;
+        if (size != index)
+            System.arraycopy(arr, index, tmp, index+1, size - index);
+        size++;
+        arr = tmp;
     }
 
     /**
@@ -578,6 +642,7 @@ public class MyArrayList<T> implements List<T> {
         LstIterator() {}
 
         LstIterator(int index) {
+            super();
             if (cursor < 0 || cursor > size())
                 throw new IndexOutOfBoundsException("Invalid cursor");
             cursor = index;
