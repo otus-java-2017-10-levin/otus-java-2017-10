@@ -2,6 +2,13 @@ package ru.otus;
 
 import java.util.*;
 
+/**
+ * Realization of ArrayList for educational purpose.
+ * Not implemented optional methods and sublist class, concurrent access.
+ *
+ *
+ * @param <T>
+ */
 public class MyArrayList<T> implements List<T> {
     private static final int DEFAULT_CAPACITY = 10;
 
@@ -508,7 +515,18 @@ public class MyArrayList<T> implements List<T> {
      *                                       (<tt>index &lt; 0 || index &gt;= size()</tt>)
      */
     public T remove(int index) {
-        return null;
+        checkBounds(index);
+
+        Object[] tmp = new Object[arr.length-1];
+
+        T res = get(index);
+        System.arraycopy(arr, 0, tmp, 0, index);
+        if (index != arr.length )
+            System.arraycopy(arr, index+1, tmp, index, arr.length - 1 - index);
+
+        arr = tmp;
+        size--;
+        return res;
     }
 
     // I T E R A T O R S

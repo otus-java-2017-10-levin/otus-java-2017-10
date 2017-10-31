@@ -38,36 +38,46 @@ public class MyArrayListTest
     }
 
     public void testIsEmpty() {
-        List<Integer> list = new MyArrayList<>();
+        List<Integer> list = createMyList();
     }
 
 
+    private <T> List<T> createMyList() {
+        return new MyArrayList<>();
+    }
+
+    private <T> List<T> createMyList(int capacity) {
+        return new MyArrayList<>(capacity);
+    }
+
+    private <T> List<T> createMyList(Collection<? extends T> objs) {
+        return new MyArrayList<>(objs);
+    }
+
     public void testConstructor() {
-        List<Integer> ints1 = new MyArrayList<>();
-        List<Integer> ints2 = new MyArrayList<>(11);
         List<Integer> ints3 = new MyArrayList<>(Arrays.asList(0,1,2,3,4,5));
         ints3.add(1);
         assertEquals("[0, 1, 2, 3, 4, 5, 1]", ints3.toString());
         assertEquals(7, ints3.size());
 
-        assertEquals("[]", ints2.toString());
-        assertEquals(0, ints2.size());
+        assertEquals("[]", createMyList(11).toString());
+        assertEquals(0, createMyList(11).size());
 
-        assertEquals("[]", ints1.toString());
-        assertEquals(0, ints1.size());
+        assertEquals("[]", createMyList().toString());
+        assertEquals(0, createMyList().size());
 
     }
 
     public void testAddAll()
     {
-        List<Integer> list = new MyArrayList<>();
+        List<Integer> list = createMyList();
         Collections.addAll(list, 0, 1, 2, 3, 4, 5);
         assertEquals( "[0, 1, 2, 3, 4, 5]", list.toString());
     }
 
     public void testCopy() {
-        List<Integer> source = new MyArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
-        List<Integer> dest = new MyArrayList<>(Arrays.asList(5, 4, 3, 2, 1, 0, -1));
+        List<Integer> source = createMyList(Arrays.asList(0, 1, 2, 3, 4, 5));
+        List<Integer> dest = createMyList(Arrays.asList(5, 4, 3, 2, 1, 0, -1));
         Collections.copy(dest, source);
 
         assertEquals( "[0, 1, 2, 3, 4, 5]", source.toString());
@@ -75,14 +85,14 @@ public class MyArrayListTest
     }
 
     public void testSort() {
-        List<Integer> list = new MyArrayList<>();
+        List<Integer> list = createMyList();
         Collections.addAll(list, 0, 1, 2, 3, 4, 5);
         Collections.sort(list, Comparator.reverseOrder());
         assertEquals( "[5, 4, 3, 2, 1, 0]", list.toString());
     }
 
     public void testListIterator() {
-        List<Integer> ints = new ArrayList<>();
+        List<Integer> ints = createMyList();
         Collections.addAll(ints, 0, 1, 2, 3, 4, 5);
         ListIterator<Integer> iter = ints.listIterator();
 
@@ -94,7 +104,7 @@ public class MyArrayListTest
 
         assertEquals("[5, 4, 3, 2, 1, 0]", ints.toString());
 
-        List<Integer> ints1 = new MyArrayList<>();
+        List<Integer> ints1 = createMyList();
         Collections.addAll(ints1, 5, 4, 3, 2, 1, 0);
         ListIterator<Integer> iter1 = ints1.listIterator(ints.size());
 
@@ -147,6 +157,25 @@ public class MyArrayListTest
         assertEquals(-1, ints.indexOf(null));
         assertEquals(5, ints.lastIndexOf(2));
         assertEquals(-1, ints.lastIndexOf(null));
+    }
+
+
+    public void testAddRemove() {
+        List<Integer> ints = createMyList();
+
+        int size = 100_000;
+
+        ints.add(1);    ints.add(1);    ints.add(1);
+        for (int i=0; i < size; i++) {
+            ints.add(i);
+            ints.remove(1);
+        }
+
+        assertEquals(3, ints.size());
+        assertEquals("[1, 99998, 99999]", ints.toString());
+
+        ints = createMyList();
+//        ints.remove(0);
     }
 
 
