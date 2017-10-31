@@ -1,4 +1,4 @@
-package ru.otus.hw02;
+package ru.otus.hw02.memory;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Array;
@@ -7,7 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class MeasureAgent {
+class MeasureAgent {
 
     private static volatile Instrumentation globalInstrumentation;
     private static boolean SKIP_POOLED_OBJECTS = false;
