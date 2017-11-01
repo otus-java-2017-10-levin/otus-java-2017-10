@@ -19,6 +19,11 @@ public class MyArrayList<T> implements List<T> {
     private int size;
     private Object arr[];
 
+    /*
+        Flags change size of this list for Iterator purpose
+     */
+    private boolean isModified = true;
+
     private void checkSize(int newSize) {
         // проверяем размер, если не хватает, то увеличиваем на половину длины массива.
         if (newSize < 0 || (newSize - MAX_CAPACITY > 0)) { // overflow
@@ -34,7 +39,7 @@ public class MyArrayList<T> implements List<T> {
 
         int newCapacity = oldCapacity == 0
                 ? DEFAULT_CAPACITY
-                : oldCapacity + (oldCapacity >> 1);
+                : oldCapacity + (oldCapacity *2);
 
         if (newCapacity < 0) { // overflow
             newCapacity = MAX_CAPACITY;
@@ -562,6 +567,7 @@ public class MyArrayList<T> implements List<T> {
         if (size != index)
             System.arraycopy(arr, index, tmp, index+1, size - index);
         size++;
+        isModified = true;
         arr = tmp;
     }
 
@@ -590,6 +596,7 @@ public class MyArrayList<T> implements List<T> {
 
         arr = tmp;
         size--;
+        isModified = true;
         return res;
     }
 
@@ -622,6 +629,7 @@ public class MyArrayList<T> implements List<T> {
         public T next() {
             if (hasNext()) {
                 lastRet = cursor;
+                isModified = false;
                 return (T) arr[cursor++];
             }
             return null;
@@ -684,6 +692,7 @@ public class MyArrayList<T> implements List<T> {
             if (!hasPrevious())
                 throw new NoSuchElementException();
             lastRet = cursor - 1;
+            isModified = false;
             return (T) arr[--cursor];
         }
 
@@ -731,7 +740,13 @@ public class MyArrayList<T> implements List<T> {
          */
         @Override
         public void remove() {
-            throw new UnsupportedOperationException();
+            if (!isModified) {
+                MyArrayList.this.remove(cursor-1);
+                if (cursor!= 0)
+                    cursor--;
+            }
+            else
+                throw new IllegalStateException("Use next or previous first");
         }
 
         /**
@@ -756,7 +771,8 @@ public class MyArrayList<T> implements List<T> {
          */
         @Override
         public void set(T t) {
-
+            if (isModified)
+                throw new IllegalArgumentException("List has been modified!");
             if (lastRet < 0)
                 throw new IllegalStateException();
 
@@ -785,7 +801,7 @@ public class MyArrayList<T> implements List<T> {
          */
         @Override
         public void add(T t) {
-            throw new UnsupportedOperationException();
+            MyArrayList.this.add(this.previousIndex(), t);
         }
     }
 
