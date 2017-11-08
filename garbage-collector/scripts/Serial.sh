@@ -11,6 +11,6 @@ JARPARAMS="-m FINALIZE -jconsole -young copy -old marksweepcmp"
 # young: parnew scavenge copy
 # old: cms marksweep marksweepcmp
 
-"C:\Program Files\Java\jre1.8.0_151\bin\java.exe" -XX:OnOutOfMemoryError="taskkill /F /PID %p" ${REMOTE_DEBUG} ${MEMORY} ${GC} ${GC_LOG} ${JMX} ${DUMP} -jar target/garbage-collector.jar ${JARPARAMS}
+java -XX:OnOutOfMemoryError="taskkill /F /PID %p" ${REMOTE_DEBUG} ${MEMORY} ${GC} ${GC_LOG} ${JMX} ${DUMP} -jar target/garbage-collector.jar ${JARPARAMS}
 
-"C:\Program Files\Java\jre1.8.0_151\bin\java.exe" -jar gcviewer-1.36-SNAPSHOT.jar logs/gc_pid.log
+java -jar gcviewer-1.36-SNAPSHOT.jar logs/gc_pid.log
