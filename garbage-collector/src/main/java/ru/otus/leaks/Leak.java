@@ -6,5 +6,5 @@ public interface Leak {
      * Execute method that leaks memory n times
      * @param n - execute n times
      */
-    void execute(int n);
+    void execute(int n) throws OutOfMemoryError;
 }

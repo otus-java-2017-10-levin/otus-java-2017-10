@@ -1,18 +1,16 @@
 package ru.otus.leaks;
 
 
-import com.sun.istack.internal.NotNull;
-
 public class LeakManager {
 
     private LeakManager() {}
     private static Leak leakStrategy = null;
 
-    public static void setStrategy(@NotNull Leak strategy) {
+    public static void setStrategy(Leak strategy) {
         leakStrategy = strategy;
     }
 
-    public static void leak(@NotNull int n) {
+    public static void leak(int n) {
         if (leakStrategy == null) {
             throw new IllegalStateException("Use setStrategy() first!");
         }
@@ -25,9 +23,6 @@ public class LeakManager {
 
         if (leakStrategy == null) {
             switch (strategy) {
-                case STRING:
-                    result = new StringLeak();
-                    break;
                 case HASH:
                     result = new HashLeak();
                     break;
@@ -35,7 +30,7 @@ public class LeakManager {
                     result = new FinalizeLeak();
                     break;
                 default:
-                    result = new StringLeak();
+                    result = new HashLeak();
             }
         }
         return result;

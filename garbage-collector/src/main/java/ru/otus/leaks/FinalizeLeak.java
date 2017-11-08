@@ -1,22 +1,17 @@
 package ru.otus.leaks;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 class FinalizeLeak implements Leak{
-
-    private final int SIZE = 1000;
-
-    private class AbstractObject {
+        private class AbstractObject {
 
         @Override
         protected void finalize() throws Throwable {
-            Integer[] a = new Integer[SIZE];
+            int size = 50000;
+            Integer[] a = new Integer[size];
         }
     }
 
     @Override
-    public void execute(int n) {
+    public void execute(int n) throws OutOfMemoryError {
         for (int i = 0; i < n; i++) {
             new AbstractObject();
         }
