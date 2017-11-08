@@ -1,8 +1,16 @@
 package ru.otus.leaks;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LeakManager {
 
+    private final static Map<LeakStrategies, Leak> leaks = new HashMap<>();
+    static {
+        leaks.put(LeakStrategies.HASH, new HashLeak());
+        leaks.put(LeakStrategies.FINALIZE, new FinalizeLeak());
+    }
     private LeakManager() {}
     private static Leak leakStrategy = null;
 
@@ -21,17 +29,9 @@ public class LeakManager {
     public static Leak getLeakStrategy(LeakStrategies strategy) {
         Leak result = leakStrategy;
 
+
         if (leakStrategy == null) {
-            switch (strategy) {
-                case HASH:
-                    result = new HashLeak();
-                    break;
-                case FINALIZE:
-                    result = new FinalizeLeak();
-                    break;
-                default:
-                    result = new HashLeak();
-            }
+            leaks.get(strategy);
         }
         return result;
     }

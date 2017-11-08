@@ -18,7 +18,7 @@ public class Benchmark implements BenchmarkMBean {
         while (true) {
             long start = System.currentTimeMillis();
             try {
-                LeakManager.leak(1000);
+                LeakManager.leak(60);
             } catch (OutOfMemoryError e) {
                 e.printStackTrace();
             }
