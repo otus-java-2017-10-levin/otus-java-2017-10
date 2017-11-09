@@ -2,37 +2,28 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.otus</groupId>
-    <artifactId>HW02</artifactId>
+    <groupId>com.iyuriy</groupId>
+    <artifactId>instrumentation</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-
-    <name>HW02</name>
-    <description>Home work for week 2</description>
-
-    <developers>
-        <developer>
-            <name>Flow</name>
-        </developer>
-    </developers>
+    <name>instrumentation</name>
+    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <jvm.options>-Xmx512m -Xms512m -javaagent:target/${project.build.finalName}.jar</jvm.options>
+        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>9</maven.compiler.target>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
         <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.22.0-GA</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-
 
     <build>
         <finalName>${project.name}</finalName>
@@ -55,10 +46,10 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>ru.otus.hw02.Main</mainClass>
+                            <mainClass>com.iyuriy.App</mainClass>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>ru.otus.hw02.MeasureAgent</Premain-Class>
+                            <Premain-Class>com.iyuriy.InstrumentationCL</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
