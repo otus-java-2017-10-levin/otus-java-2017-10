@@ -1,5 +1,9 @@
 package com.iyuriy;
 
+import java.lang.instrument.Instrumentation;
+import java.util.ArrayList;
+import java.util.List;
+
 public class App {
     class Tuple<K, V> {
         K key = null;
@@ -37,45 +41,48 @@ public class App {
 //        } catch (IOException e){
 //            e.printStackTrace();
 //        }
+        System.out.println("Start");
         try {
             Class cl = Class.forName("com.iyuriy.MyClassLoader");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-//        App app = new App();
-//        app.run();
+        App app = new App();
+        app.run();
     }
-//
-//    private void initClasses() {
-//        try {
-//            Class cl = ClassLoader.getSystemClassLoader().loadClass("java.lang.String");
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private void run() {
-//
-//        initClasses();
+
+    private void initClasses() {
+        try {
+            Class cl = ClassLoader.getSystemClassLoader().loadClass("java.lang.String");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void run() {
+
+        initClasses();
 //        printLoadedClasses();
-//    }
-//
-//    private void printLoadedClasses() {
-//        Instrumentation inst = InstrumentationCL.getInstrumentation();
-//        List<Tuple<String, String>> list = new ArrayList<>();
-//        for (Class<?> cl : inst.getAllLoadedClasses()) {
-//            ClassLoader clazz = cl.getClassLoader();
-//            if (clazz != null) {
-//                list.add(new Tuple<>(cl.getClassLoader().getName(),
-//                        cl.getCanonicalName()));
-//            } else {
-//                list.add(new Tuple<>("empty",
-//                        cl.getCanonicalName()));
-//            }
-//        }
-//
-//        list.stream().filter(tuple -> tuple.getValue() != null)
-////                .sorted(Comparator.comparing(Tuple::getValue))
-//                .forEach(System.out::println);
-//    }
+
+    }
+
+
+    private void printLoadedClasses() {
+        Instrumentation inst = InstrumentationCL.getInstrumentation();
+        List<Tuple<String, String>> list = new ArrayList<>();
+        for (Class<?> cl : inst.getAllLoadedClasses()) {
+            ClassLoader clazz = cl.getClassLoader();
+            if (clazz != null) {
+                list.add(new Tuple<>(cl.getClassLoader().getName(),
+                        cl.getCanonicalName()));
+            } else {
+                list.add(new Tuple<>("empty",
+                        cl.getCanonicalName()));
+            }
+        }
+
+        list.stream().filter(tuple -> tuple.getValue() != null)
+//                .sorted(Comparator.comparing(Tuple::getValue))
+                .forEach(System.out::println);
+    }
 }
