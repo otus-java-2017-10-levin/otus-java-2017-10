@@ -1,4 +1,4 @@
-package com.iyuriy;
+package ru.otus;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
