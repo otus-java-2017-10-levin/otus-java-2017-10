@@ -15,7 +15,11 @@ public class Assert {
     }
 
     public static <T> void assertEquals(Collection<T> col1, Collection<T> col2) {
-        assertTrue(col1.toString().equals(col2.toString()));
+        try {
+            assertTrue(col1.toString().equals(col2.toString()));
+        } catch (RuntimeException e) {
+            throw new RuntimeException(col1 + " != " + col2);
+        }
     }
 
 }

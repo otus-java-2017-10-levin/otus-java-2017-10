@@ -2,9 +2,8 @@ package ru.otus.internals;
 
 import ru.otus.annotations.AnnotationType;
 import ru.otus.annotations.Test;
+import ru.otus.common.ReflectionHelper;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  *  Keep method annotations, annotation type, method name
@@ -13,50 +12,43 @@ import java.lang.reflect.Method;
 class TestMethod {
 
     private TestAnnotations annotations;
-    private Method method;
+    private Class<?> clazz;
+    private String name;
 
-    TestMethod(Method method) {
-        if (method == null) {
-            throw new IllegalArgumentException("Method = null");
+    TestMethod(Class<?> clazz, String name) {
+        if (clazz == null) {
+            throw new IllegalArgumentException("Class = null");
         }
 
-        this.method = method;
-        annotations = new TestAnnotations(method.getDeclaredAnnotations());
+        this.clazz = clazz;
+        this.name = name;
+        annotations = new TestAnnotations(ReflectionHelper.getMethodAnnotations(clazz, name));
     }
 
-    void invoke(Object inst) throws InvocationTargetException {
+    private void invoke(Object inst) throws RuntimeException  {
 
-        try {
-            method.invoke(inst);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    TestAnnotations getAnnotations() {
-        return annotations;
+            ReflectionHelper.callMethod(inst, name);
     }
 
     boolean hasAnnotation(AnnotationType type) {
         return annotations.hasAnnotation(type);
     }
 
-    void test(Object instance) throws InvocationTargetException {
+    void test(Object instance) throws RuntimeException {
         invoke(instance);
     }
 
     String getName(){
         String res = "";
-
-        if (method.isAnnotationPresent(Test.class)) {
-            Test anno = method.getDeclaredAnnotation(Test.class);
-            res = anno.value();
+        if (annotations.hasAnnotation(AnnotationType.TEST)) {
+                Test anno = ReflectionHelper.getMethodAnnotation(clazz, name, Test.class);
+                if (anno != null) {
+                    res = anno.value();
+                }
         }
 
         if (res.equals("")) {
-            res = method.getName();
+            res = this.name;
         }
 
         return res;

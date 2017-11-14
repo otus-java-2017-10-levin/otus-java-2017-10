@@ -1,9 +1,7 @@
 package ru.otus.internals;
 
 import ru.otus.Tests.New1;
-
-import java.lang.reflect.InvocationTargetException;
-
+import ru.otus.common.ReflectionHelper;
 
 /**
  *  Driver class for run tests
@@ -12,23 +10,20 @@ import java.lang.reflect.InvocationTargetException;
 
 public class RunTests {
 
+//TODO: logger!!
 
     private void testClass(Class<?> clazz) {
         TestClass testClass = new TestClass(clazz);
 
-        try {
-            testClass.test(clazz.getDeclaredConstructor().newInstance());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        testClass.test(clazz);
     }
 
     public static void main(String[] args) {
         RunTests rt = new RunTests();
-        rt.run(args);
+        rt.run();
     }
 
-    public void run(String[] args) {
+    private void run() {
 
         testClass(New1.class);
     }

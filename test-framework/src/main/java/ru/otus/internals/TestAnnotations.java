@@ -28,19 +28,17 @@ class TestAnnotations {
         }
     }
 
-    public boolean hasAnnotations() {
-        return annotationMap.size() > 0;
-    }
-
     boolean hasAnnotation(AnnotationType type) {
         return annotationMap.containsKey(type);
     }
 
-    static boolean coantainTests(Annotation[] annotations) {
+    static boolean containTests(Annotation[] annotations) {
 
-        for (Annotation anno: annotations) {
-            if (getAnnotationType(anno) != AnnotationType.EMPTY)
-                return true;
+        if (annotations != null) {
+            for (Annotation anno : annotations) {
+                if (getAnnotationType(anno) != AnnotationType.EMPTY)
+                    return true;
+            }
         }
         return false;
     }

@@ -27,7 +27,7 @@ public class New1 {
 
     @Test("test_true")
     public void testTrue() {
-        Assert.assertEquals(list, Arrays.asList(1, 2, 3, 4));
+        Assert.assertEquals(list, Arrays.asList(1, 2, 3));
     }
 
     @Test("test_false")
