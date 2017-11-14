@@ -51,17 +51,9 @@ class TestAnnotations {
 
             return AnnotationType.AFTER;
         }
-        if (annotation instanceof AfterEach) {
-
-            return AnnotationType.AFTER_EACH;
-        }
         if (annotation instanceof Before) {
 
             return AnnotationType.BEFORE;
-        }
-        if (annotation instanceof BeforeEach) {
-
-            return AnnotationType.BEFORE_EACH;
         }
         if (annotation instanceof Skip) {
 

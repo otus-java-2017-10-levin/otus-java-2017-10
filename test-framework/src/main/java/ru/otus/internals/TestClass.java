@@ -20,7 +20,7 @@ public class TestClass {
     private int successTests = 0;
     private int failedTests = 0;
 
-    TestClass(Class<?> clazz) {
+    public TestClass(Class<?> clazz) {
 
         if (clazz == null)
             throw new IllegalArgumentException("Class is null");
@@ -35,22 +35,18 @@ public class TestClass {
         }
     }
 
-    public void test(Class<?> clazz) {
+    public void test() {
         System.out.println("Test class (" + clazz.getCanonicalName() + ") stats:");
-        Object instance = ReflectionHelper.instantiate(clazz);
-        testMethods(instance, AnnotationType.BEFORE);
 
         for (TestMethod method : getMethods(AnnotationType.TEST)) {
+            Object instance = ReflectionHelper.instantiate(clazz);
 
-            if (!method.hasAnnotation(AnnotationType.SKIP)) {
-                testMethods(instance, AnnotationType.BEFORE_EACH);
-                testMethod(instance, method);
-                testMethods(instance, AnnotationType.AFTER_EACH);
-            } else {
-                testMethod(instance, method);
-            }
+            testMethods(instance, AnnotationType.BEFORE);
+
+            testMethod(instance, method);
+            testMethods(instance, AnnotationType.AFTER);
+
         }
-        testMethods(instance, AnnotationType.AFTER);
 
         System.out.println(String.format("Success: %d; Failed: %d; Ignore: %d", successTests, failedTests, ignoreTests));
     }

@@ -2,7 +2,6 @@ package ru.otus.Tests;
 
 
 import ru.otus.annotations.Before;
-import ru.otus.annotations.BeforeEach;
 import ru.otus.annotations.Skip;
 import ru.otus.annotations.Test;
 import ru.otus.internals.Assert;
@@ -17,11 +16,6 @@ public class New1 {
 
     @Before()
     public void before() {
-//        Collections.addAll(list, 1, 2, 3);
-    }
-
-    @BeforeEach
-    public void beforeEach() {
         Collections.addAll(list, 1, 2, 3);
     }
 
