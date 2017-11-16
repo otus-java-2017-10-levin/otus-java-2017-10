@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 class TestAnnotations {
-    private Map<AnnotationType, Annotation> annotationMap = new HashMap<>();
+    private final Map<AnnotationType, Annotation> annotationMap = new HashMap<>();
 
     TestAnnotations(Annotation[] annotations) {
         for (Annotation anno: annotations) {

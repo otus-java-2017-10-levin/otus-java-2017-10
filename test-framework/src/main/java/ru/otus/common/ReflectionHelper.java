@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("UnusedReturnValue")
 public class ReflectionHelper {
 
     public static <T> T instantiate(Class<T> type, Object... args) {
@@ -60,6 +61,7 @@ public class ReflectionHelper {
         boolean isAccessible = false;
         try {
             method = object.getClass().getDeclaredMethod(name, toClasses(args));
+            //noinspection deprecation
             isAccessible = method.isAccessible();
             method.setAccessible(true);
             return method.invoke(object, args);

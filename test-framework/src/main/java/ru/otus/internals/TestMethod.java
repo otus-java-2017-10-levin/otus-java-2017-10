@@ -6,7 +6,7 @@ import ru.otus.common.ReflectionHelper;
 
 
 /**
- *  Keep method annotations, annotation type, method name
+ * Keep method annotations, annotation type, method name
  */
 
 class TestMethod {
@@ -15,7 +15,7 @@ class TestMethod {
     private Class<?> clazz;
     private String name;
 
-    TestMethod(Class<?> clazz, String name) {
+    TestMethod(Class<?> clazz, String name) throws InstantiationException {
         if (clazz == null) {
             throw new IllegalArgumentException("Class = null");
         }
@@ -23,11 +23,29 @@ class TestMethod {
         this.clazz = clazz;
         this.name = name;
         annotations = new TestAnnotations(ReflectionHelper.getMethodAnnotations(clazz, name));
+
+
+        if (!checkValidMethod()) {
+            throw new InstantiationException("Should not use @Test with @Before or @After");
+        }
     }
 
-    private void invoke(Object inst) throws RuntimeException  {
+    /*
+        Check:
+        1. @Test annotation with @Before or @After
+     */
+    private boolean checkValidMethod() {
+        if (annotations.hasAnnotation(AnnotationType.TEST)) {
+            if (annotations.hasAnnotation(AnnotationType.AFTER) ||
+                    annotations.hasAnnotation(AnnotationType.BEFORE))
+                return false;
+        }
+        return true;
+    }
 
-            ReflectionHelper.callMethod(inst, name);
+    private void invoke(Object inst) throws RuntimeException {
+
+        ReflectionHelper.callMethod(inst, name);
     }
 
     boolean hasAnnotation(AnnotationType type) {
@@ -38,13 +56,13 @@ class TestMethod {
         invoke(instance);
     }
 
-    String getName(){
+    String getName() {
         String res = "";
         if (annotations.hasAnnotation(AnnotationType.TEST)) {
-                Test anno = ReflectionHelper.getMethodAnnotation(clazz, name, Test.class);
-                if (anno != null) {
-                    res = anno.value();
-                }
+            Test anno = ReflectionHelper.getMethodAnnotation(clazz, name, Test.class);
+            if (anno != null) {
+                res = anno.value();
+            }
         }
 
         if (res.equals("")) {

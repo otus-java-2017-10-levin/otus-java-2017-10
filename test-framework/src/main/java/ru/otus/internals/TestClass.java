@@ -1,9 +1,11 @@
 package ru.otus.internals;
 
 import ru.otus.annotations.AnnotationType;
+import ru.otus.common.PathClassLoader;
 import ru.otus.common.ReflectionHelper;
 
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,15 +14,27 @@ import java.util.stream.Collectors;
  * Keeps information for testing class
  */
 
+@SuppressWarnings("ALL")
 public class TestClass {
 
     private final List<TestMethod> methods = new ArrayList<>();
     private Class<?> clazz;
-    private int ignoreTests = 0;
-    private int successTests = 0;
-    private int failedTests = 0;
+    private final TestSummary summary = new TestSummary();
 
-    public TestClass(Class<?> clazz) {
+    public TestClass(Path path, Path classNamePath) throws InstantiationException {
+
+        PathClassLoader pathClassLoader = new PathClassLoader(path);
+
+        Class<?> clazz = pathClassLoader.loadClass(classNamePath);
+
+        createTestClass(clazz);
+    }
+
+    public TestClass(Class<?> clazz) throws InstantiationException {
+        createTestClass(clazz);
+    }
+
+    private void createTestClass(Class<?> clazz) throws InstantiationException {
 
         if (clazz == null)
             throw new IllegalArgumentException("Class is null");
@@ -33,27 +47,55 @@ public class TestClass {
             if (TestAnnotations.containTests(annotations))
                 methods.add(new TestMethod(clazz, name));
         }
+
+        if (!checkValidTestClass()) {
+            throw new InstantiationException("To many @Before or @After");
+        }
+
     }
 
-    public void test() {
+    /*
+        Check:
+        1. Less than 2 @Before method
+        2. Only one @After method
+     */
+    private boolean checkValidTestClass() {
+        if (getMethods(AnnotationType.BEFORE).size() > 1)
+            return false;
+
+        return getMethods(AnnotationType.AFTER).size() <= 1;
+    }
+
+    public TestSummary test() {
         System.out.println("Test class (" + clazz.getCanonicalName() + ") stats:");
 
         for (TestMethod method : getMethods(AnnotationType.TEST)) {
             Object instance = ReflectionHelper.instantiate(clazz);
 
             testMethods(instance, AnnotationType.BEFORE);
-
             testMethod(instance, method);
             testMethods(instance, AnnotationType.AFTER);
-
         }
+        System.out.println(summary);
+        return summary;
+    }
 
-        System.out.println(String.format("Success: %d; Failed: %d; Ignore: %d", successTests, failedTests, ignoreTests));
+    boolean hasMethods() {
+        return methods.size() > 0;
+    }
+
+    private void beforeOdAfterTest(Object instance, TestMethod method) {
+        if (!method.hasAnnotation(AnnotationType.SKIP)) {
+            try {
+                method.test(instance);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void testMethod(Object instance, TestMethod method) {
-
-        System.out.print("\t\t" + method.getName() + " : ");
+        System.out.print("\t\t" + method.getName() + ": ");
         if (!method.hasAnnotation(AnnotationType.SKIP)) {
             try {
                 method.test(instance);
@@ -61,15 +103,24 @@ public class TestClass {
             } catch (Exception e) {
                 System.out.println("failed.");
                 System.out.println(e.getCause() + "\n");
-                failedTests = increment(failedTests, method);
+
+                if (method.hasAnnotation(AnnotationType.TEST)) {
+                    summary.add(TestSummary.TYPE.FAILED, 1);
+                }
+
                 return;
             }
         } else {
             System.out.println("skipped.\n");
-            ignoreTests = increment(ignoreTests, method);
+            if (method.hasAnnotation(AnnotationType.TEST)) {
+                summary.add(TestSummary.TYPE.IGNORE, 1);
+            }
             return;
         }
-        successTests = increment(successTests, method);
+
+        if (method.hasAnnotation(AnnotationType.TEST)) {
+            summary.add(TestSummary.TYPE.SUCCESS, 1);
+        }
     }
 
     private List<TestMethod> getMethods(AnnotationType type) {
@@ -78,13 +129,7 @@ public class TestClass {
 
     private void testMethods(Object instance, AnnotationType type) {
         for (TestMethod testMethod : getMethods(type)) {
-            testMethod(instance, testMethod);
+            beforeOdAfterTest(instance, testMethod);
         }
-    }
-
-    private int increment(int counter, TestMethod method) {
-        if (method.hasAnnotation(AnnotationType.TEST))
-            counter++;
-        return counter;
     }
 }

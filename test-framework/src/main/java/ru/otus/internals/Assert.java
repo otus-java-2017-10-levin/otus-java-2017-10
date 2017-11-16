@@ -1,6 +1,6 @@
 package ru.otus.internals;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Class with static methods for assert values in tests
@@ -8,18 +8,20 @@ import java.util.Collection;
 
 public class Assert {
 
-    public static void assertTrue(boolean value) {
+    public static void assertTrue(boolean value) throws RuntimeException {
         if (!value) {
-            throw new RuntimeException(value + " != true");
+            throw new RuntimeException();
         }
     }
 
-    public static <T> void assertEquals(Collection<T> col1, Collection<T> col2) {
-        try {
-            assertTrue(col1.toString().equals(col2.toString()));
-        } catch (RuntimeException e) {
-            throw new RuntimeException(col1 + " != " + col2);
+    public static <T> void assertEquals(List<T> col1, List<T> col2) throws RuntimeException {
+        assertTrue(col1!= null && col2!=null);
+        assertTrue(col1.size() == col2.size());
+
+        for (int i=0; i < col1.size(); i++) {
+            if (!col1.get(i).equals(col2.get(i))) {
+                throw new RuntimeException();
+            }
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package ru.otus.Tests;
+package ru.otus.internals;
 
 
 import ru.otus.annotations.Before;
@@ -12,9 +12,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class New1 {
-    private List<Integer> list = new ArrayList<>();
+    private final List<Integer> list = new ArrayList<>();
 
-    @Before()
+    @Before
     public void before() {
         Collections.addAll(list, 1, 2, 3);
     }
@@ -24,7 +24,7 @@ public class New1 {
         Assert.assertEquals(list, Arrays.asList(1, 2, 3));
     }
 
-    @Test("test_false")
+    @Test
     public void testFalse() {
         Assert.assertTrue(false);
     }
@@ -34,6 +34,4 @@ public class New1 {
     public void testSkip() {
         Assert.assertTrue(false);
     }
-
-
 }
