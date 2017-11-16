@@ -1,7 +1,6 @@
 package ru.otus.common;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
@@ -27,7 +26,8 @@ public class PathClassLoader {
                     i++;
                 }
                 cl = URLClassLoader.newInstance(urls);
-            } catch (MalformedURLException e) {
+
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
