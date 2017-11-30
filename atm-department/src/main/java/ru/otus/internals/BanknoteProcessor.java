@@ -10,15 +10,15 @@ import java.util.Map;
 
 class BanknoteProcessor {
 
-    Handler handler;
+    private Handler handler;
 
-    public boolean process(long sum, Map<Banknote, Long> atmCash, Map<Banknote, Long> result) {
+    public boolean process(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
         long res =  handler.handle(sum, atmCash, result);
 
         return res == sum;
     }
 
-    void addHandler(Handler handler) {
+    private void addHandler(Handler handler) {
         if (this.handler == null)
             this.handler = handler;
         else

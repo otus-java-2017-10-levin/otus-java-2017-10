@@ -3,31 +3,35 @@ package ru.otus.currency;
 import java.util.Objects;
 
 public class Banknote {
-    private BanknoteNames name;
-    private long value;
-    private String currencyName;
+    private final BanknoteNames name;
+    private final int value;
+    private final Currency currency;
 
-    Banknote(BanknoteNames name, long value, String currencyName) {
+    Banknote(BanknoteNames name, int value, Currency currency) {
         this.name = name;
         this.value = value;
-        this.currencyName = currencyName;
+
+        if (currency == null)
+            throw new NullPointerException("Currency = null");
+
+        this.currency = currency;
     }
 
     public BanknoteNames getName() {
         return name;
     }
 
-    public long getValue() {
+    public int getValue() {
         return value;
     }
 
     public String getCurrencyName() {
-        return currencyName;
+        return currency.getCurrency();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, value, currencyName);
+        return Objects.hash(name, value, getCurrencyName());
     }
 
     @Override
@@ -41,6 +45,17 @@ public class Banknote {
         Banknote banknote = (Banknote) obj;
         return value == banknote.value &&
                 Objects.equals(name, banknote.name) &&
-                Objects.equals(currencyName, banknote.currencyName);
+                Objects.equals(getCurrencyName(), banknote.getCurrencyName());
+    }
+
+    public String getSign() {
+        return currency.getSign();
+    }
+
+    @Override
+    public String toString() {
+        return "Banknote:" + name + ";" +
+                value + getSign() + ";" +
+                getCurrencyName();
     }
 }

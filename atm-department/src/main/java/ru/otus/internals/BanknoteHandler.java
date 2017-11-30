@@ -14,9 +14,10 @@ class BanknoteHandler implements Handler {
     }
 
     @Override
-    public long handle(long sum, Map<Banknote, Long> atmCash, Map<Banknote, Long> result) {
-        long ret = 0;
-            ret = calculate(sum, atmCash, result);
+    public long handle(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
+        long ret = calculate(sum, atmCash, result);
+//            if (sum == ret)
+//                return 0;
         if (nextHandler != null) {
             ret += nextHandler.handle(sum - ret, atmCash, result);
         }
@@ -34,27 +35,27 @@ class BanknoteHandler implements Handler {
     private Banknote banknoteHandler;
     private Handler nextHandler;
 
-    private long calculate(long sum, Map<Banknote, Long> atmCash, Map<Banknote, Long> result) {
+    private long calculate(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
         if (sum < 0 || atmCash == null || result == null)
             throw new IllegalArgumentException();
 
-        long max = 0;
+        int totalBanknotes = 0;
         if (atmCash.containsKey(banknoteHandler))
-            max = atmCash.get(banknoteHandler);
+            totalBanknotes = atmCash.get(banknoteHandler);
 
 
-        if (max < 0)
+        if (totalBanknotes < 0)
             throw new IllegalArgumentException();
 
         if (result.containsValue(banknoteHandler)) {
             throw new IllegalArgumentException();
         }
 
-        long banknotePrice = banknoteHandler.getValue();
-        long res = sum / banknotePrice;
+        int banknotePrice = banknoteHandler.getValue();
+        int res = (int)(sum / banknotePrice);
 
-        if (res > max)
-            res = max;
+        if (res > totalBanknotes)
+            res = totalBanknotes;
 
         result.put(banknoteHandler, res);
         return res*banknotePrice;

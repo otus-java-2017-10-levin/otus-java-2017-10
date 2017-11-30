@@ -7,19 +7,19 @@ import ru.otus.currency.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BankautomatTest {
+class BankautomatTest {
 
     private ATM atm;
-    private Currency cur = CurrencyHelper.createCurrency("Ruble");
-    private Banknote hundreds = cur.get(BanknoteNames.HUNDRED);
+    private final Currency cur = CurrencyHelper.createCurrency("Ruble");
+    private final Banknote hundreds = cur != null ? cur.get(BanknoteNames.HUNDRED) : null;
     @BeforeEach
-    public void createATM() {
+    void createATM() {
         atm = new Bankautomat();
     }
 
     @Test
     @DisplayName("add banknotes")
-    public void TestAddBanknotes() {
+    void TestAddBanknotes() {
         atm.addBanknote(hundreds, 100);
 
         assertEquals(100*100, atm.getBalance());
@@ -27,7 +27,7 @@ public class BankautomatTest {
 
     @Test
     @DisplayName("get cash")
-    public void TestGetCash() {
+    void TestGetCash() {
         Currency cur = CurrencyHelper.createCurrency("Ruble");
         atm.addBanknote(hundreds, 100);
 

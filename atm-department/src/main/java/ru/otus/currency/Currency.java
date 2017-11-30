@@ -7,7 +7,17 @@ import java.util.*;
  */
 public abstract class Currency {
 
+    private String currency;
+    private Set<Banknote> banknotes = new HashSet<>();
+    private String sign = "";
+
     Currency(String currency, BanknoteNames... banknotes) {
+        this.currency = currency;
+        this.banknotes = createBanknotesForCurrency(this.getCurrency(), banknotes);
+    }
+
+    Currency(String currency, String sign, BanknoteNames... banknotes) {
+        this.sign = sign;
         this.currency = currency;
         this.banknotes = createBanknotesForCurrency(this.getCurrency(), banknotes);
     }
@@ -42,11 +52,15 @@ public abstract class Currency {
      * Get banknote for specified value.
      *
      * @param value - one of the value from BanknoteName enum
-     * @return - banknot object or null if there is no banknote
+     * @return - banknote object or null if there is no banknote
      * containing selected value
      */
     public Banknote get(BanknoteNames value) {
-        return banknotes.stream().filter(e -> e.getName().equals(value)).findFirst().orElse(null);
+        Banknote res = banknotes.stream().filter(e -> e.getName().equals(value)).findFirst().orElse(null);
+        if (res == null)
+            throw new IllegalArgumentException(value.name() + " not found in this currency");
+        else
+            return res;
     }
 
     /**
@@ -58,6 +72,15 @@ public abstract class Currency {
         return currency;
     }
 
+    public String getSign() {
+        return sign;
+    }
+
+    @Override
+    public String toString() {
+        return "Currency: "+ currency + "(" + sign+ ")";
+    }
+
     private Set<Banknote> createBanknotesForCurrency(String currency, BanknoteNames[] banknoteNames) {
         Set<Banknote> result = new HashSet<>();
 
@@ -65,37 +88,33 @@ public abstract class Currency {
             throw new IllegalArgumentException();
 
         for (BanknoteNames name: banknoteNames) {
-            Long key = banknotesValues.get(name);
+            Integer key = banknotesValues.get(name);
 
             if (name == null)
                 throw new IllegalArgumentException("Element = null");
             if (key == null)
-                throw new IllegalStateException("Banknote name: "+ name + " not found.");
+                throw new IllegalStateException("Banknote name: "+ name.name() + " not found.");
 
-            if (!result.add(new Banknote(name, key, currency)))
-                throw new IllegalArgumentException("Element " + name + " dublicate");
+            if (!result.add(new Banknote(name, key, this)))
+                throw new IllegalArgumentException("Element " + name.name() + " duplicate");
         }
 
         return result;
     }
-
-    private String currency;
-    private Set<Banknote> banknotes = new HashSet<>();
-
-    private static Map<BanknoteNames, Long> banknotesValues = new HashMap<>();
+    private static final Map<BanknoteNames, Integer> banknotesValues = new HashMap<>();
 
     static  {
-        banknotesValues.put(BanknoteNames.ONE, 1L);
-        banknotesValues.put(BanknoteNames.TWO, 2L);
-        banknotesValues.put(BanknoteNames.FIVE, 5L);
-        banknotesValues.put(BanknoteNames.TEN, 10L);
-        banknotesValues.put(BanknoteNames.TWENTY, 20L);
-        banknotesValues.put(BanknoteNames.FIFTY, 50L);
-        banknotesValues.put(BanknoteNames.HUNDRED, 100L);
-        banknotesValues.put(BanknoteNames.TWO_HUNDRED, 200L);
-        banknotesValues.put(BanknoteNames.FIVE_HUNDRED, 500L);
-        banknotesValues.put(BanknoteNames.THOUSAND, 1000L);
-        banknotesValues.put(BanknoteNames.TWO_THOUSAND, 2000L);
-        banknotesValues.put(BanknoteNames.FIVE_THOUSAND, 5000L);
+        banknotesValues.put(BanknoteNames.ONE, 1);
+        banknotesValues.put(BanknoteNames.TWO, 2);
+        banknotesValues.put(BanknoteNames.FIVE, 5);
+        banknotesValues.put(BanknoteNames.TEN, 10);
+        banknotesValues.put(BanknoteNames.TWENTY, 20);
+        banknotesValues.put(BanknoteNames.FIFTY, 50);
+        banknotesValues.put(BanknoteNames.HUNDRED, 100);
+        banknotesValues.put(BanknoteNames.TWO_HUNDRED, 200);
+        banknotesValues.put(BanknoteNames.FIVE_HUNDRED, 500);
+        banknotesValues.put(BanknoteNames.THOUSAND, 1000);
+        banknotesValues.put(BanknoteNames.TWO_THOUSAND, 2000);
+        banknotesValues.put(BanknoteNames.FIVE_THOUSAND, 5000);
     }
 }

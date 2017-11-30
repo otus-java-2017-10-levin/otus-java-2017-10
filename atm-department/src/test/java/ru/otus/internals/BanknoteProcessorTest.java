@@ -7,11 +7,10 @@ import ru.otus.currency.CurrencyHelper;
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
-public class BanknoteProcessorTest {
+class BanknoteProcessorTest {
 
     @Test
-    public void testStatic() {
-        BanknoteProcessor processor = BanknoteProcessor.createProcessor(CurrencyHelper.createCurrency("Ruble"));
-
+    void testStatic() {
+        BanknoteProcessor.createProcessor(CurrencyHelper.createCurrency("Ruble"));
     }
 }

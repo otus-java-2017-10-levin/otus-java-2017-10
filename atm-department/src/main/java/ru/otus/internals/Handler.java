@@ -7,14 +7,7 @@ import java.util.Map;
 /**
  * Chains of responsibility pattern
  */
-public interface Handler {
-
-    /**
-     * Returns number of banknotes of BanknoteNames or max param for given sum.
-     * If sum / banknote prize > max, then returns max. Else return the division result.
-     *
-     * @return - number of banknotes or max.
-     */
+interface Handler {
 
     /**
      * Returns number of banknotes of BanknoteNames or max param for given sum.
@@ -25,7 +18,7 @@ public interface Handler {
      * @return - total cash handled in this handler. If sum != return value,
      * we cannot give money (insufficient banknotes, or wrong sum)
      */
-    long handle(long sum, Map<Banknote, Long> atmCash, Map<Banknote, Long> result);
+    long handle(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result);
 
     /**
      * Setting next handler

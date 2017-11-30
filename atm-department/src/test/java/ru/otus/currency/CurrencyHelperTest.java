@@ -9,16 +9,18 @@ import static ru.otus.currency.BanknoteNames.*;
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
-public class CurrencyHelperTest {
+class CurrencyHelperTest {
     @Test
-    public void createCurrency() {
+    void createCurrency() {
         Currency cur = CurrencyHelper.createCurrency("ruble");
 
+        assert cur != null;
         Banknote[] banknotes = cur.getBanknotes();
 
         assertEquals(true, banknotes != null);
+        assert banknotes != null;
         assertEquals(11, banknotes.length);
-        assertEquals(true, CurrencyTest.getBanknote(ONE, 1).equals(banknotes[0]));
+        assertEquals(CurrencyTest.getBanknote(ONE, 1), banknotes[0]);
         assertEquals(true, CurrencyTest.getBanknote(TWO, 2).equals(banknotes[1]));
         assertEquals(true, CurrencyTest.getBanknote(FIVE, 5).equals(banknotes[2]));
         assertEquals(true, CurrencyTest.getBanknote(TEN, 10).equals(banknotes[3]));
@@ -34,7 +36,7 @@ public class CurrencyHelperTest {
 
     @Test
     @DisplayName("exception while creation")
-    public void createCurrencyExceptions() {
+    void createCurrencyExceptions() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> CurrencyHelper.createCurrency(null));
         assertEquals(null, e.getMessage());
 

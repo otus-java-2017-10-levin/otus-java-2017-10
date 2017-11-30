@@ -13,25 +13,26 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BanknoteHandlerTest {
+class BanknoteHandlerTest {
 
-    private Currency cur = CurrencyHelper.createCurrency("ruble");
+    private final Currency cur = CurrencyHelper.createCurrency("ruble");
     @Test
-    public void creationTest() {
+    void creationTest() {
 
+        assert cur != null;
         Handler h = new BanknoteHandler(cur.get(BanknoteNames.HUNDRED));
-        assertEquals(true, h != null);
 
         Exception e = assertThrows(IllegalArgumentException.class, () -> new BanknoteHandler(null));
         assertEquals(null, e.getMessage());
     }
 
     @Test
-    public void handleTest() {
+    void handleTest() {
+        assert cur != null;
         Handler h = new BanknoteHandler(cur.get(BanknoteNames.FIVE_THOUSAND));
-        Map<Banknote, Long> atmCash = new HashMap<>();
-        Map<Banknote, Long> result = new HashMap<>();
-        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), 100L);
+        Map<Banknote, Integer> atmCash = new HashMap<>();
+        Map<Banknote, Integer> result = new HashMap<>();
+        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), 100);
 
         assertEquals(400000, h.handle(400300, atmCash, result));
         assertEquals(1, result.size());
@@ -40,23 +41,24 @@ public class BanknoteHandlerTest {
         Exception e = assertThrows(IllegalArgumentException.class, () -> h.handle(-50000, atmCash, result));
         assertEquals(null, e.getMessage());
 
-        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), -1L);
+        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), -1);
         e = assertThrows(IllegalArgumentException.class, () -> h.handle(500300, atmCash, result));
         assertEquals(null, e.getMessage());
 
-        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), 0L);
+        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), 0);
         assertEquals(0, h.handle(10000, atmCash, result));
     }
 
     @Test
-    public void handleTestExp() {
+    void handleTestExp() {
+        assert cur != null;
         Handler h = new BanknoteHandler(cur.get(BanknoteNames.FIVE_THOUSAND));
         h.setNext(new BanknoteHandler(cur.get(BanknoteNames.HUNDRED)));
 
-        Map<Banknote, Long> atmCash = new HashMap<>();
-        Map<Banknote, Long> result = new HashMap<>();
-        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), 100L);
-        atmCash.put(cur.get(BanknoteNames.HUNDRED), 100L);
+        Map<Banknote, Integer> atmCash = new HashMap<>();
+        Map<Banknote, Integer> result = new HashMap<>();
+        atmCash.put(cur.get(BanknoteNames.FIVE_THOUSAND), 100);
+        atmCash.put(cur.get(BanknoteNames.HUNDRED), 100);
 
         long ret = h.handle(10500, atmCash, result);
         assertEquals(10500L, ret);

@@ -1,8 +1,8 @@
 package ru.otus.currency;
 
-class Ruble extends Currency {
+final class Ruble extends Currency {
     Ruble() {
-        super("Ruble", BanknoteNames.ONE,
+        super("Ruble",  "\u20bd",   BanknoteNames.ONE,
                 BanknoteNames.TWO,
                 BanknoteNames.FIVE,
                 BanknoteNames.TEN,

@@ -7,18 +7,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ru.otus.currency.BanknoteNames.*;
 
-public class CurrencyTest {
+class CurrencyTest {
 
-    private Currency currency;
+    private static Currency currency = CurrencyHelper.createCurrency("Ruble");
 
-    static Banknote getBanknote(BanknoteNames name, long value) {
-        return new Banknote(name, value, "Ruble");
+    static Banknote getBanknote(BanknoteNames name, int value) {
+        return new Banknote(name, value, currency);
     }
 
     @Test
     @DisplayName("Create currency")
-    public void createCurrency() {
-        currency = new Currency("Ruble",
+    void createCurrency() {
+        currency = new Currency("Ruble",  "\u20bd",
                 ONE,
                 FIVE,
                 TEN,
@@ -38,7 +38,7 @@ public class CurrencyTest {
 
     @Test
     @DisplayName("Wrong create currency")
-    public void createCurrencyErrors() {
+    void createCurrencyErrors() {
         Exception e = assertThrows(IllegalArgumentException.class,
                 () -> currency = new Currency("Ruble",
                         ONE,
@@ -53,16 +53,15 @@ public class CurrencyTest {
                         TWO_THOUSAND,
                         FIVE_THOUSAND) {
                 });
-        assertEquals("Element FIVE dublicate", e.getMessage());
+        assertEquals("Element FIVE duplicate", e.getMessage());
 
-        currency = new Currency("Ruble",
-                new BanknoteNames[0]) {
+        currency = new Currency("Ruble") {
         };
     }
 
     @Test
     @DisplayName("Wrong create currency (null in args)")
-    public void createCurrencyErrorsNull() {
+    void createCurrencyErrorsNull() {
         Exception e = assertThrows(IllegalArgumentException.class,
                 () -> currency = new Currency("Ruble",
                         ONE,
@@ -85,7 +84,7 @@ public class CurrencyTest {
 
     @Test
     @DisplayName("Wrong create currency (null  currency)")
-    public void createCurrencyErrorsNullCurrency() {
+    void createCurrencyErrorsNullCurrency() {
         Exception e = assertThrows(IllegalArgumentException.class,
                 () -> currency = new Currency("") {
                 });
@@ -102,19 +101,19 @@ public class CurrencyTest {
 
     @Test
     @DisplayName("add banknote test")
-    public void addTest() {
+    void addTest() {
         String cur = "Ruble";
-        currency = new Currency("Ruble") {
+        currency = new Currency(cur) {
         };
 
-        currency.addBanknote(new Banknote(ONE, 1, cur));
-        Exception e = assertThrows(IllegalArgumentException.class, () -> currency.addBanknote(new Banknote(ONE, 1, cur)));
+        currency.addBanknote(new Banknote(ONE, 1, currency));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> currency.addBanknote(new Banknote(ONE, 1, currency)));
         assertEquals(null, e.getMessage());
     }
 
     @Test
     @DisplayName("get banknote")
-    public void getBanknote() {
+    void getBanknote() {
         currency = new Currency("Ruble",
                 ONE,
                 FIVE,
@@ -129,13 +128,13 @@ public class CurrencyTest {
         };
 
         Banknote b = currency.get(FIVE);
-        Banknote expected = new Banknote(FIVE, 5, "Ruble");
+        Banknote expected = new Banknote(FIVE, 5, currency);
         assertEquals(true, b.equals(expected));
     }
 
     @Test
-    @DisplayName("get bancknote")
-    public void getBanknoteTest() {
+    @DisplayName("get banknote")
+    void getBanknoteTest() {
         Currency currency = new Ruble();
 
         assertEquals(true, currency.get(ONE).equals(getBanknote(ONE, 1)));
@@ -153,8 +152,8 @@ public class CurrencyTest {
     }
 
     @Test
-    @DisplayName("get all bancknotes")
-    public void getAllBanknotes() {
+    @DisplayName("get all banknotes")
+    void getAllBanknotes() {
         currency = new Currency("Ruble", ONE, FIVE, HUNDRED) {
         };
 
@@ -164,6 +163,7 @@ public class CurrencyTest {
         assertEquals(true, getBanknote(FIVE, 5).equals(arr[1]));
         assertEquals(true, getBanknote(HUNDRED, 100).equals(arr[2]));
 
-        assertEquals(null, currency.get(FIFTY));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> currency.get(FIFTY));
+        assertEquals("FIFTY not found in this currency", e.getMessage());
     }
 }

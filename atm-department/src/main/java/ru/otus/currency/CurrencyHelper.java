@@ -10,8 +10,11 @@ public class CurrencyHelper {
         if (name == null)
             throw new IllegalArgumentException();
 
-        if (name.toLowerCase().equals("ruble")) {
+        name = name.toLowerCase();
+        if (name.equals("ruble")) {
             return new Ruble();
+        } else if (name.equals("dollar")) {
+            return new Dollar();
         }
         return null;
     }
