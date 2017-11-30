@@ -1,8 +1,5 @@
 package ru.otus.currency;
 
-/**
- *  Класс для хранения купюр для различных валют
- */
 public class CurrencyHelper {
     private CurrencyHelper() {}
 
