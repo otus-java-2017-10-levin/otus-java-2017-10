@@ -1,23 +1,24 @@
 package ru.otus.currency;
 
+import ru.otus.common.CommonHelper;
+
 import java.util.Objects;
 
 public class Banknote {
-    private final BanknoteNames name;
+    private final BanknoteName name;
     private final int value;
     private final Currency currency;
 
-    Banknote(BanknoteNames name, int value, Currency currency) {
+    Banknote(BanknoteName name, int value, Currency currency) {
         this.name = name;
         this.value = value;
 
-        if (currency == null)
-            throw new NullPointerException("Currency = null");
+        CommonHelper.verify(NullPointerException.class, "Currency = null", () -> currency == null);
 
         this.currency = currency;
     }
 
-    public BanknoteNames getName() {
+    public BanknoteName getName() {
         return name;
     }
 
@@ -26,7 +27,7 @@ public class Banknote {
     }
 
     public String getCurrencyName() {
-        return currency.getCurrency();
+        return currency.getCurrencyName();
     }
 
     @Override

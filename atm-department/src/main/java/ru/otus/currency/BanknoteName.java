@@ -1,6 +1,6 @@
 package ru.otus.currency;
 
-public enum BanknoteNames {
+public enum BanknoteName {
     ONE             (1),
     TWO             (2),
     FIVE            (5),
@@ -16,12 +16,12 @@ public enum BanknoteNames {
 
     private final int value;
 
-    BanknoteNames(int value) {
+    BanknoteName(int value) {
         this.value = value;
     }
 
-    public static BanknoteNames get(long value) {
-        for (BanknoteNames name: BanknoteNames.values()) {
+    public static BanknoteName get(long value) {
+        for (BanknoteName name: BanknoteName.values()) {
             if (name.value == value)
                 return name;
         }

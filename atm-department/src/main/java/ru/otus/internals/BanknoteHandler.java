@@ -1,14 +1,15 @@
 package ru.otus.internals;
 
+import ru.otus.common.CommonHelper;
 import ru.otus.currency.Banknote;
 
 import java.util.Map;
 
 class BanknoteHandler implements Handler {
 
-    public BanknoteHandler(Banknote banknote) {
-        if (banknote == null)
-            throw new IllegalArgumentException();
+    BanknoteHandler(Banknote banknote) {
+
+        CommonHelper.verify(IllegalArgumentException.class, null, () -> banknote == null);
 
         banknoteHandler = banknote;
     }
@@ -16,8 +17,6 @@ class BanknoteHandler implements Handler {
     @Override
     public long handle(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
         long ret = calculate(sum, atmCash, result);
-//            if (sum == ret)
-//                return 0;
         if (nextHandler != null) {
             ret += nextHandler.handle(sum - ret, atmCash, result);
         }
@@ -36,20 +35,17 @@ class BanknoteHandler implements Handler {
     private Handler nextHandler;
 
     private long calculate(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
-        if (sum < 0 || atmCash == null || result == null)
-            throw new IllegalArgumentException();
+        CommonHelper.verify(IllegalArgumentException.class, "",
+                () -> sum < 0 || atmCash == null || result == null);
 
-        int totalBanknotes = 0;
-        if (atmCash.containsKey(banknoteHandler))
-            totalBanknotes = atmCash.get(banknoteHandler);
+        CommonHelper.verify(IllegalArgumentException.class, null,
+                () -> atmCash.getOrDefault(banknoteHandler, 0) < 0);
 
+        CommonHelper.verify(IllegalStateException.class,
+                "Result already contains banknote (" +banknoteHandler+ ")",
+                () -> result.containsKey(banknoteHandler));
 
-        if (totalBanknotes < 0)
-            throw new IllegalArgumentException();
-
-        if (result.containsValue(banknoteHandler)) {
-            throw new IllegalArgumentException();
-        }
+        int totalBanknotes = atmCash.getOrDefault(banknoteHandler, 0);
 
         int banknotePrice = banknoteHandler.getValue();
         int res = (int)(sum / banknotePrice);
@@ -57,7 +53,9 @@ class BanknoteHandler implements Handler {
         if (res > totalBanknotes)
             res = totalBanknotes;
 
-        result.put(banknoteHandler, res);
+        if (res != 0) {
+            result.put(banknoteHandler, res);
+        }
         return res*banknotePrice;
     }
 }

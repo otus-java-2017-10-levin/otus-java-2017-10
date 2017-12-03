@@ -1,14 +1,14 @@
 package ru.otus.currency;
 
 
-final class Dollar extends Currency {
+final class Dollar extends AbstractCurrency {
     Dollar() {
         super("Dollar",  "$",
-                BanknoteNames.ONE,
-                BanknoteNames.TWO,
-                BanknoteNames.FIVE,
-                BanknoteNames.TEN,
-                BanknoteNames.FIFTY,
-                BanknoteNames.HUNDRED);
+                BanknoteName.ONE,
+                BanknoteName.TWO,
+                BanknoteName.FIVE,
+                BanknoteName.TEN,
+                BanknoteName.FIFTY,
+                BanknoteName.HUNDRED);
     }
 }

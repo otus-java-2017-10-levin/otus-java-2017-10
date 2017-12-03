@@ -5,20 +5,20 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.otus.currency.BanknoteNames.*;
+import static ru.otus.currency.BanknoteName.*;
 
 class CurrencyTest {
 
-    private static Currency currency = CurrencyHelper.createCurrency("Ruble");
+    private static Currency currency = CurrencyFactory.getCurrency("Rouble");
 
-    static Banknote getBanknote(BanknoteNames name, int value) {
+    static Banknote getBanknote(BanknoteName name, int value) {
         return new Banknote(name, value, currency);
     }
 
     @Test
     @DisplayName("Create currency")
     void createCurrency() {
-        currency = new Currency("Ruble",  "\u20bd",
+        currency = new AbstractCurrency("Rouble",  "\u20bd",
                 ONE,
                 FIVE,
                 TEN,
@@ -31,7 +31,7 @@ class CurrencyTest {
                 FIVE_THOUSAND) {
         };
 
-        currency = new Currency("Ruble") {
+        currency = new AbstractCurrency("Rouble") {
         };
 
     }
@@ -40,7 +40,7 @@ class CurrencyTest {
     @DisplayName("Wrong create currency")
     void createCurrencyErrors() {
         Exception e = assertThrows(IllegalArgumentException.class,
-                () -> currency = new Currency("Ruble",
+                () -> currency = new AbstractCurrency("Rouble",
                         ONE,
                         FIVE,
                         FIVE,
@@ -55,7 +55,7 @@ class CurrencyTest {
                 });
         assertEquals("Element FIVE duplicate", e.getMessage());
 
-        currency = new Currency("Ruble") {
+        currency = new AbstractCurrency("Rouble") {
         };
     }
 
@@ -63,7 +63,7 @@ class CurrencyTest {
     @DisplayName("Wrong create currency (null in args)")
     void createCurrencyErrorsNull() {
         Exception e = assertThrows(IllegalArgumentException.class,
-                () -> currency = new Currency("Ruble",
+                () -> currency = new AbstractCurrency("Rouble",
                         ONE,
                         null,
                         FIVE,
@@ -78,7 +78,7 @@ class CurrencyTest {
                 });
         assertEquals("Element = null", e.getMessage());
 
-        currency = new Currency("Ruble") {
+        currency = new AbstractCurrency("Rouble") {
         };
     }
 
@@ -86,14 +86,14 @@ class CurrencyTest {
     @DisplayName("Wrong create currency (null  currency)")
     void createCurrencyErrorsNullCurrency() {
         Exception e = assertThrows(IllegalArgumentException.class,
-                () -> currency = new Currency("") {
+                () -> currency = new AbstractCurrency("") {
                 });
 
         assertEquals(null, e.getMessage());
 
 
         e = assertThrows(IllegalArgumentException.class,
-                () -> currency = new Currency(null) {
+                () -> currency = new AbstractCurrency(null) {
                 });
 
         assertEquals(null, e.getMessage());
@@ -102,8 +102,8 @@ class CurrencyTest {
     @Test
     @DisplayName("add banknote test")
     void addTest() {
-        String cur = "Ruble";
-        currency = new Currency(cur) {
+        String cur = "Rouble";
+        currency = new AbstractCurrency(cur) {
         };
 
         currency.addBanknote(new Banknote(ONE, 1, currency));
@@ -114,7 +114,7 @@ class CurrencyTest {
     @Test
     @DisplayName("get banknote")
     void getBanknote() {
-        currency = new Currency("Ruble",
+        currency = new AbstractCurrency("Rouble",
                 ONE,
                 FIVE,
                 TEN,
@@ -135,7 +135,7 @@ class CurrencyTest {
     @Test
     @DisplayName("get banknote")
     void getBanknoteTest() {
-        Currency currency = new Ruble();
+        AbstractCurrency currency = new Rouble();
 
         assertEquals(true, currency.get(ONE).equals(getBanknote(ONE, 1)));
         assertEquals(true, currency.get(FIVE).equals(getBanknote(FIVE, 5)));
@@ -154,7 +154,7 @@ class CurrencyTest {
     @Test
     @DisplayName("get all banknotes")
     void getAllBanknotes() {
-        currency = new Currency("Ruble", ONE, FIVE, HUNDRED) {
+        currency = new AbstractCurrency("Rouble", ONE, FIVE, HUNDRED) {
         };
 
         Banknote[] arr = currency.getBanknotes();

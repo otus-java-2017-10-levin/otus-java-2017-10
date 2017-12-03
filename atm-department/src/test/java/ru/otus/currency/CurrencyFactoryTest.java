@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.otus.currency.BanknoteNames.*;
+import static ru.otus.currency.BanknoteName.*;
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
-class CurrencyHelperTest {
+class CurrencyFactoryTest {
     @Test
     void createCurrency() {
-        Currency cur = CurrencyHelper.createCurrency("ruble");
+        Currency cur = CurrencyFactory.getCurrency("rouble");
 
         assert cur != null;
         Banknote[] banknotes = cur.getBanknotes();
@@ -31,16 +31,17 @@ class CurrencyHelperTest {
         assertEquals(true, CurrencyTest.getBanknote(THOUSAND, 1000).equals(banknotes[8]));
         assertEquals(true, CurrencyTest.getBanknote(TWO_THOUSAND, 2000).equals(banknotes[9]));
         assertEquals(true, CurrencyTest.getBanknote(FIVE_THOUSAND, 5000).equals(banknotes[10]));
-        assertEquals("Ruble", cur.getCurrency());
+        assertEquals("Rouble", cur.getCurrencyName());
     }
 
     @Test
     @DisplayName("exception while creation")
     void createCurrencyExceptions() {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> CurrencyHelper.createCurrency(null));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> CurrencyFactory.getCurrency(null));
         assertEquals(null, e.getMessage());
 
-        assertEquals(null, CurrencyHelper.createCurrency(""));
+        e = assertThrows(IllegalArgumentException.class, () -> CurrencyFactory.getCurrency(""));
+        assertEquals("Currency not found", e.getMessage());
     }
 
 }

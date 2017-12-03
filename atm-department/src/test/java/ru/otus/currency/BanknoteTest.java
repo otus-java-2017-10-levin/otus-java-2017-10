@@ -8,25 +8,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BanknoteTest {
 
-    private final Currency currency = CurrencyHelper.createCurrency("Ruble");
-    private final Currency dollarsCurrency = CurrencyHelper.createCurrency("Dollar");
+    private final Currency currency = CurrencyFactory.getCurrency("Rouble");
+    private final Currency dollarsCurrency = CurrencyFactory.getCurrency("Dollar");
 
     @Test
     @DisplayName("Banknote constructor")
     void BanknoteConstructorTest() {
         int value = 100;
-        Banknote note = new Banknote(BanknoteNames.HUNDRED, value, currency);
+        Banknote note = new Banknote(BanknoteName.HUNDRED, value, currency);
 
-        assertEquals(BanknoteNames.HUNDRED, note.getName());
+        assertEquals(BanknoteName.HUNDRED, note.getName());
         assertEquals(value, note.getValue());
         assert currency != null;
-        assertEquals(currency.getCurrency(), note.getCurrencyName());
+        assertEquals(currency.getCurrencyName(), note.getCurrencyName());
     }
 
     @Test
     void getValueTest() {
         int value = 100;
-        Banknote note = new Banknote(BanknoteNames.HUNDRED, value, currency);
+        Banknote note = new Banknote(BanknoteName.HUNDRED, value, currency);
 
         assertEquals(value, note.getValue());
     }
@@ -34,7 +34,7 @@ class BanknoteTest {
     @Test
     void getSignTest() {
         int value = 100;
-        Banknote note = new Banknote(BanknoteNames.HUNDRED, value, dollarsCurrency);
+        Banknote note = new Banknote(BanknoteName.HUNDRED, value, dollarsCurrency);
 
         assertEquals("$", note.getSign());
     }
@@ -42,11 +42,11 @@ class BanknoteTest {
     @Test
     @DisplayName("equals")
     void equalsTest() {
-        Banknote a = new Banknote(BanknoteNames.FIFTY, 50, currency);
-        Banknote b = new Banknote(BanknoteNames.FIFTY, 50, currency);
-        Banknote c = new Banknote(BanknoteNames.FIFTY, 0, currency);
-        Banknote d = new Banknote(BanknoteNames.TWENTY, 50, currency);
-        Banknote e = new Banknote(BanknoteNames.FIFTY, 50, dollarsCurrency);
+        Banknote a = new Banknote(BanknoteName.FIFTY, 50, currency);
+        Banknote b = new Banknote(BanknoteName.FIFTY, 50, currency);
+        Banknote c = new Banknote(BanknoteName.FIFTY, 0, currency);
+        Banknote d = new Banknote(BanknoteName.TWENTY, 50, currency);
+        Banknote e = new Banknote(BanknoteName.FIFTY, 50, dollarsCurrency);
 
         assertEquals(true, a.equals(b));
         assertEquals(false, a.equals(c));
@@ -57,11 +57,11 @@ class BanknoteTest {
     @Test
     @DisplayName("hashCode")
     void hashCodeTest() {
-        Banknote a = new Banknote(BanknoteNames.FIFTY, 50, currency);
-        Banknote b = new Banknote(BanknoteNames.FIFTY, 50, currency);
-        Banknote c = new Banknote(BanknoteNames.FIFTY, 0, currency);
-        Banknote d = new Banknote(BanknoteNames.TWENTY, 50, currency);
-        Banknote e = new Banknote(BanknoteNames.FIFTY, 50, dollarsCurrency);
+        Banknote a = new Banknote(BanknoteName.FIFTY, 50, currency);
+        Banknote b = new Banknote(BanknoteName.FIFTY, 50, currency);
+        Banknote c = new Banknote(BanknoteName.FIFTY, 0, currency);
+        Banknote d = new Banknote(BanknoteName.TWENTY, 50, currency);
+        Banknote e = new Banknote(BanknoteName.FIFTY, 50, dollarsCurrency);
 
         assertEquals(true, a.hashCode()==b.hashCode());
         assertEquals(false, a.hashCode()==c.hashCode());

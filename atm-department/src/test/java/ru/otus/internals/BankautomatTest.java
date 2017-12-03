@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BankautomatTest {
 
     private ATM atm;
-    private final Currency cur = CurrencyHelper.createCurrency("Ruble");
-    private final Banknote hundreds = cur != null ? cur.get(BanknoteNames.HUNDRED) : null;
+    private final Currency cur = CurrencyFactory.getCurrency("Rouble");
+    private final Banknote hundreds = cur != null ? cur.get(BanknoteName.HUNDRED) : null;
     @BeforeEach
     void createATM() {
         atm = new Bankautomat();
@@ -28,10 +28,22 @@ class BankautomatTest {
     @Test
     @DisplayName("get cash")
     void TestGetCash() {
-        Currency cur = CurrencyHelper.createCurrency("Ruble");
+        Currency cur = CurrencyFactory.getCurrency("Rouble");
         atm.addBanknote(hundreds, 100);
 
-        atm.getCash(5000, cur);
+        atm.getCash(5000);
         assertEquals(5000, atm.getBalance());
     }
+
+
+    @Test
+    @DisplayName("test currencies")
+    void currenciesTest() {
+        Currency cur = CurrencyFactory.getCurrency("Rouble");
+        atm.addBanknote(hundreds, 100);
+
+        atm.getCash(5000);
+        assertEquals(5000, atm.getBalance());
+    }
+
 }
