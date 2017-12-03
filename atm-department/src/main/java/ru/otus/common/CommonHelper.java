@@ -12,7 +12,7 @@ public class CommonHelper {
      * @param errorMessage - error message
      * @param condition    - condition to condition
      */
-    public static <T extends Exception> void verify(Class<T> e, String errorMessage, Supplier<Boolean> condition) throws T {
+    public static <T extends Exception> void throwIf(Class<T> e, String errorMessage, Supplier<Boolean> condition) throws T {
         if (condition.get()) {
             T exception;
             try {

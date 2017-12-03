@@ -14,10 +14,15 @@ class Bankautomat implements ATM {
         currentCurrency = CurrencyFactory.getCurrency("Rouble");
     }
 
+    private Bankautomat(Map<Banknote, Integer> banknotes, Currency currentCurrency) {
+        this.banknotes = new HashMap<>(banknotes);
+        this.currentCurrency = currentCurrency;
+    }
+
     @Override
     public void addBanknote(Banknote note, int count) {
-        CommonHelper.verify(IllegalArgumentException.class, "Wrong banknote", () -> note == null);
-        CommonHelper.verify(IllegalArgumentException.class, "Wrong count: " + count, () -> count <= 0);
+        CommonHelper.throwIf(IllegalArgumentException.class, "Wrong banknote", () -> note == null);
+        CommonHelper.throwIf(IllegalArgumentException.class, "Wrong count: " + count, () -> count <= 0);
 
         int banknotesCount = 0;
         if (banknotes.containsKey(note)) {
@@ -28,12 +33,12 @@ class Bankautomat implements ATM {
 
     @Override
     public void getCash(long value) throws RuntimeException {
-        CommonHelper.verify(RuntimeException.class, "Insufficient funds", () -> value > getBalance());
+        CommonHelper.throwIf(RuntimeException.class, "Insufficient funds", () -> value > getBalance());
 
         BanknoteProcessor processor = BanknoteProcessor.createProcessor(currentCurrency);
 
         Map<Banknote, Integer> result = new HashMap<>();
-        CommonHelper.verify(RuntimeException.class, "Cannot pay this value (insufficient banknotes!)",
+        CommonHelper.throwIf(RuntimeException.class, "Cannot pay this value (insufficient banknotes!)",
                 () -> !processor.process(value, banknotes, result));
         subtractCash(result);
     }
@@ -49,14 +54,46 @@ class Bankautomat implements ATM {
     }
 
     @Override
-    public void changeCurrency(@NotNull Currency currency) {
-        currency = currentCurrency;
-    }
-
-    @Override
     @NotNull
     public Currency getCurrency() {
         return currentCurrency;
+    }
+
+    @Override
+    public void saveState() {
+        if (savedState.size() == 0) {
+            saveState(new Bankautomat(banknotes, currentCurrency));
+        } else {
+            int pos = savedState.size() - 1;
+            Bankautomat tmp = savedState.get(pos).getState();
+            if (!this.equals(tmp)) {
+                saveState(new Bankautomat(banknotes, currentCurrency));
+            }
+        }
+    }
+
+    private void saveState(Bankautomat bankautomat) {
+        originator.setState(bankautomat);
+        savedState.add(originator.saveToMemento());
+
+    }
+
+    @Override
+    public void loadState(STATES currentState) {
+        CommonHelper.throwIf(IllegalArgumentException.class, "savedState is empty", () -> savedState.size() == 0);
+
+        if (currentState == STATES.INITIAL) {
+            loadState(0);
+        } else if (currentState == STATES.LAST_MODIFICATION) {
+            loadState(savedState.size()-1);
+        }
+    }
+
+    private void loadState(int pos) {
+        Memento<Bankautomat> memento = savedState.get(pos);
+
+        this.banknotes = memento.getState().banknotes;
+        this.currentCurrency = memento.getState().currentCurrency;
     }
 
     @Override
@@ -77,16 +114,35 @@ class Bankautomat implements ATM {
         return builder.toString();
     }
 
-    private final Map<Banknote, Integer> banknotes;
-    private Currency currentCurrency;
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentCurrency, banknotes);
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (!(obj instanceof Bankautomat))
+            return false;
+
+        Bankautomat bank = (Bankautomat) obj;
+        return currentCurrency ==  bank.currentCurrency &&
+                Objects.equals(banknotes, bank.banknotes);
+    }
+
+    private Map<Banknote, Integer> banknotes;
+    private Currency currentCurrency;
+    private Originator<Bankautomat> originator = new Originator<>();
+    private final List<Memento<Bankautomat>> savedState = new ArrayList<>();
 
     private void subtractCash(Map<Banknote, Integer> sub) {
         for (Map.Entry<Banknote, Integer> b : sub.entrySet()) {
             Banknote tmp = b.getKey();
             if (banknotes.containsKey(tmp)) {
                 int r = banknotes.get(tmp) - b.getValue();
-                CommonHelper.verify(RuntimeException.class, null, () -> r <0);
+                CommonHelper.throwIf(RuntimeException.class, null, () -> r <0);
 
                 banknotes.put(tmp, r);
             }

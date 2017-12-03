@@ -9,7 +9,7 @@ class BanknoteHandler implements Handler {
 
     BanknoteHandler(Banknote banknote) {
 
-        CommonHelper.verify(IllegalArgumentException.class, null, () -> banknote == null);
+        CommonHelper.throwIf(IllegalArgumentException.class, null, () -> banknote == null);
 
         banknoteHandler = banknote;
     }
@@ -35,13 +35,13 @@ class BanknoteHandler implements Handler {
     private Handler nextHandler;
 
     private long calculate(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
-        CommonHelper.verify(IllegalArgumentException.class, "",
+        CommonHelper.throwIf(IllegalArgumentException.class, "",
                 () -> sum < 0 || atmCash == null || result == null);
 
-        CommonHelper.verify(IllegalArgumentException.class, null,
+        CommonHelper.throwIf(IllegalArgumentException.class, null,
                 () -> atmCash.getOrDefault(banknoteHandler, 0) < 0);
 
-        CommonHelper.verify(IllegalStateException.class,
+        CommonHelper.throwIf(IllegalStateException.class,
                 "Result already contains banknote (" +banknoteHandler+ ")",
                 () -> result.containsKey(banknoteHandler));
 

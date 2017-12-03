@@ -13,9 +13,11 @@ public interface ATMDepartment {
     /**
      * Checks if atm needs to be refilled.
      *  If so, add money to ATM
+     *  If no atm found - throw exception
      *  @param atm - atm to refill
+     * @throws IllegalArgumentException - throws when {@code atm} not found in {@code ATMDepartment} instance
      */
-    void refillATM(ATM atm);
+    void refillATM(ATM atm) throws IllegalArgumentException;
 
     /**
      *  Add money to all ATMs in ATMDepartment

@@ -26,7 +26,7 @@ abstract class AbstractCurrency implements Currency {
 
     @Override
     public void addBanknote(Banknote note) throws IllegalArgumentException {
-        CommonHelper.verify(IllegalArgumentException.class, null,
+        CommonHelper.throwIf(IllegalArgumentException.class, null,
                 () ->note == null || banknotes.contains(note));
 
         banknotes.add(note);
@@ -44,7 +44,7 @@ abstract class AbstractCurrency implements Currency {
     public Banknote get(BanknoteName value) {
         Banknote res = banknotes.stream().filter(e -> e.getName().equals(value)).findFirst().orElse(null);
 
-        CommonHelper.verify(IllegalArgumentException.class, value.name() + " not found in this currency",
+        CommonHelper.throwIf(IllegalArgumentException.class, value.name() + " not found in this currency",
                 () -> res == null);
 
         return res;
@@ -68,16 +68,16 @@ abstract class AbstractCurrency implements Currency {
     private Set<Banknote> createBanknotesForCurrency(String currency, BanknoteName[] banknoteNames) {
         Set<Banknote> result = new HashSet<>();
 
-        CommonHelper.verify(IllegalArgumentException.class, null,
+        CommonHelper.throwIf(IllegalArgumentException.class, null,
                 () -> currency == null || currency.equals(""));
 
         for (BanknoteName name: banknoteNames) {
             Integer key = banknotesValues.get(name);
 
-            CommonHelper.verify(IllegalArgumentException.class, "Element = null",() -> name == null);
-            CommonHelper.verify(IllegalStateException.class, "Banknote name: "+ name.name() + " not found.",
+            CommonHelper.throwIf(IllegalArgumentException.class, "Element = null",() -> name == null);
+            CommonHelper.throwIf(IllegalStateException.class, "Banknote name: "+ name.name() + " not found.",
                     () -> key == null);
-            CommonHelper.verify(IllegalArgumentException.class, "Element " + name.name() + " duplicate",
+            CommonHelper.throwIf(IllegalArgumentException.class, "Element " + name.name() + " duplicate",
                     () -> !result.add(new Banknote(name, key, this)));
         }
 

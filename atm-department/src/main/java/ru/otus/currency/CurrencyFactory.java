@@ -9,10 +9,10 @@ public class CurrencyFactory {
     private CurrencyFactory() {}
 
     public static Currency getCurrency(String name) {
-        CommonHelper.verify(IllegalArgumentException.class, null, ()-> name == null);
+        CommonHelper.throwIf(IllegalArgumentException.class, null, ()-> name == null);
 
         String tmp = name.toLowerCase();
-        CommonHelper.verify(IllegalArgumentException.class, "Currency not found",
+        CommonHelper.throwIf(IllegalArgumentException.class, "Currency not found",
                 () -> !currencies.containsKey(tmp));
 
         return currencies.get(tmp);

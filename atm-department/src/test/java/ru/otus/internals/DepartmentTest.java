@@ -8,7 +8,7 @@ import ru.otus.currency.CurrencyFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class ATMTerminalsTest {
+class DepartmentTest {
 
     private Currency currency = CurrencyFactory.getCurrency("Rouble");
     private ATM atm = new ATMBuilder().addBanknote(currency.get(BanknoteName.FIVE_THOUSAND), 100)
@@ -19,7 +19,7 @@ class ATMTerminalsTest {
 
     @Test
     void addTest() {
-        ATMDepartment department = new ATMTerminals();
+        ATMDepartment department = new Department();
 
         department.addATM(atm);
         Exception e = assertThrows(IllegalArgumentException.class, () -> department.addATM(null));
@@ -31,15 +31,20 @@ class ATMTerminalsTest {
 
     @Test
     void refillATMTest() {
-        ATMDepartment department = new ATMTerminals();
+        ATMDepartment department = new Department();
 
         department.addATM(atm);
         department.refillATM(atm);
+
+        ATM emptyATM = new ATMBuilder().build();
+
+        Exception e = assertThrows(IllegalArgumentException.class, () -> department.refillATM(emptyATM));
+        assertEquals("atm not found", e.getMessage());
     }
 
     @Test
     void refillAllTest() {
-        ATMDepartment department = new ATMTerminals();
+        ATMDepartment department = new Department();
 
         department.addATM(atm);
         department.refillAll();
@@ -47,7 +52,7 @@ class ATMTerminalsTest {
 
     @Test
     void getAvailableCash() {
-        ATMDepartment department = new ATMTerminals();
+        ATMDepartment department = new Department();
 
         department.addATM(atm);
         assertEquals(850_000L, department.getAvailableCash());

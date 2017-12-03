@@ -13,7 +13,7 @@ public class Banknote {
         this.name = name;
         this.value = value;
 
-        CommonHelper.verify(NullPointerException.class, "Currency = null", () -> currency == null);
+        CommonHelper.throwIf(NullPointerException.class, "Currency = null", () -> currency == null);
 
         this.currency = currency;
     }
