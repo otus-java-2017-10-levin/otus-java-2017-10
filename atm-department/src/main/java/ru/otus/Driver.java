@@ -16,9 +16,8 @@ import java.util.List;
 class Driver {
 
     private static final Logger logger = Logger.getLogger(Driver.class);
-    private static final String RUBLE = "Rouble";
     private static List<ATM> atms = new ArrayList<>();
-    private Currency currency = CurrencyFactory.getCurrency(RUBLE);
+    private Currency currency = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
 
     public static void main(String[] args) {
         Driver driver = new Driver();

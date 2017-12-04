@@ -13,7 +13,7 @@ class Bankautomat implements ATM {
 
     Bankautomat() {
         banknotes = new HashMap<>();
-        currentCurrency = CurrencyFactory.getCurrency("Rouble");
+        currentCurrency = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
     }
 
     private Bankautomat(Map<Banknote, Integer> banknotes, Currency currentCurrency) {
@@ -89,8 +89,6 @@ class Bankautomat implements ATM {
             loadState(savedState.size()-1);
         }
     }
-
-
 
     @Override
     public String toString() {

@@ -8,9 +8,9 @@ import java.util.Map;
 public class CurrencyFactory {
 
     public enum Currencies {
-        ROUBLE,
-        DOLLAR
+        ROUBLE
     }
+
     private CurrencyFactory() {}
 
     public static Currency getCurrency(Currencies name) {
@@ -26,6 +26,5 @@ public class CurrencyFactory {
     private static final Map<Currencies, Currency> currencies = new HashMap<>();
     static {
         currencies.put(Currencies.ROUBLE, new Rouble());
-        currencies.put(Currencies.DOLLAR, new Dollar());
     }
 }
