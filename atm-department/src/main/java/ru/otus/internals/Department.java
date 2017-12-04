@@ -1,7 +1,7 @@
 package ru.otus.internals;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.common.CommonHelper;
 
 import java.util.HashSet;
@@ -9,12 +9,10 @@ import java.util.Set;
 
 class Department implements ATMDepartment {
 
-    private final Logger logger = Logger.getLogger(Department.class);
+    private final Logger logger = LogManager.getLogger(Department.class);
     private final Set<ATMInfo> atms = new HashSet<>();
 
-    Department() {
-        BasicConfigurator.configure();
-    }
+    Department() {}
 
     @Override
     public void addATM(ATM atm) {

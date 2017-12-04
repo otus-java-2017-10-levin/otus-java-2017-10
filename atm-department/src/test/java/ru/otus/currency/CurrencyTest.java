@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.otus.currency.BanknoteName.*;
+import static ru.otus.currency.Banknote.Name.*;
 
 class CurrencyTest {
 
-    private static Currency currency = CurrencyFactory.getCurrency("Rouble");
+    private static Currency currency = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
 
-    static Banknote getBanknote(BanknoteName name, int value) {
+    static Banknote getBanknote(Banknote.Name name, int value) {
         return new Banknote(name, value, currency);
     }
 

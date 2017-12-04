@@ -11,8 +11,7 @@ public interface Rollback {
      * LAST_MODIFICATION - last modified state
      */
     enum STATES {
-        INITIAL,
-        LAST_MODIFICATION
+        INITIAL
     }
     /**
      * Save state for object

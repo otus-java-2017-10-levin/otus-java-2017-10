@@ -20,6 +20,6 @@ public class ATMBuilder {
     }
 
     public ATM build() {
-        return object;
+        return getObject();
     }
 }

@@ -11,11 +11,11 @@ public interface Currency {
     /**
      * Get banknote for specified value.
      *
-     * @param value - one of the value from BanknoteName enum
+     * @param value - one of the value from Name enum
      * @return - banknote object or null if there is no banknote
      * containing selected value
      */
-    Banknote get(BanknoteName value);
+    Banknote get(Banknote.Name value);
 
     /**
      * Returns currency name

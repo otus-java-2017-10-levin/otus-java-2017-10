@@ -1,7 +1,7 @@
 package ru.otus.internals;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.currency.BanknoteName;
+import ru.otus.currency.Banknote;
 import ru.otus.currency.Currency;
 import ru.otus.currency.CurrencyFactory;
 
@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DepartmentTest {
 
-    private Currency currency = CurrencyFactory.getCurrency("Rouble");
-    private ATM atm = new ATMBuilder().addBanknote(currency.get(BanknoteName.FIVE_THOUSAND), 100)
-            .addBanknote(currency.get(BanknoteName.TWO_THOUSAND), 100)
-            .addBanknote(currency.get(BanknoteName.THOUSAND), 100)
-            .addBanknote(currency.get(BanknoteName.FIVE_HUNDRED), 100)
+    private Currency currency = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
+    private ATM atm = new ATMBuilder().addBanknote(currency.get(Banknote.Name.FIVE_THOUSAND), 100)
+            .addBanknote(currency.get(Banknote.Name.TWO_THOUSAND), 100)
+            .addBanknote(currency.get(Banknote.Name.THOUSAND), 100)
+            .addBanknote(currency.get(Banknote.Name.FIVE_HUNDRED), 100)
             .build();
 
     @Test
@@ -38,17 +38,17 @@ class DepartmentTest {
         Exception e = assertThrows(IllegalArgumentException.class, () -> department.refillATM(emptyATM));
         assertEquals("atm not found", e.getMessage());
 
-        ATM atm =  new ATMBuilder().addBanknote(currency.get(BanknoteName.FIVE_THOUSAND), 100)
-                .addBanknote(currency.get(BanknoteName.TWO_THOUSAND), 100)
-                .addBanknote(currency.get(BanknoteName.THOUSAND), 100)
-                .addBanknote(currency.get(BanknoteName.FIVE_HUNDRED), 100)
-                .addBanknote(currency.get(BanknoteName.TWO_HUNDRED), 100)
-                .addBanknote(currency.get(BanknoteName.HUNDRED), 100)
-                .addBanknote(currency.get(BanknoteName.FIFTY), 100)
-                .addBanknote(currency.get(BanknoteName.TEN), 100)
-                .addBanknote(currency.get(BanknoteName.FIVE), 100)
-                .addBanknote(currency.get(BanknoteName.TWO), 100)
-                .addBanknote(currency.get(BanknoteName.ONE), 100)
+        ATM atm =  new ATMBuilder().addBanknote(currency.get(Banknote.Name.FIVE_THOUSAND), 100)
+                .addBanknote(currency.get(Banknote.Name.TWO_THOUSAND), 100)
+                .addBanknote(currency.get(Banknote.Name.THOUSAND), 100)
+                .addBanknote(currency.get(Banknote.Name.FIVE_HUNDRED), 100)
+                .addBanknote(currency.get(Banknote.Name.TWO_HUNDRED), 100)
+                .addBanknote(currency.get(Banknote.Name.HUNDRED), 100)
+                .addBanknote(currency.get(Banknote.Name.FIFTY), 100)
+                .addBanknote(currency.get(Banknote.Name.TEN), 100)
+                .addBanknote(currency.get(Banknote.Name.FIVE), 100)
+                .addBanknote(currency.get(Banknote.Name.TWO), 100)
+                .addBanknote(currency.get(Banknote.Name.ONE), 100)
                 .build();
 
         department.addATM(atm);

@@ -1,6 +1,7 @@
 package ru.otus;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.common.CommonHelper;
 import ru.otus.currency.Currency;
 import ru.otus.internals.ATM;
@@ -14,7 +15,7 @@ public class ATMCustomer {
     private static int counter = 0;
     private final int ID = counter++;
     private static final Random rnd = new Random();
-    private final static Logger logger = Logger.getLogger(ATMCustomer.class);
+    private final static Logger logger = LogManager.getLogger(ATMCustomer.class);
 
     private enum Action {
         GET(1),
@@ -44,6 +45,7 @@ public class ATMCustomer {
     }
 
     public void work(ATM atm) {
+        CommonHelper.throwIf(IllegalArgumentException.class, null, () -> atm == null);
         Action act = Action.getRandomAction();
 
         switch (act) {

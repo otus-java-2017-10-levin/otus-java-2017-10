@@ -1,5 +1,7 @@
 package ru.otus.common;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.ATMCustomer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -7,11 +9,9 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import org.apache.log4j.Logger;
-
 public class CommonHelper {
 
-    final static Logger logger = Logger.getLogger(ATMCustomer.class);
+    final static Logger logger = LogManager.getLogger(ATMCustomer.class);
     /**
      * Test condition {@code condition} and if false throws an exception of type {@code e} with message {@code errorMessage}
      *

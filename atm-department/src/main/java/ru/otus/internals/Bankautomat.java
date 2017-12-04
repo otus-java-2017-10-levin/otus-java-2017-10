@@ -85,8 +85,8 @@ class Bankautomat implements ATM {
 
         if (currentState == STATES.INITIAL) {
             loadState(0);
-        } else if (currentState == STATES.LAST_MODIFICATION) {
-            loadState(savedState.size()-1);
+        } else {
+            throw new IllegalStateException("not supported operation");
         }
     }
 

@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.otus.currency.BanknoteName.*;
+import static ru.otus.currency.Banknote.Name.*;
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
 class CurrencyFactoryTest {
     @Test
     void createCurrency() {
-        Currency cur = CurrencyFactory.getCurrency("rouble");
+        Currency cur = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
 
         assert cur != null;
         Banknote[] banknotes = cur.getBanknotes();
@@ -39,9 +39,6 @@ class CurrencyFactoryTest {
     void createCurrencyExceptions() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> CurrencyFactory.getCurrency(null));
         assertEquals(null, e.getMessage());
-
-        e = assertThrows(IllegalArgumentException.class, () -> CurrencyFactory.getCurrency(""));
-        assertEquals("Currency not found", e.getMessage());
     }
 
 }

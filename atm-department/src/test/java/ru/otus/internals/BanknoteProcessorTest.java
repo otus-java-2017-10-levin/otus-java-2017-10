@@ -11,6 +11,6 @@ class BanknoteProcessorTest {
 
     @Test
     void testStatic() {
-        BanknoteProcessor.createProcessor(CurrencyFactory.getCurrency("Rouble"));
+        BanknoteProcessor.createProcessor(CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE));
     }
 }

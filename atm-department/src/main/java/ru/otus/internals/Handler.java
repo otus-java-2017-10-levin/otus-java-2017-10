@@ -10,7 +10,7 @@ import java.util.Map;
 interface Handler {
 
     /**
-     * Returns number of banknotes of BanknoteName or max param for given sum.
+     * Returns number of banknotes of Name or max param for given sum.
      * If sum / banknote prize > max, then returns max. Else return the division result.
      * @param sum - total cash to get
      * @param atmCash - total number of each banknote in the ATM
