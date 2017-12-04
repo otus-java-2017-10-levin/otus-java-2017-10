@@ -100,18 +100,6 @@ class CurrencyTest {
     }
 
     @Test
-    @DisplayName("add banknote test")
-    void addTest() {
-        String cur = "Rouble";
-        currency = new AbstractCurrency(cur) {
-        };
-
-        currency.addBanknote(new Banknote(ONE, 1, currency));
-        Exception e = assertThrows(IllegalArgumentException.class, () -> currency.addBanknote(new Banknote(ONE, 1, currency)));
-        assertEquals(null, e.getMessage());
-    }
-
-    @Test
     @DisplayName("get banknote")
     void getBanknote() {
         currency = new AbstractCurrency("Rouble",

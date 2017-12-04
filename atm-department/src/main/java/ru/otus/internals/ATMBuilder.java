@@ -12,6 +12,7 @@ public class ATMBuilder {
         object = new Bankautomat();
         return object;
     }
+
     public ATMBuilder addBanknote(Banknote note, int count) {
 
         getObject().addBanknote(note, count);

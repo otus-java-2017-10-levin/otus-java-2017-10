@@ -33,13 +33,32 @@ class DepartmentTest {
     void refillATMTest() {
         ATMDepartment department = new Department();
 
-        department.addATM(atm);
-        department.refillATM(atm);
-
         ATM emptyATM = new ATMBuilder().build();
 
         Exception e = assertThrows(IllegalArgumentException.class, () -> department.refillATM(emptyATM));
         assertEquals("atm not found", e.getMessage());
+
+        ATM atm =  new ATMBuilder().addBanknote(currency.get(BanknoteName.FIVE_THOUSAND), 100)
+                .addBanknote(currency.get(BanknoteName.TWO_THOUSAND), 100)
+                .addBanknote(currency.get(BanknoteName.THOUSAND), 100)
+                .addBanknote(currency.get(BanknoteName.FIVE_HUNDRED), 100)
+                .addBanknote(currency.get(BanknoteName.TWO_HUNDRED), 100)
+                .addBanknote(currency.get(BanknoteName.HUNDRED), 100)
+                .addBanknote(currency.get(BanknoteName.FIFTY), 100)
+                .addBanknote(currency.get(BanknoteName.TEN), 100)
+                .addBanknote(currency.get(BanknoteName.FIVE), 100)
+                .addBanknote(currency.get(BanknoteName.TWO), 100)
+                .addBanknote(currency.get(BanknoteName.ONE), 100)
+                .build();
+
+        department.addATM(atm);
+        long sum = atm.getBalance();
+        atm.getCash(atm.getBalance());
+        assertEquals(0, atm.getBalance());
+
+        department.refillATM(atm);
+
+        assertEquals(sum, atm.getBalance());
     }
 
     @Test

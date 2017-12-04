@@ -25,14 +25,6 @@ abstract class AbstractCurrency implements Currency {
     }
 
     @Override
-    public void addBanknote(Banknote note) throws IllegalArgumentException {
-        CommonHelper.throwIf(IllegalArgumentException.class, null,
-                () ->note == null || banknotes.contains(note));
-
-        banknotes.add(note);
-    }
-
-    @Override
     public Banknote[] getBanknotes() {
         List<Banknote> res = new ArrayList<>();
         Collections.addAll(res, banknotes.toArray(new Banknote[0]));
@@ -84,7 +76,6 @@ abstract class AbstractCurrency implements Currency {
         return result;
     }
     private static final Map<BanknoteName, Integer> banknotesValues = new HashMap<>();
-
     static  {
         banknotesValues.put(BanknoteName.ONE, 1);
         banknotesValues.put(BanknoteName.TWO, 2);

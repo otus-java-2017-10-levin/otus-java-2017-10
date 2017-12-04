@@ -1,18 +1,20 @@
 package ru.otus.internals;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 import ru.otus.common.CommonHelper;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class Department implements ATMDepartment {
 
-    private final double refillPercent = 0.20;
+    private final Logger logger = Logger.getLogger(Department.class);
     private final Set<ATMInfo> atms = new HashSet<>();
 
-    Department() {    }
+    Department() {
+        BasicConfigurator.configure();
+    }
 
     @Override
     public void addATM(ATM atm) {
@@ -31,8 +33,11 @@ class Department implements ATMDepartment {
         ATMInfo atmInfo = getATM(atm);
         CommonHelper.throwIf(IllegalArgumentException.class, "atm not found", () -> atmInfo == null);
 
-        double coeff = atm.getBalance() / atmInfo.getInitialCash();
+        double refillPercent = 0.20;
+        double coeff = (double)atm.getBalance() / atmInfo.getInitialCash();
+
         if (coeff < refillPercent) {
+            logger.info("refill ATM (id:" + atm.getId() + ")");
             atm.loadState(Rollback.STATES.INITIAL);
         }
     }
@@ -63,8 +68,6 @@ class Department implements ATMDepartment {
     private class ATMInfo {
         private ATM atm;
         private long initialCash;
-
-        private List<Memento<ATM>> mementoList = new ArrayList<>();
 
         ATMInfo(ATM atm, long initialCash) {
             this.atm = atm;

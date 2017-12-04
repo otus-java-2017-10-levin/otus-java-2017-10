@@ -6,28 +6,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CurrencyFactory {
+
+    public enum Currencies {
+        ROUBLE,
+        DOLLAR
+    }
     private CurrencyFactory() {}
 
-    public static Currency getCurrency(String name) {
+    public static Currency getCurrency(Currencies name) {
         CommonHelper.throwIf(IllegalArgumentException.class, null, ()-> name == null);
 
-        String tmp = name.toLowerCase();
         CommonHelper.throwIf(IllegalArgumentException.class, "Currency not found",
-                () -> !currencies.containsKey(tmp));
+                () -> !currencies.containsKey(name));
 
-        return currencies.get(tmp);
+        return currencies.get(name);
 
     }
 
-    public static String getInfo() {
-        StringBuilder res = new StringBuilder("Available currencies:\n");
-        currencies.forEach((key, value) -> res.append("\t").append(key).append("\n"));
-        return res.toString();
-    }
-
-    private static final Map<String, Currency> currencies = new HashMap<>();
+    private static final Map<Currencies, Currency> currencies = new HashMap<>();
     static {
-        currencies.put("rouble", new Rouble());
-        currencies.put("dollar", new Dollar());
+        currencies.put(Currencies.ROUBLE, new Rouble());
+        currencies.put(Currencies.DOLLAR, new Dollar());
     }
 }

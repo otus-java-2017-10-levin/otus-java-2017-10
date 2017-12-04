@@ -9,6 +9,8 @@ import ru.otus.currency.CurrencyFactory;
 import java.util.*;
 
 class Bankautomat implements ATM {
+
+
     Bankautomat() {
         banknotes = new HashMap<>();
         currentCurrency = CurrencyFactory.getCurrency("Rouble");
@@ -54,6 +56,11 @@ class Bankautomat implements ATM {
     }
 
     @Override
+    public Integer getId() {
+        return ID;
+    }
+
+    @Override
     @NotNull
     public Currency getCurrency() {
         return currentCurrency;
@@ -72,12 +79,6 @@ class Bankautomat implements ATM {
         }
     }
 
-    private void saveState(Bankautomat bankautomat) {
-        originator.setState(bankautomat);
-        savedState.add(originator.saveToMemento());
-
-    }
-
     @Override
     public void loadState(STATES currentState) {
         CommonHelper.throwIf(IllegalArgumentException.class, "savedState is empty", () -> savedState.size() == 0);
@@ -89,12 +90,7 @@ class Bankautomat implements ATM {
         }
     }
 
-    private void loadState(int pos) {
-        Memento<Bankautomat> memento = savedState.get(pos);
 
-        this.banknotes = memento.getState().banknotes;
-        this.currentCurrency = memento.getState().currentCurrency;
-    }
 
     @Override
     public String toString() {
@@ -116,7 +112,7 @@ class Bankautomat implements ATM {
 
     @Override
     public int hashCode() {
-        return Objects.hash(currentCurrency, banknotes);
+        return Objects.hash(ID, currentCurrency, banknotes);
     }
 
     @Override
@@ -128,7 +124,8 @@ class Bankautomat implements ATM {
             return false;
 
         Bankautomat bank = (Bankautomat) obj;
-        return currentCurrency ==  bank.currentCurrency &&
+        return ID == bank.ID &&
+                currentCurrency ==  bank.currentCurrency &&
                 Objects.equals(banknotes, bank.banknotes);
     }
 
@@ -136,6 +133,8 @@ class Bankautomat implements ATM {
     private Currency currentCurrency;
     private Originator<Bankautomat> originator = new Originator<>();
     private final List<Memento<Bankautomat>> savedState = new ArrayList<>();
+    private static int counter = 0;
+    private final int ID = counter++;
 
     private void subtractCash(Map<Banknote, Integer> sub) {
         for (Map.Entry<Banknote, Integer> b : sub.entrySet()) {
@@ -147,5 +146,25 @@ class Bankautomat implements ATM {
                 banknotes.put(tmp, r);
             }
         }
+    }
+
+    private void loadState(int pos) {
+        Memento<Bankautomat> memento = savedState.get(pos);
+
+        this.banknotes = memento.getState().banknotes;
+        this.currentCurrency = memento.getState().currentCurrency;
+
+        clearState();
+    }
+
+    private void clearState() {
+        savedState.clear();
+        saveState();
+    }
+
+    private void saveState(Bankautomat bankautomat) {
+        originator.setState(bankautomat);
+        savedState.add(originator.saveToMemento());
+
     }
 }
