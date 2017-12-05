@@ -36,7 +36,7 @@ class Department implements ATMDepartment {
 
         if (coeff < refillPercent) {
             logger.info("refill ATM (id:" + atm.getId() + ")");
-            atm.loadState(Rollback.STATES.INITIAL);
+            atm.loadState(atmInfo.getMemento());
         }
     }
 
@@ -64,12 +64,14 @@ class Department implements ATMDepartment {
     }
 
     private class ATMInfo {
-        private ATM atm;
-        private long initialCash;
+        private final ATM atm;
+        private final long initialCash;
+        private final Memento memento;
 
         ATMInfo(ATM atm, long initialCash) {
             this.atm = atm;
             this.initialCash = initialCash;
+            this.memento = atm.saveState();
         }
 
         public ATM getAtm() {
@@ -78,6 +80,10 @@ class Department implements ATMDepartment {
 
         long getInitialCash() {
             return initialCash;
+        }
+
+        public Memento getMemento() {
+            return memento;
         }
     }
 }

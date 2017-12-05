@@ -6,22 +6,13 @@ package ru.otus.internals;
 public interface Rollback {
 
     /**
-     * States for rollback.
-     * INITIAL STATE - first saved state
-     * LAST_MODIFICATION - last modified state
-     */
-    enum STATES {
-        INITIAL
-    }
-    /**
      * Save state for object
      */
-    void saveState();
+    Memento saveState();
 
     /**
-     * Roll to {@code currentState}
-     * We can rollback to the first save state, or rollforward to the last saved state
-     * @param currentState - one of the states from {@code STATE}
+     * Roll to {@code memento}
+     * @param memento - memento object
      */
-    void loadState(STATES currentState);
+    void loadState(Memento memento);
 }

@@ -8,7 +8,6 @@ import java.util.Map;
  * Chains of responsibility pattern
  */
 interface Handler {
-
     /**
      * Returns number of banknotes of Name or max param for given sum.
      * If sum / banknote prize > max, then returns max. Else return the division result.

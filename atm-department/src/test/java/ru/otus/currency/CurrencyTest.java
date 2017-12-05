@@ -12,7 +12,7 @@ class CurrencyTest {
     private static Currency currency = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
 
     static Banknote getBanknote(Banknote.Name name, int value) {
-        return new Banknote(name, value, currency);
+        return Banknote.of(name, value, currency);
     }
 
     @Test
@@ -116,7 +116,7 @@ class CurrencyTest {
         };
 
         Banknote b = currency.get(FIVE);
-        Banknote expected = new Banknote(FIVE, 5, currency);
+        Banknote expected = Banknote.of(FIVE, 5, currency);
         assertEquals(true, b.equals(expected));
     }
 

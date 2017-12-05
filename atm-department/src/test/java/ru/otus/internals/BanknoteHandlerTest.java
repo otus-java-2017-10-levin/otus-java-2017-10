@@ -39,11 +39,11 @@ class BanknoteHandlerTest {
         assertEquals(80, (long)result.get(cur.get(Banknote.Name.FIVE_THOUSAND)));
 
         Exception e = assertThrows(IllegalArgumentException.class, () -> h.handle(-50000, atmCash, result));
-        assertEquals(null, e.getMessage());
+        assertEquals("wrong arguments", e.getMessage());
 
         atmCash.put(cur.get(Banknote.Name.FIVE_THOUSAND), -1);
         e = assertThrows(IllegalArgumentException.class, () -> h.handle(500300, atmCash, result));
-        assertEquals(null, e.getMessage());
+        assertEquals("illegal banknotes in ATM!", e.getMessage());
 
         atmCash.put(cur.get(Banknote.Name.FIVE_THOUSAND), 0);
         Map<Banknote, Integer> result1 = new HashMap<>();

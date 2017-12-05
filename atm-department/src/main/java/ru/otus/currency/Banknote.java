@@ -4,18 +4,33 @@ import ru.otus.common.CommonHelper;
 
 import java.util.Objects;
 
-public class Banknote {
+/**
+ *  Class represents banknote.
+ *
+ *
+ */
+public final class Banknote {
     private final Name name;
     private final int value;
     private final Currency currency;
 
-    Banknote(Name name, int value, Currency currency) {
+    /**
+     * Constructor, previously validated
+     *
+     * @param name - banknote name from @{@link Name}
+     * @param value - banknote cost
+     * @param currency - currency of banknote.
+     */
+    private Banknote(Name name, int value, Currency currency) {
         this.name = name;
         this.value = value;
+        this.currency = currency;
+    }
 
+    public static Banknote of(Name name, int value, Currency currency) {
         CommonHelper.throwIf(NullPointerException.class, "Currency = null", () -> currency == null);
 
-        this.currency = currency;
+        return new Banknote(name, value, currency);
     }
 
     public Name getName() {

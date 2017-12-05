@@ -1,13 +1,17 @@
 package ru.otus.internals;
 
-public class Memento<T> {
-    private final T state;
+import ru.otus.currency.Banknote;
 
-    public Memento(T state) {
+import java.util.Map;
+
+public class Memento {
+    private final Map<Banknote, Integer> state;
+
+    public Memento(Map<Banknote, Integer> state) {
         this.state = state;
     }
 
-    public T getState() {
+    public Map<Banknote, Integer> getState() {
         return state;
     }
 }

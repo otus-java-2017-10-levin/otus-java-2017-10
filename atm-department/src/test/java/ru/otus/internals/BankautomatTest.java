@@ -50,13 +50,16 @@ class BankautomatTest {
     @Test
     void saveStateTest() {
         ATM atm = new Bankautomat();
-        atm.saveState();
+        Memento mem = atm.saveState();
         atm.addBanknote(cur.get(Banknote.Name.FIVE_THOUSAND), 2);
-        atm.saveState();
+        Memento mem1 = atm.saveState();
         assertEquals(10000, atm.getBalance());
 
-        atm.loadState(Rollback.STATES.INITIAL);
+        atm.loadState(mem);
         assertEquals(0, atm.getBalance());
+
+        atm.loadState(mem1);
+        assertEquals(10000, atm.getBalance());
     }
 
     @Test

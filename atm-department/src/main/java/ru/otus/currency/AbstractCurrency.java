@@ -5,15 +5,44 @@ import ru.otus.common.CommonHelper;
 import java.util.*;
 
 /**
- * Keeps all banknotes for selected currency
+ * Abstract currency for creating concrete currency.
+ * Has banknote names enumeration from with initial values e.g.
+ *
+ *          FIVE_THOUSAND = 5000 etc.
+ *
+ * This class has only final fields and getters for immutability.
+ * So you should not extends it for adding setters methods.
+ *
+ * Example:
+ *
+ *   final class Rouble extends AbstractCurrency {
+ *       Rouble() {
+ *           super("Rouble",  "\u20bd",   Banknote.Name.ONE,
+ *                   Banknote.Name.TWO,
+ *                   Banknote.Name.FIVE,
+ *                   Banknote.Name.TEN,
+ *                   Banknote.Name.FIFTY,
+ *                   Banknote.Name.HUNDRED,
+ *                   Banknote.Name.TWO_HUNDRED,
+ *                   Banknote.Name.FIVE_HUNDRED,
+ *                   Banknote.Name.THOUSAND,
+ *                   Banknote.Name.TWO_THOUSAND,
+ *                   Banknote.Name.FIVE_THOUSAND);
+ *       }
+ *   }
+ *
+ *   Immutable
  */
+
+
 abstract class AbstractCurrency implements Currency {
 
-    private String currency;
-    private Set<Banknote> banknotes;
-    private String sign = "";
+    private final String currency;
+    private final Set<? extends Banknote> banknotes;
+    private final String sign;
 
     AbstractCurrency(String currency, Banknote.Name... banknotes) {
+        this.sign = "";
         this.currency = currency;
         this.banknotes = createBanknotesForCurrency(this.getCurrencyName(), banknotes);
     }
@@ -57,7 +86,7 @@ abstract class AbstractCurrency implements Currency {
         return "Currency: "+ currency + "(" + sign+ ")";
     }
 
-    private Set<Banknote> createBanknotesForCurrency(String currency, Banknote.Name[] names) {
+    private Set<? extends Banknote> createBanknotesForCurrency(String currency, Banknote.Name[] names) {
         Set<Banknote> result = new HashSet<>();
 
         CommonHelper.throwIf(IllegalArgumentException.class, null,
@@ -70,11 +99,12 @@ abstract class AbstractCurrency implements Currency {
             CommonHelper.throwIf(IllegalStateException.class, "Banknote name: "+ name.name() + " not found.",
                     () -> key == null);
             CommonHelper.throwIf(IllegalArgumentException.class, "Element " + name.name() + " duplicate",
-                    () -> !result.add(new Banknote(name, key, this)));
+                    () -> !result.add(Banknote.of(name, key, this)));
         }
 
         return result;
     }
+
     private static final Map<Banknote.Name, Integer> banknotesValues = new HashMap<>();
     static  {
         banknotesValues.put(Banknote.Name.ONE, 1);

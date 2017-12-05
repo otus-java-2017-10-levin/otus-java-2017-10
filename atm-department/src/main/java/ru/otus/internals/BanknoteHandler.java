@@ -35,10 +35,10 @@ class BanknoteHandler implements Handler {
     private Handler nextHandler;
 
     private long calculate(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
-        CommonHelper.throwIf(IllegalArgumentException.class, "",
+        CommonHelper.throwIf(IllegalArgumentException.class, "wrong arguments",
                 () -> sum < 0 || atmCash == null || result == null);
 
-        CommonHelper.throwIf(IllegalArgumentException.class, null,
+        CommonHelper.throwIf(IllegalArgumentException.class, "illegal banknotes in ATM!",
                 () -> atmCash.getOrDefault(banknoteHandler, 0) < 0);
 
         CommonHelper.throwIf(IllegalStateException.class,

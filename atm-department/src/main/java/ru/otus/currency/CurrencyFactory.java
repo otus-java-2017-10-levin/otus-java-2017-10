@@ -20,7 +20,6 @@ public class CurrencyFactory {
                 () -> !currencies.containsKey(name));
 
         return currencies.get(name);
-
     }
 
     private static final Map<Currencies, Currency> currencies = new HashMap<>();

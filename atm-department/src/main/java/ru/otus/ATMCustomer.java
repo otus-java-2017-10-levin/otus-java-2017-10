@@ -6,64 +6,39 @@ import ru.otus.common.CommonHelper;
 import ru.otus.currency.Currency;
 import ru.otus.internals.ATM;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class ATMCustomer {
 
-    private Currency cur;
+    private final Currency cur;
     private static int counter = 0;
     private final int ID = counter++;
     private static final Random rnd = new Random();
     private final static Logger logger = LogManager.getLogger(ATMCustomer.class);
-
-    private enum Action {
-        GET(1),
-        ADD(2),
-        BALANCE(3);
-
-        private final int value;
-
-        Action(int value) {
-            this.value = value;
-        }
-
-        static Action getRandomAction() {
-            int count = Action.values().length-1;
-
-            int random = rnd.nextInt(count)+1;
-
-            Action res = Arrays.stream(Action.values()).filter(el -> el.value == random).findFirst().orElse(null);
-
-            CommonHelper.throwIf(IllegalStateException.class, "no such element " + random, () -> res == null);
-            return res;
-        }
-    }
 
     ATMCustomer(Currency cur) {
         this.cur = cur;
     }
 
     public void work(ATM atm) {
-        CommonHelper.throwIf(IllegalArgumentException.class, null, () -> atm == null);
-        Action act = Action.getRandomAction();
-
-        switch (act) {
-            case GET:
-                getCash(atm);
-                break;
-            default:
-                logger.info("Skipping Customer (id:" +  ID + ")");
+        CommonHelper.throwIf(IllegalArgumentException.class, "ATM - null", () -> atm == null);
+        synchronized (atm) {
+            getCash(atm);
         }
     }
 
     private void getCash(ATM atm) {
-        long cash = rnd.nextInt(100_000);
-        logger.info("Customer (id: "+ ID +") gets " + cur.formatCurrency(cash) + " from ATM (" + atm.getId()+ ")");
+        long cash = rnd.nextInt(10_000)/10 * 10+5000;
+        StringBuilder sb = new StringBuilder(Thread.currentThread().getName())
+                .append(" Customer (id: ").append(ID).append(") gets ").append(cur.formatCurrency(cash))
+                .append(" from ATM (").append(atm.getId()).append("; balance: ").append(cur.formatCurrency(atm.getBalance())).append(")");
         try {
             atm.getCash(cash);
+            sb.append(" >> success");
+            sb.append(" balance after transaction: ").append(atm.getBalance());
         } catch (RuntimeException e) {
-            logger.info(e.getMessage());
+            sb.append(" >> failed: ").append(e.getMessage());
         }
+        logger.info(sb);
     }
 }
