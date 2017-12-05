@@ -1,6 +1,6 @@
 package ru.otus.internals;
 
-import ru.otus.common.CommonHelper;
+import ru.otus.common.Utils;
 import ru.otus.currency.Currency;
 import ru.otus.currency.Banknote;
 import ru.otus.currency.CurrencyFactory;
@@ -12,12 +12,19 @@ class Bankautomat implements ATM {
     Bankautomat() {
         banknotes = new HashMap<>();
         currentCurrency = CurrencyFactory.getCurrency(CurrencyFactory.Currencies.ROUBLE);
+        ID = ++counter;
+    }
+
+    private Bankautomat(Bankautomat bankautomat) {
+        this.banknotes = new HashMap<>(bankautomat.banknotes);
+        this.currentCurrency = bankautomat.currentCurrency;
+        this.ID = bankautomat.ID;
     }
 
     @Override
     public synchronized void addBanknote(Banknote note, int count) {
-        CommonHelper.throwIf(IllegalArgumentException.class, "Wrong banknote", () -> note == null);
-        CommonHelper.throwIf(IllegalArgumentException.class, "Wrong count: " + count, () -> count <= 0);
+        Utils.throwIf(IllegalArgumentException.class, "Wrong banknote", () -> note == null);
+        Utils.throwIf(IllegalArgumentException.class, "Wrong count: " + count, () -> count <= 0);
 
         int banknotesCount = 0;
         if (banknotes.containsKey(note)) {
@@ -28,12 +35,12 @@ class Bankautomat implements ATM {
 
     @Override
     public synchronized void getCash(long value) throws RuntimeException {
-        CommonHelper.throwIf(RuntimeException.class, "Insufficient funds", () -> value > getBalance());
+        Utils.throwIf(RuntimeException.class, "Insufficient funds", () -> value > getBalance());
 
         BanknoteProcessor processor = BanknoteProcessor.createProcessor(currentCurrency);
 
         Map<Banknote, Integer> result = new HashMap<>();
-        CommonHelper.throwIf(RuntimeException.class, "Cannot pay this value (insufficient banknotes!)",
+        Utils.throwIf(RuntimeException.class, "Cannot pay this value (insufficient banknotes!)",
                 () -> !processor.process(value, banknotes, result));
         subtractCash(result);
     }
@@ -54,19 +61,19 @@ class Bankautomat implements ATM {
     }
 
     @Override
-    public synchronized Currency getCurrency() {
-        return currentCurrency;
+    public synchronized Memento<ATM> saveState() {
+        return new Memento<>(new Bankautomat(this));
     }
 
     @Override
-    public synchronized Memento saveState() {
-        return new Memento(Collections.unmodifiableMap(new HashMap<>(this.banknotes)));
+    public synchronized void loadState(Memento<ATM> memento) {
+        Utils.throwIf(IllegalArgumentException.class, "Cannot rollback - memento = null", () -> memento == null);
+        this.banknotes = new HashMap<>(memento.getState().getBanknotes());
     }
 
     @Override
-    public synchronized void loadState(Memento memento) {
-        CommonHelper.throwIf(IllegalArgumentException.class, "Cannot rollback - memento = null", () -> memento == null);
-        this.banknotes = new HashMap<>(memento.getState());
+    public Map<Banknote, Integer> getBanknotes() {
+        return Collections.unmodifiableMap(this.banknotes);
     }
 
     @Override
@@ -109,14 +116,14 @@ class Bankautomat implements ATM {
     private Map<Banknote, Integer> banknotes;
     private final Currency currentCurrency;
     private static int counter = 0;
-    private final int ID = counter++;
+    private final int ID;
 
     private void subtractCash(Map<Banknote, Integer> sub) {
         for (Map.Entry<Banknote, Integer> b : sub.entrySet()) {
             Banknote tmp = b.getKey();
             if (banknotes.containsKey(tmp)) {
                 int r = banknotes.get(tmp) - b.getValue();
-                CommonHelper.throwIf(RuntimeException.class, "r < 0", () -> r <0);
+                Utils.throwIf(RuntimeException.class, "r < 0", () -> r <0);
 
                 banknotes.put(tmp, r);
             }

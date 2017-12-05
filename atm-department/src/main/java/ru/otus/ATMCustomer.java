@@ -2,7 +2,7 @@ package ru.otus;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.otus.common.CommonHelper;
+import ru.otus.common.Utils;
 import ru.otus.currency.Currency;
 import ru.otus.internals.ATM;
 
@@ -12,8 +12,7 @@ public class ATMCustomer {
 
     private final Currency cur;
     private static int counter = 0;
-    private final int ID = counter++;
-    private static final Random rnd = new Random();
+    private final int ID = ++counter;
     private final static Logger logger = LogManager.getLogger(ATMCustomer.class);
 
     ATMCustomer(Currency cur) {
@@ -21,21 +20,23 @@ public class ATMCustomer {
     }
 
     public void work(ATM atm) {
-        CommonHelper.throwIf(IllegalArgumentException.class, "ATM - null", () -> atm == null);
+        Utils.throwIf(IllegalArgumentException.class, "ATM - null", () -> atm == null);
         synchronized (atm) {
             getCash(atm);
         }
     }
 
     private void getCash(ATM atm) {
-        long cash = rnd.nextInt(10_000)/10 * 10+5000;
+        int bound = 10_000;
+        Random rnd = new Random();
+        long cash = rnd.nextInt(bound);
         StringBuilder sb = new StringBuilder(Thread.currentThread().getName())
                 .append(" Customer (id: ").append(ID).append(") gets ").append(cur.formatCurrency(cash))
-                .append(" from ATM (").append(atm.getId()).append("; balance: ").append(cur.formatCurrency(atm.getBalance())).append(")");
+                .append(" from ATM (id: ").append(atm.getId()).append("; balance: ").append(cur.formatCurrency(atm.getBalance())).append(")");
         try {
             atm.getCash(cash);
             sb.append(" >> success");
-            sb.append(" balance after transaction: ").append(atm.getBalance());
+            sb.append(" balance after transaction: ").append(cur.formatCurrency(atm.getBalance()));
         } catch (RuntimeException e) {
             sb.append(" >> failed: ").append(e.getMessage());
         }

@@ -1,6 +1,6 @@
 package ru.otus.currency;
 
-import ru.otus.common.CommonHelper;
+import ru.otus.common.Utils;
 
 import java.util.*;
 
@@ -65,7 +65,7 @@ abstract class AbstractCurrency implements Currency {
     public Banknote get(Banknote.Name value) {
         Banknote res = banknotes.stream().filter(e -> e.getName().equals(value)).findFirst().orElse(null);
 
-        CommonHelper.throwIf(IllegalArgumentException.class, value.name() + " not found in this currency",
+        Utils.throwIf(IllegalArgumentException.class, value.name() + " not found in this currency",
                 () -> res == null);
 
         return res;
@@ -89,16 +89,16 @@ abstract class AbstractCurrency implements Currency {
     private Set<? extends Banknote> createBanknotesForCurrency(String currency, Banknote.Name[] names) {
         Set<Banknote> result = new HashSet<>();
 
-        CommonHelper.throwIf(IllegalArgumentException.class, null,
+        Utils.throwIf(IllegalArgumentException.class, null,
                 () -> currency == null || currency.equals(""));
 
         for (Banknote.Name name: names) {
             Integer key = banknotesValues.get(name);
 
-            CommonHelper.throwIf(IllegalArgumentException.class, "Element = null",() -> name == null);
-            CommonHelper.throwIf(IllegalStateException.class, "Banknote name: "+ name.name() + " not found.",
+            Utils.throwIf(IllegalArgumentException.class, "Element = null",() -> name == null);
+            Utils.throwIf(IllegalStateException.class, "Banknote name: "+ name.name() + " not found.",
                     () -> key == null);
-            CommonHelper.throwIf(IllegalArgumentException.class, "Element " + name.name() + " duplicate",
+            Utils.throwIf(IllegalArgumentException.class, "Element " + name.name() + " duplicate",
                     () -> !result.add(Banknote.of(name, key, this)));
         }
 

@@ -12,12 +12,12 @@ import java.util.concurrent.Executors;
  * ExecutionService for ATMCustomers
  */
 
-public class CustomerPool {
+class CustomerPool {
 
-    private ExecutorService pool = Executors.newCachedThreadPool();
-    private Currency currency;
+    private final ExecutorService pool = Executors.newCachedThreadPool();
+    private final Currency currency;
 
-    public CustomerPool(Currency currency) {
+    CustomerPool(Currency currency) {
         this.currency = currency;
     }
 
@@ -28,14 +28,14 @@ public class CustomerPool {
      * @param atm - atm to add
      */
     public void addATM(ATM atm) {
-        int randomBoubd = 2_000;
+        int randomBound = 2_000;
         Random random = new Random();
-        int i = random.nextInt(randomBoubd);
+        int i = random.nextInt(randomBound);
 
         pool.submit(() -> {
             while (true) {
                 new ATMCustomer(currency).work(atm);
-                Thread.sleep(i+randomBoubd);
+                Thread.sleep(i+randomBound);
             }
         });
     }

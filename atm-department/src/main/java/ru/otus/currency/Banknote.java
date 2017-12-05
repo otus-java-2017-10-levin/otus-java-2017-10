@@ -1,6 +1,6 @@
 package ru.otus.currency;
 
-import ru.otus.common.CommonHelper;
+import ru.otus.common.Utils;
 
 import java.util.Objects;
 
@@ -28,7 +28,7 @@ public final class Banknote {
     }
 
     public static Banknote of(Name name, int value, Currency currency) {
-        CommonHelper.throwIf(NullPointerException.class, "Currency = null", () -> currency == null);
+        Utils.throwIf(NullPointerException.class, "Currency = null", () -> currency == null);
 
         return new Banknote(name, value, currency);
     }

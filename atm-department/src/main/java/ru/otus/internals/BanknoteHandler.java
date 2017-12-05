@@ -1,6 +1,6 @@
 package ru.otus.internals;
 
-import ru.otus.common.CommonHelper;
+import ru.otus.common.Utils;
 import ru.otus.currency.Banknote;
 
 import java.util.Map;
@@ -9,7 +9,7 @@ class BanknoteHandler implements Handler {
 
     BanknoteHandler(Banknote banknote) {
 
-        CommonHelper.throwIf(IllegalArgumentException.class, null, () -> banknote == null);
+        Utils.throwIf(IllegalArgumentException.class, null, () -> banknote == null);
 
         banknoteHandler = banknote;
     }
@@ -31,17 +31,17 @@ class BanknoteHandler implements Handler {
             nextHandler.setNext(handler);
     }
 
-    private Banknote banknoteHandler;
+    private final Banknote banknoteHandler;
     private Handler nextHandler;
 
     private long calculate(long sum, Map<Banknote, Integer> atmCash, Map<Banknote, Integer> result) {
-        CommonHelper.throwIf(IllegalArgumentException.class, "wrong arguments",
+        Utils.throwIf(IllegalArgumentException.class, "wrong arguments",
                 () -> sum < 0 || atmCash == null || result == null);
 
-        CommonHelper.throwIf(IllegalArgumentException.class, "illegal banknotes in ATM!",
+        Utils.throwIf(IllegalArgumentException.class, "illegal banknotes in ATM!",
                 () -> atmCash.getOrDefault(banknoteHandler, 0) < 0);
 
-        CommonHelper.throwIf(IllegalStateException.class,
+        Utils.throwIf(IllegalStateException.class,
                 "Result already contains banknote (" +banknoteHandler+ ")",
                 () -> result.containsKey(banknoteHandler));
 

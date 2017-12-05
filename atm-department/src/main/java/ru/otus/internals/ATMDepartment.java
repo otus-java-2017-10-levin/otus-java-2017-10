@@ -25,7 +25,7 @@ public interface ATMDepartment {
     void refillAll();
 
     /**
-     * Calculate the summ of available cash through all of added ATMs
+     * Calculate the sum of available cash through all of added ATMs
      * @return - available cash
      */
     long getAvailableCash();

@@ -2,7 +2,7 @@ package ru.otus.internals;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.otus.common.CommonHelper;
+import ru.otus.common.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,27 +16,34 @@ class Department implements ATMDepartment {
 
     @Override
     public void addATM(ATM atm) {
-        CommonHelper.throwIf(IllegalArgumentException.class, "atm is null",
+        Utils.throwIf(IllegalArgumentException.class, "atm is null",
                 () -> atm == null);
-        atm.saveState();
 
-        CommonHelper.throwIf(IllegalArgumentException.class, "atm already added",
+        Utils.throwIf(IllegalArgumentException.class, "atm already added",
                 () -> atms.contains(getATM(atm)));
 
         atms.add(new ATMInfo(atm, atm.getBalance()));
     }
 
+    private Memento<ATM> saveState(Rollback<ATM> object) {
+        return object.saveState();
+    }
+
+    private void loadState(Rollback<ATM> object, Memento<ATM> mem) {
+        object.loadState(mem);
+    }
+
     @Override
     public void refillATM(ATM atm) throws IllegalArgumentException {
         ATMInfo atmInfo = getATM(atm);
-        CommonHelper.throwIf(IllegalArgumentException.class, "atm not found", () -> atmInfo == null);
+        Utils.throwIf(IllegalArgumentException.class, "atm not found", () -> atmInfo == null);
 
         double refillPercent = 0.20;
         double coeff = (double)atm.getBalance() / atmInfo.getInitialCash();
 
         if (coeff < refillPercent) {
             logger.info("refill ATM (id:" + atm.getId() + ")");
-            atm.loadState(atmInfo.getMemento());
+            loadState(atm, atmInfo.getMemento());
         }
     }
 
@@ -54,11 +61,6 @@ class Department implements ATMDepartment {
         return balance;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
     private ATMInfo getATM(ATM atm) {
         return atms.stream().filter(e -> e.getAtm().equals(atm)).findFirst().orElse(null);
     }
@@ -66,15 +68,15 @@ class Department implements ATMDepartment {
     private class ATMInfo {
         private final ATM atm;
         private final long initialCash;
-        private final Memento memento;
+        private final Memento<ATM> memento;
 
         ATMInfo(ATM atm, long initialCash) {
             this.atm = atm;
             this.initialCash = initialCash;
-            this.memento = atm.saveState();
+            this.memento = saveState(atm);
         }
 
-        public ATM getAtm() {
+        ATM getAtm() {
             return atm;
         }
 
@@ -82,7 +84,7 @@ class Department implements ATMDepartment {
             return initialCash;
         }
 
-        public Memento getMemento() {
+        Memento<ATM> getMemento() {
             return memento;
         }
     }

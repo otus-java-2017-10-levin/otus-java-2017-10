@@ -5,9 +5,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
-public class CommonHelper {
+public class Utils {
 
-    final static Logger logger = LogManager.getLogger(CommonHelper.class);
+    private final static Logger logger = LogManager.getLogger(Utils.class);
     /**
      * Test condition {@code condition} and if false throws an exception of type {@code e} with message {@code errorMessage}
      *

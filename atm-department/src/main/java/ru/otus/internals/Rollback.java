@@ -3,16 +3,16 @@ package ru.otus.internals;
 /**
  * Interface for managing object states
  */
-public interface Rollback {
+interface Rollback<T> {
 
     /**
      * Save state for object
      */
-    Memento saveState();
+    Memento<T> saveState();
 
     /**
      * Roll to {@code memento}
      * @param memento - memento object
      */
-    void loadState(Memento memento);
+    void loadState(Memento<T> memento);
 }
