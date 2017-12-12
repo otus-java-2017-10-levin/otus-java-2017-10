@@ -1,4 +1,4 @@
-package ru.otus.internals;
+package ru.otus.serializer;
 
 public class JsonFormatter extends JsonDecorator {
 

@@ -1,4 +1,4 @@
-package ru.otus.internals;
+package ru.otus.serializer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,6 +14,7 @@ class GsonSerializer implements JsonSerializer {
         return gson.toJson(object);
     }
 
+    @Override
     public <T> T fromJson(String jsonString, Class<T> objectClass) {
         return gson.fromJson(jsonString, objectClass);
     }

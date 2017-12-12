@@ -1,4 +1,4 @@
-package ru.otus.internals;
+package ru.otus.serializer;
 
 abstract class JsonDecorator implements JsonSerializer {
     private final JsonSerializer serializer;
@@ -10,5 +10,10 @@ abstract class JsonDecorator implements JsonSerializer {
     @Override
     public String toJson(Object object) {
         return serializer.toJson(object);
+    }
+
+    @Override
+    public <T> T fromJson(String jsonString, Class<T> objectClass) {
+        return serializer.fromJson(jsonString, objectClass);
     }
 }

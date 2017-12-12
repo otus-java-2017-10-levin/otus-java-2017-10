@@ -1,4 +1,4 @@
-package ru.otus.internals;
+package ru.otus.serializer;
 
 
 /**
@@ -14,4 +14,6 @@ public interface JsonSerializer {
      * @return - json string
      */
     String toJson(Object object);
+
+    <T> T fromJson(String jsonString, Class<T> objectClass);
 }
