@@ -1,4 +1,4 @@
-package ru.otus.json;
+package ru.otus.classes;
 
 public class PlainWrappers {
 

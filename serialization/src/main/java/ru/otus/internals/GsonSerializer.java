@@ -5,10 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-class GsonSerializer implements JsonSerializer, JsonDeserializer {
+class GsonSerializer implements JsonSerializer {
 
     private final Gson gson = new Gson();
 
+    @Override
     public String toJson(Object object) {
         return gson.toJson(object);
     }

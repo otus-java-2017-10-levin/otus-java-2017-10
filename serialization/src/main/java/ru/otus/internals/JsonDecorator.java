@@ -1,9 +1,9 @@
 package ru.otus.internals;
 
 abstract class JsonDecorator implements JsonSerializer {
-    private JsonSerializer serializer;
+    private final JsonSerializer serializer;
 
-    public JsonDecorator(JsonSerializer serializer) {
+    JsonDecorator(JsonSerializer serializer) {
         this.serializer = serializer;
     }
 

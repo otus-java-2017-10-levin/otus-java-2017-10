@@ -1,14 +1,14 @@
 package ru.otus.internals;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.json.*;
+import ru.otus.classes.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SimpleJsonSerializerTest {
+class JavaXJsonTest {
 
     private void compareWithGson(Object object) {
-        JsonSerializer json = new JsonFormatter(new SimpleJsonSerializer());
+        JsonSerializer json = new JsonFormatter(new JavaXJson());
         JsonSerializer gson = new JsonFormatter(JsonFactory.get(JsonFactory.JSON.GSON));
         String expected = gson.toJson(object);
         String actual = json.toJson(object);
@@ -18,13 +18,8 @@ class SimpleJsonSerializerTest {
     }
 
     @Test
-    void plainObjectTest() {
+    void plainTest() {
         compareWithGson(new Plain());
-    }
-
-    @Test
-    void plainWrapperObjectTest() {
-        compareWithGson(new PlainWrappers());
     }
 
     @Test
@@ -33,8 +28,8 @@ class SimpleJsonSerializerTest {
     }
 
     @Test
-    void complexArraysTest() {
-        compareWithGson(new ComplexArrays());
+    void complexSetTest() {
+        compareWithGson(new ComplexSet());
     }
 
     @Test
@@ -43,7 +38,12 @@ class SimpleJsonSerializerTest {
     }
 
     @Test
-    void complexSetTest() {
-        compareWithGson(new ComplexSet());
+    void complexArrayTest() {
+        compareWithGson(new ComplexArrays());
+    }
+
+    @Test
+    void plainWrappers() {
+        compareWithGson(new PlainWrappers());
     }
 }

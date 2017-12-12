@@ -1,13 +1,14 @@
-package ru.otus.json;
+package ru.otus.classes;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class Plain {
-    boolean aBoolean = true;
-    byte aByte = 7;
-    char aChar = '\u0001';
-    short aShort = -1;
-    int anInt;
-    float aFloat;
-    double aDouble = 1.0;
+    private boolean aBoolean = true;
+    private byte aByte = 7;
+    private char aChar = '\u0001';
+    private short aShort = -1;
+    private int anInt;
+    private float aFloat;
+    private double aDouble = 1.0;
 
     @Override
     public String toString() {

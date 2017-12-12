@@ -15,7 +15,7 @@ public class JsonFactory {
         return jsonSerializer.getOrDefault(json, null);
     }
 
-    private static final Map<JSON, JsonSerializer> jsonSerializer = new HashMap<JSON, JsonSerializer>();
+    private static final Map<JSON, JsonSerializer> jsonSerializer = new HashMap<>();
     static {
         jsonSerializer.put(JSON.GSON, new GsonSerializer());
     }
