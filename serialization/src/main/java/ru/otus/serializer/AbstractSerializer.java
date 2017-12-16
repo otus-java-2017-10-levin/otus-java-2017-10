@@ -1,5 +1,6 @@
 package ru.otus.serializer;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.otus.json.ArrayBuilder;
@@ -18,6 +19,14 @@ abstract class AbstractSerializer implements JsonSerializer {
 
     @Override
     public String toJson(Object object) {
+        if (object.getClass().isArray()) {
+            try {
+                return BuilderFactory.createArrayBuilder(this.builder).add(putArray(convert(object))).build().toString();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             return parseObject(object).toString();
         } catch (IllegalAccessException e) {
@@ -45,12 +54,22 @@ abstract class AbstractSerializer implements JsonSerializer {
                 builder.addNode(fieldName, null);
 
             if (isCollection(fieldClass)) {
-                Collection<?> coll = Collection.class.cast(value);
-                builder.addNode(fieldName, putArray((coll.toArray())));
+
+                if (value != null) {
+                    Collection<?> coll = Collection.class.cast(value);
+                    builder.addNode(fieldName, putArray(coll.toArray()));
+                }
             } else if (isPlain(fieldClass)) {
                 builder.addNode(fieldName, value);
             } else if (fieldClass.isArray()) {
-                builder.addNode(fieldName, putArray((Object[]) value));
+                if (value != null) {
+                    Class arrayClass = value.getClass().getComponentType();
+                    if (arrayClass.isPrimitive()) {
+                        builder.addNode(fieldName, putArray(convert(value)));
+                    } else {
+                        builder.addNode(fieldName, putArray((Object[]) value));
+                    }
+                }
             } else {
                 assert value != null;
                 builder.addNode(fieldName, parseObject(value));
@@ -59,8 +78,36 @@ abstract class AbstractSerializer implements JsonSerializer {
         return builder.build();
     }
 
-    private Object putArray(Object[] list) throws IllegalAccessException {
+    private Object[] convert(Object primitiveArray) {
+        Class<?> cl = primitiveArray.getClass();
+        if (cl.equals(boolean[].class)) {
+            return ArrayUtils.toObject(boolean[].class.cast(primitiveArray));
+        }
+        if (cl.equals(byte[].class)) {
+            return ArrayUtils.toObject(byte[].class.cast(primitiveArray));
+        }
+        if (cl.equals(char[].class)) {
+            return ArrayUtils.toObject(char[].class.cast(primitiveArray));
+        }
+        if (cl.equals(short[].class)) {
+            return ArrayUtils.toObject(short[].class.cast(primitiveArray));
+        }
+        if (cl.equals(int[].class)) {
+            return ArrayUtils.toObject(int[].class.cast(primitiveArray));
+        }
+        if (cl.equals(long[].class)) {
+            return ArrayUtils.toObject(long[].class.cast(primitiveArray));
+        }
+        if (cl.equals(float[].class)) {
+            return ArrayUtils.toObject(float[].class.cast(primitiveArray));
+        }
+        if (cl.equals(double[].class)) {
+            return ArrayUtils.toObject(double[].class.cast(primitiveArray));
+        }
+        throw new IllegalStateException();
+    }
 
+    private Object putArray(Object[] list) throws IllegalAccessException {
         ArrayBuilder builder = BuilderFactory.createArrayBuilder(this.builder);
 
         if (list == null)

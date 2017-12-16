@@ -8,9 +8,7 @@ final class JavaXObjectBuilder implements ObjectBuilder {
 
     @Override
     public ObjectBuilder addNode(String name, Object node) {
-        if (instance == null) {
-            instance = factory.createObjectBuilder();
-        }
+        checkValid();
         try {
             instance.add(name, JavaXUtils.valueOf(node));
         } catch (IllegalArgumentException e) {
@@ -21,6 +19,13 @@ final class JavaXObjectBuilder implements ObjectBuilder {
 
     @Override
     public Object build() {
+        checkValid();
         return instance.build();
+    }
+
+    private void checkValid() {
+        if (instance == null) {
+            instance = factory.createObjectBuilder();
+        }
     }
 }
