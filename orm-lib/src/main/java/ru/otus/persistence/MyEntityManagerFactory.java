@@ -1,10 +1,15 @@
-package ru.otus.persistance;
+package ru.otus.persistence;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MyEntityManagerFactory implements EntityManagerFactory {
+
+
+    private List<EntityManager> entities = new ArrayList<>();
 
     /**
      * Create a new EntityManager.
@@ -14,7 +19,7 @@ public class MyEntityManagerFactory implements EntityManagerFactory {
      */
     @Override
     public EntityManager createEntityManager() {
-        return null;
+        return createEntityManager(null);
     }
 
     /**
@@ -28,7 +33,7 @@ public class MyEntityManagerFactory implements EntityManagerFactory {
      */
     @Override
     public EntityManager createEntityManager(Map map) {
-        return null;
+        return new MyEntityManager();
     }
 
     /**

@@ -1,4 +1,4 @@
-package ru.otus.persistance;
+package ru.otus.persistence;
 /*
  *  Copyright by Flow on 18.12.2017.
  
@@ -10,7 +10,7 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 import java.util.Map;
 
-public class MyPersistanceProvider implements PersistenceProvider {
+public class MyPersistenceProvider implements PersistenceProvider {
 
     /**
      * Called by Persistence class when an {@link EntityManagerFactory}
@@ -27,7 +27,7 @@ public class MyPersistanceProvider implements PersistenceProvider {
      */
     @Override
     public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
-        return null;
+        return new MyEntityManagerFactory();
     }
 
     /**

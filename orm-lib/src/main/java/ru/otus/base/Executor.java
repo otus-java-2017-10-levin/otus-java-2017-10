@@ -1,5 +1,7 @@
 package ru.otus.base;
 
+import ru.otus.jdbc.ResultHandler;
+
 import java.sql.*;
 import java.util.List;
 
@@ -22,7 +24,6 @@ public class Executor {
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         return null;
     }
-
 
     public <T> T execQuery(String query, ResultHandler<T> handler) throws SQLException {
         try (Statement stmt = connection.createStatement()) {

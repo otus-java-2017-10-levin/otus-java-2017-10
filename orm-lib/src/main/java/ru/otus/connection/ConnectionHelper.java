@@ -16,7 +16,6 @@ class ConnectionHelper {
                     "db_example?" +              //db name
                     "user=Flow&" +              //login
                     "password=grandmaster&" +           //password
-
                     "useSSL=false";             //do not use Secure Sockets Layer
 
 

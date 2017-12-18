@@ -1,4 +1,4 @@
-package ru.otus.persistance;
+package ru.otus.persistence;
 
 import javax.persistence.*;
 

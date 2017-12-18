@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.connection;
 
 import ru.otus.base.DBService;
 import ru.otus.connection.DBConnection;

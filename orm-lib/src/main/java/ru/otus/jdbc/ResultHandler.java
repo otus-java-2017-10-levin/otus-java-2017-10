@@ -1,4 +1,4 @@
-package ru.otus.base;
+package ru.otus.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
