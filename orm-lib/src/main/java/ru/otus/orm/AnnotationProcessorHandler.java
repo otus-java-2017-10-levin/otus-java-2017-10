@@ -6,7 +6,7 @@ public class AnnotationProcessorHandler implements AnnotationProcessor {
 
     @Override
     public OrmField processId(Annotation[] annotations) throws IllegalArgumentException {
-        OrmField.builder().
+//        OrmField.builder().
         return null;
     }
 
