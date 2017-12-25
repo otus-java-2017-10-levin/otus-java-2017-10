@@ -33,7 +33,7 @@ public class MyEntityManagerFactory implements EntityManagerFactory {
      */
     @Override
     public EntityManager createEntityManager(Map map) {
-        return new MyEntityManager();
+        return new MyEntityManager(map);
     }
 
     /**

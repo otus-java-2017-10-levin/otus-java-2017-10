@@ -1,25 +1,19 @@
 package ru.otus.base;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
-@Table
+@Data
 public class UsersDataSet {
-    private final long id;
-    private final String name;
+    @Id
+    private long id;
+    private String name;
+
+    public UsersDataSet() {}
 
     public UsersDataSet(long id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    @Id
-    @Column(name = "USER_ID")
-    public long getId() {
-        return id;
-    }
-
-    @Column(name = "USER_NAME")
-    public String getName() {
-        return name;
     }
 }

@@ -13,7 +13,7 @@ public class App
     {
 
         UsersDataSet set = new UsersDataSet(1, "Flow");
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("otusJPA", new HashMap());
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("otusJPAPSQL", new HashMap());
         EntityManager em = factory.createEntityManager();
 
         em.persist(set);
@@ -24,7 +24,7 @@ public class App
 //            System.out.println(connection.getMetaData());
 //            connection.prepareTables();
 //            connection.addUsers("Flow", "Jolly");
-//            System.out.println("get the first user name: " + connection.getUserName(1));
+//            System.out.println("get the first user phone: " + connection.getUserName(1));
 //            System.out.println(connection.getAllNames());
 //            connection.deleteTables();
 //        }

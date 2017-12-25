@@ -1,8 +1,50 @@
 package ru.otus.persistence;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
+import ru.otus.annotations.AnnotatedClass;
+import ru.otus.jdbc.DBConnection;
+import ru.otus.jdbc.DbManagerFactory;
+import ru.otus.xml.PersistenceParams;
+
 import javax.persistence.*;
+import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
+import java.util.*;
 
 public class MyEntityManager implements EntityManager {
+
+    private DBConnection connection;
+    private PersistenceParams params;
+    private List<AnnotatedClass> annotatedClass = new ArrayList<>();
+    private boolean isOpen;
+    private Map<AnnotatedClass, Set<Object>> objects = new HashMap<>();
+
+    public MyEntityManager(Map params) {
+        this.params = new PersistenceParams(params);
+        connection = DbManagerFactory.createDataBaseManager(this.params.getConnectionData()).createConnection();
+        try {
+            loadEntityClasses();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        isOpen = true;
+        dropTables();
+        createTables();
+    }
+
+    private void loadEntityClasses() throws ClassNotFoundException {
+        if (params == null || params.getEntityClasses().size() == 0)
+            throw new IllegalStateException("There is no entity classes in persistence.xml");
+
+        for (String className : params.getEntityClasses()) {
+            if (className == null)
+                throw new IllegalArgumentException("className is null");
+
+            AnnotatedClass cl = AnnotatedClass.of(Class.forName(className));
+
+            annotatedClass.add(cl);
+        }
+    }
 
     /**
      * Make an entity instance managed and persistent.
@@ -22,7 +64,27 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public void persist(Object entity) {
+        if (!isOpen)
+            throw new IllegalStateException("EntityManager is closed");
 
+        AnnotatedClass cl = checkEntity(entity);
+
+        Set<Object> set = objects.containsKey(cl) ? objects.get(cl) : new HashSet<>();
+
+        if (set.contains(entity))
+            throw new EntityExistsException();
+
+        set.add(entity);
+        objects.put(cl, set);
+    }
+
+    private AnnotatedClass checkEntity(Object entity) {
+        for (AnnotatedClass cl : annotatedClass) {
+            if (cl.is(entity)) {
+                return cl;
+            }
+        }
+        throw new IllegalArgumentException("is not an entity");
     }
 
     /**
@@ -160,6 +222,7 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public void lock(Object entity, LockModeType lockMode) {
+        throw new UnsupportedOperationException();
 
     }
 
@@ -222,22 +285,22 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(String qlString) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
      * Create an instance of Query for executing a
      * named query (in the Java Persistence query language or in native SQL).
      *
-     * @param name the name of a query defined in metadata
+     * @param name the phone of a query defined in metadata
      * @return the new query instance
      * @throws IllegalStateException    if this EntityManager has been closed.
      * @throws IllegalArgumentException if a query has not been
-     *                                  defined with the given name
+     *                                  defined with the given phone
      */
     @Override
     public Query createNamedQuery(String name) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -272,7 +335,7 @@ public class MyEntityManager implements EntityManager {
      * a native SQL query.
      *
      * @param sqlString        a native SQL query string
-     * @param resultSetMapping the name of the result set mapping
+     * @param resultSetMapping the phone of the result set mapping
      * @return the new query instance
      * @throws IllegalStateException if this EntityManager has been closed.
      */
@@ -324,7 +387,57 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public void close() {
+        if (!isOpen)
+            throw new IllegalStateException();
 
+        writeObjects();
+
+        isOpen = false;
+    }
+
+    private void writeObjects() {
+        saveObjects();
+    }
+
+    private void saveObjects() {
+        for (Map.Entry<AnnotatedClass, Set<Object>> entry : objects.entrySet()) {
+            saveObject(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void saveObject(AnnotatedClass annotatedClass, Set<Object> objects) {
+        String query = TableFactory.getInsertQuery(annotatedClass);
+        connection.execQuery(query, statement -> {
+            for (Object object : objects) {
+                int count = 1;
+                for (Field field : annotatedClass.getFields()) {
+
+                    try {
+                        statement.setString(count++, FieldUtils.readField(field, object, true).toString());
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+                count = 0;
+                statement.execute();
+            }
+        });
+    }
+
+    private void dropTables() {
+        for (AnnotatedClass cl : annotatedClass) {
+            String query = TableFactory.getDropTableQuery(cl);
+            System.out.println(query);
+            connection.execQuery(query);
+        }
+    }
+
+    private void createTables() {
+        for (AnnotatedClass cl : annotatedClass) {
+            String query = TableFactory.getQuery(cl);
+            System.out.println(query);
+            connection.execQuery(query);
+        }
     }
 
     /**
@@ -334,7 +447,7 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public boolean isOpen() {
-        return false;
+        return isOpen;
     }
 
     /**
@@ -348,6 +461,6 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public EntityTransaction getTransaction() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

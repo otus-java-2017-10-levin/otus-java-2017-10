@@ -1,7 +1,6 @@
 package ru.otus.jdbc;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.xml.PersistanceParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DbManagerFactoryTest {
 
-    private static final String persistanceUnit = "otusJPA";
-    private static final String persistancePath = "META-INF/persistence.xml";
 
-    public static final Map<String, String> properties = PersistanceParser.parse(persistanceUnit, persistancePath);
     @Test
     void createOnEmptyMapTest() {
         HashMap<String, String> props = new HashMap<>();
@@ -23,7 +19,7 @@ class DbManagerFactoryTest {
 
     @Test
     void createTest() {
-        DbManager dbManager = DbManagerFactory.createDataBaseManager(properties);
+        DbManager dbManager = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties);
 
         assertEquals(true, dbManager != null);
     }
@@ -31,8 +27,8 @@ class DbManagerFactoryTest {
     @Test
     void createDatabaseWithWrongDriverTest() {
         Map<String, String> properties = new HashMap<>();
-        properties.put("javax.persistence.jdbc.driver", "com.mysql.cj.jdbc.Driver1");
+        properties.put(JdbcTestParams.DB_DRIVER_KEY, "com.mysql.cj.jdbc.Driver1");
         Exception e = assertThrows(IllegalArgumentException.class, () -> DbManagerFactory.createDataBaseManager(properties));
-        assertEquals("Cannot create database manager. Unsupported driver.", e.getMessage());
+        assertEquals("Driver com.mysql.cj.jdbc.Driver1 is not supported", e.getMessage());
     }
 }

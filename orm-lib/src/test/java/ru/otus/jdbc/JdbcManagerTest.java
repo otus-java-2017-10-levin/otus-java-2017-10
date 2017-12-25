@@ -3,6 +3,7 @@ package ru.otus.jdbc;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,9 +11,8 @@ class JdbcManagerTest {
 
     @Test
     void createConnectionTest() {
-        DbManager manager = DbManagerFactory.createDataBaseManager(new HashMap<>());
+        DbManager manager = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties);
 
-        assert manager != null;
         try (DBConnection connection = manager.createConnection()) {
             assertEquals(true, connection != null);
         } catch (Exception e) {
@@ -22,9 +22,8 @@ class JdbcManagerTest {
 
     @Test
     void createConnectionWithWrongParamsTest() {
-        DbManager manager = DbManagerFactory.createDataBaseManager(new HashMap<>());
-
-        Exception e = assertThrows(IllegalArgumentException.class, () -> manager.createConnection());
-        assertEquals("Connection failed to db! Wrong params.", e.getMessage());
+        Map<String, String> props = new HashMap<>();
+        props.put(JdbcTestParams.DB_DRIVER_KEY, "org.postgresql.Driver");
+        assertThrows(IllegalArgumentException.class, () -> DbManagerFactory.createDataBaseManager(props));
     }
 }
