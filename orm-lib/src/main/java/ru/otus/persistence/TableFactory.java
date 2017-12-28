@@ -5,7 +5,7 @@ import ru.otus.base.UsersDataSet;
 
 import java.lang.reflect.Field;
 
-public class TableFactory {
+class TableFactory {
     private static final String CREATE_IF_NOT_EXIST = "create table if not exists ";
     private static final String ID_FIELD = " bigint auto_increment";
     private static final String PRIMARY_KEY = "primary key (";
@@ -86,9 +86,7 @@ public class TableFactory {
     }
 
     public static String getDropTableQuery(AnnotatedClass annotatedClass) {
-        StringBuilder sb = new StringBuilder(DROP_TABLE);
-        sb.append(annotatedClass.getSimpleName()).append(IF_EXIST);
 
-        return sb.toString().toUpperCase();
+        return (DROP_TABLE + annotatedClass.getSimpleName() + IF_EXIST).toUpperCase();
     }
 }

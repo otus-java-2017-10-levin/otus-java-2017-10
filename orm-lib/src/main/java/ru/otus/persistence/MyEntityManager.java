@@ -1,25 +1,29 @@
 package ru.otus.persistence;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.otus.annotations.AnnotatedClass;
+import ru.otus.base.UsersDataSet;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManagerFactory;
 import ru.otus.xml.PersistenceParams;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.*;
 
-public class MyEntityManager implements EntityManager {
+class MyEntityManager implements EntityManager {
 
-    private DBConnection connection;
-    private PersistenceParams params;
-    private List<AnnotatedClass> annotatedClass = new ArrayList<>();
+    private final DBConnection connection;
+    private final PersistenceParams params;
+    private final List<AnnotatedClass> annotatedClass = new ArrayList<>();
     private boolean isOpen;
-    private Map<AnnotatedClass, Set<Object>> objects = new HashMap<>();
+    private final Map<AnnotatedClass, Set<Object>> objects = new HashMap<>();
 
-    public MyEntityManager(Map params) {
+    MyEntityManager(Map params) {
         this.params = new PersistenceParams(params);
         connection = DbManagerFactory.createDataBaseManager(this.params.getConnectionData()).createConnection();
         try {
@@ -138,7 +142,45 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey) {
-        return null;
+        if (!isOpen)
+            throw new IllegalStateException();
+
+        final AnnotatedClass cl = AnnotatedClass.of(entityClass);
+
+        Class<?> cl1 = cl.getId().getType();
+        if (cl1.isPrimitive())
+            cl1 = ClassUtils.primitiveToWrapper(cl1);
+        Class<?> cl2 = primaryKey.getClass();
+        if (!annotatedClass.contains(cl) ||
+                !cl1.equals(cl2)) {
+            throw new IllegalArgumentException();
+        }
+
+        long id = -1;
+        try {
+            id = ((Long) primaryKey);
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+
+        T cls = null;
+        try {
+            cls = connection.execQuery("SELECT * FROM "+ cl.getSimpleName() + " WHERE ID =" + id, result -> {
+
+                ObjectBuilder<T> builder = new ObjectBuilder<T>(entityClass);
+                result.next();
+                builder.set("id", result.getLong("id"));
+                for (Field f: cl.getFields()) {
+                    String name = f.getName();
+                    builder.set(name, result.getString(name));
+                }
+                return builder.build();
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return cls;
     }
 
     /**
@@ -179,7 +221,10 @@ public class MyEntityManager implements EntityManager {
      */
     @Override
     public void flush() {
+        if (!isOpen)
+            throw new IllegalStateException();
 
+        writeObjects();
     }
 
     /**
@@ -418,10 +463,27 @@ public class MyEntityManager implements EntityManager {
                         e.printStackTrace();
                     }
                 }
-                count = 0;
                 statement.execute();
+                long id = connection.getLastInsertedId();
+                saveObjectId(annotatedClass, object, id);
             }
         });
+    }
+
+    private void saveObjectId(AnnotatedClass annotatedClass, Object object, long id) {
+
+        Class<?> cl = annotatedClass.getAnnotatedClass();
+        try {
+            Method m = cl.getMethod("setId", long.class);
+            try {
+                m.invoke(object, id);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     private void dropTables() {

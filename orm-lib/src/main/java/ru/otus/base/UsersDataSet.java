@@ -1,6 +1,6 @@
 package ru.otus.base;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,8 +12,7 @@ public class UsersDataSet {
 
     public UsersDataSet() {}
 
-    public UsersDataSet(long id, String name) {
-        this.id = id;
+    public UsersDataSet(String name) {
         this.name = name;
     }
 }

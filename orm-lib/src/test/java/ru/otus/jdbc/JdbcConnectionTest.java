@@ -1,36 +1,56 @@
 package ru.otus.jdbc;
 
 import org.dbunit.Assertion;
-import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.junit.Before;
 import org.junit.jupiter.api.*;
 import ru.otus.H2Db;
+import ru.otus.base.UsersDataSet;
 
 import java.sql.SQLException;
 
 
 class JdbcConnectionTest extends H2DatabaseTest {
 
-    private final String create = "insert into user (name) values ('Flow')";
+    private final String INSERT = "insert into user (name) values ('Flow')";
     private final String createUserTable = "create table if not exists user (id bigint auto_increment, name varchar(256), primary key (id))";
-    private final String TABLE_NAME = "USER";
-    private DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).createConnection();
+    private final String TABLE_NAME = "user";
+    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).createConnection();
 
-    public JdbcConnectionTest(TestInfo testInfo) {
+    JdbcConnectionTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());
+    }
+    @Before
+    void srart() throws SQLException {
+        H2Db.start();
     }
 
     @BeforeEach
-    void createTable() throws SQLException {
-        H2Db.start();
+    void createTable() {
+        connection.execQuery("DROP TABLE USER IF EXISTS");
         connection.execQuery(createUserTable);
     }
 
     @Test
+    void testSelect() throws SQLException {
+        connection.execQuery(INSERT);
+        UsersDataSet set = connection.execQuery("SELECT * FROM "+TABLE_NAME + " WHERE ID = 1", result -> {
+            UsersDataSet user = new UsersDataSet();
+            result.next();
+            user.setId(result.getLong("id"));
+            user.setName(result.getString("name"));
+            return user;
+        });
+
+        assertEquals(1, set.getId());
+        assertEquals("Flow", set.getName());
+    }
+
+    @Test
     void executeQueryWithoutAnswer() throws Exception {
-        assertEquals(true, connection.execQuery(create));
+        assertEquals(true, connection.execQuery(INSERT));
 
         IDataSet databaseDataSet = getConnection().createDataSet();
         ITable actualTable = databaseDataSet.getTable(TABLE_NAME);
@@ -41,9 +61,32 @@ class JdbcConnectionTest extends H2DatabaseTest {
         Assertion.assertEquals(expectedTable, actualTable);
     }
 
+    @Test
+    void executeQueryThatReturnsLong() {
+        connection.execQuery(INSERT);
+
+        try {
+            long id = connection.execQuery("SELECT SCOPE_IDENTITY()", result -> {
+                result.next();
+                return result.getLong(1);
+            });
+            assertEquals(1, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void getLastInsertedIdInConnection() {
+        connection.execQuery(INSERT);
+
+        long id = connection.getLastInsertedId();
+        assertEquals(1, id);
+    }
+
     @AfterEach
-    void dropTable()  {
-        connection.execQuery("drop table user");
+    void closeServer() throws SQLException {
+        connection.execQuery("drop table user if exists");
     }
 
     @Override

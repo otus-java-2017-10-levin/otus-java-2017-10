@@ -6,12 +6,13 @@ import ru.otus.base.UsersDataSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TableCreationTest {
+@SuppressWarnings("SpellCheckingInspection")
+class TableCreationTest {
 
     @Test
     void createTableFromEntity() {
         AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
-        UsersDataSet user = new UsersDataSet(1, "Flow");
+        UsersDataSet user = new UsersDataSet("Flow");
 
         String actualQuery = TableFactory.getQuery(annotatedClass);
         String expectedQuery = "CREATE TABLE IF NOT EXISTS USERSDATASET (ID BIGINT AUTO_INCREMENT, NAME VARCHAR(256), PRIMARY KEY (ID))";

@@ -7,7 +7,7 @@ import org.xml.sax.SAXParseException;
 import java.io.PrintStream;
 
 class MyErrorHandler implements ErrorHandler {
-    private PrintStream out;
+    private final PrintStream out;
 
     MyErrorHandler(PrintStream out) {
         this.out = out;
@@ -20,10 +20,8 @@ class MyErrorHandler implements ErrorHandler {
             systemId = "null";
         }
 
-        String info = "URI=" + systemId + " Line="
+        return "URI=" + systemId + " Line="
                 + spe.getLineNumber() + ": " + spe.getMessage();
-
-        return info;
     }
 
     public void warning(SAXParseException spe) throws SAXException {

@@ -11,9 +11,13 @@ import java.util.Set;
 public class AnnotatedClass {
 
     private static Map<Class<?>, AnnotatedClass> cacheClasses;
-    private Class<?> annotatedClass;
+    private final Class<?> annotatedClass;
 
-    private Set<Field> fields = new HashSet<>();
+    public Class<?> getAnnotatedClass() {
+        return annotatedClass;
+    }
+
+    private final Set<Field> fields = new HashSet<>();
     private Field idField;
 
     private AnnotatedClass(Class<?> annotatedClass) {
@@ -21,6 +25,12 @@ public class AnnotatedClass {
         parse();
     }
 
+    /**
+     * Create AnnotatedClass instance.
+     * @param key - class to create AnnotatedClass instance
+     * @throws IllegalArgumentException - if class has no @Id field
+     * @return - instance of AnnotatedClass
+     */
     public static AnnotatedClass of(Class<?> key) {
         if (cacheClasses == null)
             cacheClasses = new HashMap<>();
@@ -42,6 +52,8 @@ public class AnnotatedClass {
                 fields.add(f);
             }
         }
+        if (idField == null)
+            throw new IllegalArgumentException();
     }
 
     public Field getId() {

@@ -1,8 +1,12 @@
 package ru.otus.annotations;
 
+
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.h2.engine.UserDataType;
 import org.junit.jupiter.api.Test;
 import ru.otus.base.PhoneDataSet;
 import ru.otus.base.UsersDataSet;
+import ru.otus.persistence.PersistenceHelper;
 
 import java.lang.reflect.Field;
 import java.util.Set;
@@ -12,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AnnotationsTest {
 
-    private AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+    private final AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
 
     @Test
     void loadAnnotations() {
@@ -31,7 +35,7 @@ class AnnotationsTest {
 
     @Test
     void ifObjectIsEntity() {
-        UsersDataSet set = new UsersDataSet(1, "Flow");
+        UsersDataSet set = new UsersDataSet("Flow");
         PhoneDataSet phone = new PhoneDataSet(1, "100");
         AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
 
@@ -52,5 +56,12 @@ class AnnotationsTest {
         AnnotatedClass anno2 = AnnotatedClass.of(UsersDataSet.class);
 
         assertEquals(anno1, anno2);
+    }
+
+
+    @Test
+    void createWithWrongClass() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> AnnotatedClass.of(String.class));
+        assertEquals(null, e.getMessage());
     }
 }

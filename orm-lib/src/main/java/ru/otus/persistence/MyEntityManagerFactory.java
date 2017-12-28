@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MyEntityManagerFactory implements EntityManagerFactory {
+class MyEntityManagerFactory implements EntityManagerFactory {
 
 
     private List<EntityManager> entities = new ArrayList<>();

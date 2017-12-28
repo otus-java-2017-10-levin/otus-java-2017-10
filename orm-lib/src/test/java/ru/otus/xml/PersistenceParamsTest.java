@@ -11,19 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersistenceParamsTest {
 
-    private String persistenceUnit = "otusJPAMySQL";
-    private String persistencePath = "META-INF/persistence.xml";
+    private final String persistenceUnit = "otusJPAMySQL";
+    private final String persistencePath = "META-INF/persistence.xml";
 
     @Test
     void parseXMLWithNull() {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            new PersistenceParams(null, "");
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () -> new PersistenceParams(null, ""));
         assertEquals("Argument is null", e.getMessage());
 
-        e = assertThrows(IllegalArgumentException.class, () -> {
-            new PersistenceParams(persistenceUnit, null);
-        });
+        e = assertThrows(IllegalArgumentException.class, () -> new PersistenceParams(persistenceUnit, null));
         assertEquals("Argument is null", e.getMessage());
     }
 
@@ -38,9 +34,7 @@ class PersistenceParamsTest {
 
     @Test
     void parseXMLWrongURL() {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            new PersistenceParams(persistenceUnit, "");
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () -> new PersistenceParams(persistenceUnit, ""));
         assertEquals("Wrong XML path!", e.getMessage());
     }
 
