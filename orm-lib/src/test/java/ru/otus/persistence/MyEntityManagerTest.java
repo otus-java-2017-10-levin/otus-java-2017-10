@@ -86,6 +86,24 @@ class MyEntityManagerTest extends H2DatabaseTest {
             assertEquals("Flow", set.getName());
             assertEquals(id, set.getId());
         }
+
+        @Test
+        void findTestMultipleTypes() {
+            PhoneDataSet set = new PhoneDataSet("Flow");
+            set.setHouseNumber(11);
+
+            em.persist(set);
+            em.flush();
+
+            set.setPhone("Flow1");
+            long id = set.getId();
+            set = em.find(PhoneDataSet.class, id);
+            em.close();
+
+            assertEquals("Flow", set.getPhone());
+            assertEquals(11, set.getHouseNumber());
+            assertEquals(id, set.getId());
+        }
     }
 
     @Override

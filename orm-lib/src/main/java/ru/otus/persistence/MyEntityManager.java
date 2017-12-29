@@ -3,16 +3,17 @@ package ru.otus.persistence;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.otus.annotations.AnnotatedClass;
-import ru.otus.base.UsersDataSet;
+import ru.otus.annotations.AnnotationField;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManagerFactory;
 import ru.otus.xml.PersistenceParams;
 
 import javax.persistence.*;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.*;
 
 class MyEntityManager implements EntityManager {
@@ -165,21 +166,22 @@ class MyEntityManager implements EntityManager {
 
         T cls = null;
         try {
-            cls = connection.execQuery("SELECT * FROM "+ cl.getSimpleName() + " WHERE ID =" + id, result -> {
+            cls = connection.execQuery(QueryFactory.getSelectQuery(cl, id), result -> {
 
                 ObjectBuilder<T> builder = new ObjectBuilder<T>(entityClass);
+                ResultSetMetaData rsmd = result.getMetaData();
                 result.next();
-                builder.set("id", result.getLong("id"));
-                for (Field f: cl.getFields()) {
-                    String name = f.getName();
-                    builder.set(name, result.getString(name));
+
+                int count = rsmd.getColumnCount();
+                for (int i = 1; i <= count; i++) {
+                    String name = rsmd.getColumnName(i);
+                    builder.set(cl.getField(name).getName(), result.getObject(i));
                 }
                 return builder.build();
             });
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return cls;
     }
 
@@ -451,14 +453,17 @@ class MyEntityManager implements EntityManager {
     }
 
     private void saveObject(AnnotatedClass annotatedClass, Set<Object> objects) {
-        String query = TableFactory.getInsertQuery(annotatedClass);
+        String query = QueryFactory.getInsertQuery(annotatedClass);
         connection.execQuery(query, statement -> {
             for (Object object : objects) {
                 int count = 1;
-                for (Field field : annotatedClass.getFields()) {
-
+                for (AnnotationField field : annotatedClass.getFields()) {
                     try {
-                        statement.setString(count++, FieldUtils.readField(field, object, true).toString());
+                        if (field.isPrimaryKey())
+                            statement.setNull(count++, Types.BIGINT);
+                        else
+                            statement.setString(count++, FieldUtils.readField(field.getField(), object, true).toString());
+
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -488,7 +493,7 @@ class MyEntityManager implements EntityManager {
 
     private void dropTables() {
         for (AnnotatedClass cl : annotatedClass) {
-            String query = TableFactory.getDropTableQuery(cl);
+            String query = QueryFactory.getDropTableQuery(cl);
             System.out.println(query);
             connection.execQuery(query);
         }
@@ -496,7 +501,7 @@ class MyEntityManager implements EntityManager {
 
     private void createTables() {
         for (AnnotatedClass cl : annotatedClass) {
-            String query = TableFactory.getQuery(cl);
+            String query = QueryFactory.createTableQuery(cl);
             System.out.println(query);
             connection.execQuery(query);
         }

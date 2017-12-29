@@ -27,7 +27,6 @@ public class MyPersistenceProvider implements PersistenceProvider {
      */
     @Override
     public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
-//        Map<String, Object> props = ;
         return new MyEntityManagerFactory();
     }
 

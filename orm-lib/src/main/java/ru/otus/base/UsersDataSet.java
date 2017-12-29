@@ -10,6 +10,7 @@ public class UsersDataSet {
     private long id;
     private String name;
 
+
     public UsersDataSet() {}
 
     public UsersDataSet(String name) {

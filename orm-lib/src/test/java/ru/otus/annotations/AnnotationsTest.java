@@ -9,6 +9,7 @@ import ru.otus.base.UsersDataSet;
 import ru.otus.persistence.PersistenceHelper;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,16 +22,16 @@ class AnnotationsTest {
     @Test
     void loadAnnotations() {
 
-        Field idField = annotatedClass.getId();
+        AnnotationField idField = annotatedClass.getId();
 
         assertEquals(true, idField.getName().equals("id"));
     }
 
     @Test
     void getArrayOfFields() {
-        Set<Field> fields = annotatedClass.getFields();
+        List<AnnotationField> fields = annotatedClass.getFields();
 
-        assertEquals(1, fields.size());
+        assertEquals(2, fields.size());
     }
 
     @Test
@@ -63,5 +64,15 @@ class AnnotationsTest {
     void createWithWrongClass() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> AnnotatedClass.of(String.class));
         assertEquals(null, e.getMessage());
+    }
+
+    @Test
+    void getFieldByNameInBase() {
+        AnnotatedClass user = AnnotatedClass.of(UsersDataSet.class);
+
+        String dbName = "NAME";
+        AnnotationField f = user.getField(dbName);
+
+        assertEquals("name", f.getName());
     }
 }
