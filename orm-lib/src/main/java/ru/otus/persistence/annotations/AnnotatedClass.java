@@ -3,7 +3,6 @@ package ru.otus.persistence.annotations;
 import java.lang.reflect.Field;
 import java.util.*;
 
-
 public class AnnotatedClass {
 
     private static Map<Class<?>, AnnotatedClass> cacheClasses;
