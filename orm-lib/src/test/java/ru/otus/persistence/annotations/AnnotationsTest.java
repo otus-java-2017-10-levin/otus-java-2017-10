@@ -1,16 +1,11 @@
-package ru.otus.annotations;
+package ru.otus.persistence.annotations;
 
 
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.h2.engine.UserDataType;
 import org.junit.jupiter.api.Test;
 import ru.otus.base.PhoneDataSet;
 import ru.otus.base.UsersDataSet;
-import ru.otus.persistence.PersistenceHelper;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,14 +17,14 @@ class AnnotationsTest {
     @Test
     void loadAnnotations() {
 
-        AnnotationField idField = annotatedClass.getId();
+        AnnotatedField idField = annotatedClass.getId();
 
         assertEquals(true, idField.getName().equals("id"));
     }
 
     @Test
     void getArrayOfFields() {
-        List<AnnotationField> fields = annotatedClass.getFields();
+        List<AnnotatedField> fields = annotatedClass.getFields();
 
         assertEquals(2, fields.size());
     }
@@ -37,7 +32,7 @@ class AnnotationsTest {
     @Test
     void ifObjectIsEntity() {
         UsersDataSet set = new UsersDataSet("Flow");
-        PhoneDataSet phone = new PhoneDataSet(1, "100");
+        PhoneDataSet phone = new PhoneDataSet("100", 1);
         AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
 
         assertEquals(true, annotatedClass.is(set));
@@ -71,7 +66,7 @@ class AnnotationsTest {
         AnnotatedClass user = AnnotatedClass.of(UsersDataSet.class);
 
         String dbName = "NAME";
-        AnnotationField f = user.getField(dbName);
+        AnnotatedField f = user.getField(dbName);
 
         assertEquals("name", f.getName());
     }

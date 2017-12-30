@@ -4,26 +4,24 @@ import java.sql.*;
 
 class JdbcConnection implements  DBConnection {
 
-
     private static final String SCOPE_IDENTITY = "SELECT SCOPE_IDENTITY()";
     private final Connection connection;
     JdbcConnection(Connection connection) {
         this.connection = connection;
     }
 
-        @Override
+    @Override
     public void close() throws Exception {
         connection.close();
     }
 
     @Override
-    public boolean execQuery(String query) throws IllegalArgumentException {
+    public void execQuery(String query) throws IllegalArgumentException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true;
     }
 
 
@@ -38,9 +36,8 @@ class JdbcConnection implements  DBConnection {
     }
 
     @Override
-    public <T> T execQuery(String query, TResultHandler<T> handler) throws SQLException {
+    public <T> T execQuery(String query, ResultHandler<T> handler) throws SQLException {
         try(Statement stmt = connection.createStatement()) {
-            System.out.println(query);
             stmt.execute(query);
             ResultSet result = stmt.getResultSet();
             return handler.handle(result);
@@ -50,6 +47,8 @@ class JdbcConnection implements  DBConnection {
     /**
      * It returns the last IDENTITY value produced on a connection
      * and by a statement in the same scope, regardless of the table that produced the value.
+     *
+     * Supports only long type id
      *
      * @return - last added id
      */

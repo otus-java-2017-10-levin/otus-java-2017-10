@@ -1,14 +1,14 @@
 package ru.otus.persistence;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
-import ru.otus.base.UsersDataSet;
+import ru.otus.persistence.annotations.AnnotatedClass;
+import ru.otus.persistence.annotations.AnnotatedField;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Builder for reconstructing objects from database
- *
+ * We set fields values through getters via reflection, and call build.
+
  * @param <T> - object's class
  */
 final class ObjectBuilder<T> {
@@ -22,9 +22,17 @@ final class ObjectBuilder<T> {
         }
     }
 
+    /**
+     * Set {@code value} for the field {@code fieldName}
+     * @param fieldName - string name of field
+     * @param value - new value for the {@code fieldName}
+     * @param <R> -
+     * @return -
+     */
     public <R> ObjectBuilder<T> set(String fieldName, R value) {
         try {
-            PersistenceHelper.setFieldValue(object, fieldName, value);
+            AnnotatedField field = AnnotatedClass.of(object.getClass()).getField(fieldName);
+            PersistenceHelper.setFieldValue(object, field, value);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

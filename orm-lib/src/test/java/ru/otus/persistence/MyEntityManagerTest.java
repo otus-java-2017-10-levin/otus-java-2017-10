@@ -20,9 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MyEntityManagerTest extends H2DatabaseTest {
 
-    private final String TABLE_NAME = "USERSDATASET";
-    private EntityManagerFactory factory = Persistence.createEntityManagerFactory("otusJPAH2");
-    private EntityManager em = factory.createEntityManager(JdbcTestParams.persistenceXml.getParameters());
+    private final EntityManagerFactory factory = Persistence.createEntityManagerFactory("otusJPAH2");
+    private final EntityManager em = factory.createEntityManager(JdbcTestParams.persistenceXml.getParameters());
 
     MyEntityManagerTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());
@@ -37,6 +36,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
         em.close();
 
         IDataSet databaseDataSet = getConnection().createDataSet();
+        String TABLE_NAME = "USERSDATASET";
         ITable actualTable = databaseDataSet.getTable(TABLE_NAME);
 
         IDataSet expectedDataSet = getDataSet();

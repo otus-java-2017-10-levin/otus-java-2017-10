@@ -1,13 +1,13 @@
-package ru.otus.annotations;
+package ru.otus.persistence.annotations;
 
 import javax.persistence.Id;
 import java.lang.reflect.Field;
 
-public final class AnnotationField {
+public final class AnnotatedField {
     private final Field field;
     private final boolean isPrimaryKey;
 
-    public AnnotationField(Field field) {
+    public AnnotatedField(Field field) {
         if (field == null)
             throw new IllegalArgumentException();
 

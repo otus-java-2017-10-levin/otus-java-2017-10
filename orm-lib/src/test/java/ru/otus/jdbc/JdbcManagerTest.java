@@ -13,7 +13,7 @@ class JdbcManagerTest {
     void createConnectionTest() {
         DbManager manager = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties);
 
-        try (DBConnection connection = manager.createConnection()) {
+        try (DBConnection connection = manager.getConnection()) {
             assertEquals(true, connection != null);
         } catch (Exception e) {
             e.printStackTrace();

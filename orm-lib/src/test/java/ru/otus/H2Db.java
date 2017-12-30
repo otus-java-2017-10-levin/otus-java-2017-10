@@ -1,7 +1,6 @@
 package ru.otus;
 
 import org.h2.tools.Server;
-import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 

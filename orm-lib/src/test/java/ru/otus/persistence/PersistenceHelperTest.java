@@ -1,11 +1,7 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.annotations.AnnotatedClass;
 import ru.otus.base.UsersDataSet;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 

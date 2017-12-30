@@ -15,21 +15,22 @@ import java.sql.SQLException;
 class JdbcConnectionTest extends H2DatabaseTest {
 
     private final String INSERT = "insert into user (name) values ('Flow')";
-    private final String createUserTable = "create table if not exists user (id bigint auto_increment, name varchar(256), primary key (id))";
     private final String TABLE_NAME = "user";
-    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).createConnection();
+    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).getConnection();
 
     JdbcConnectionTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());
     }
+
     @Before
-    void srart() throws SQLException {
+    void start() throws SQLException {
         H2Db.start();
     }
 
     @BeforeEach
     void createTable() {
         connection.execQuery("DROP TABLE USER IF EXISTS");
+        String createUserTable = "create table if not exists user (id bigint auto_increment, name varchar(256), primary key (id))";
         connection.execQuery(createUserTable);
     }
 
@@ -50,7 +51,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
 
     @Test
     void executeQueryWithoutAnswer() throws Exception {
-        assertEquals(true, connection.execQuery(INSERT));
+        connection.execQuery(INSERT);
 
         IDataSet databaseDataSet = getConnection().createDataSet();
         ITable actualTable = databaseDataSet.getTable(TABLE_NAME);
@@ -85,7 +86,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
     }
 
     @AfterEach
-    void closeServer() throws SQLException {
+    void closeServer() {
         connection.execQuery("drop table user if exists");
     }
 

@@ -1,6 +1,5 @@
-package ru.otus.annotations;
+package ru.otus.persistence.annotations;
 
-import javax.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -9,14 +8,14 @@ public class AnnotatedClass {
 
     private static Map<Class<?>, AnnotatedClass> cacheClasses;
     private final Class<?> annotatedClass;
-    private NameGenerator generator;
+    private final NameGenerator generator;
 
     public Class<?> getAnnotatedClass() {
         return annotatedClass;
     }
 
-    private final Map<String, AnnotationField> fields = new LinkedHashMap<>();
-    private AnnotationField idField;
+    private final Map<String, AnnotatedField> fields = new LinkedHashMap<>();
+    private AnnotatedField idField;
 
     private AnnotatedClass(Class<?> annotatedClass, NameGenerator nameGenerator) {
         this.annotatedClass = annotatedClass;
@@ -43,11 +42,11 @@ public class AnnotatedClass {
         }
     }
 
-    public AnnotationField getId() {
+    public AnnotatedField getId() {
         return idField;
     }
 
-    public List<AnnotationField> getFields() {
+    public List<AnnotatedField> getFields() {
         return new ArrayList<>(fields.values());
     }
 
@@ -59,14 +58,15 @@ public class AnnotatedClass {
         return annotatedClass.getSimpleName();
     }
 
-    public AnnotationField getField(String dbName) {
-        return fields.get(dbName);
+    public AnnotatedField getField(String dbName) {
+        String name = generator.generate(dbName);
+        return fields.get(name);
     }
 
     private void parse() {
         boolean hasId = false;
         for (Field f : annotatedClass.getDeclaredFields()) {
-            AnnotationField af = new AnnotationField(f);
+            AnnotatedField af = new AnnotatedField(f);
             fields.put(generator.generate(f.getName()), af);
             if (af.isPrimaryKey()) {
                 if (hasId)
@@ -76,6 +76,7 @@ public class AnnotatedClass {
                 idField = af;
             }
         }
+
         if (!hasId)
             throw new IllegalArgumentException();
     }

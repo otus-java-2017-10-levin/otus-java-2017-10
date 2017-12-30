@@ -1,10 +1,8 @@
 package ru.otus.persistence;
 
-import ru.otus.annotations.AnnotatedClass;
-import ru.otus.annotations.AnnotationField;
-import ru.otus.base.UsersDataSet;
+import ru.otus.persistence.annotations.AnnotatedClass;
+import ru.otus.persistence.annotations.AnnotatedField;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +42,7 @@ class QueryFactory {
 
         query.append(annotatedClass.getSimpleName()).append(" (");
 
-        AnnotationField id = annotatedClass.getId();
+        AnnotatedField id = annotatedClass.getId();
         if (id == null)
             throw new IllegalArgumentException("no @Id field");
 
@@ -63,10 +61,13 @@ class QueryFactory {
         sb.append(VALUES).append("(");
 
         int count = 0;
-        for (int i = 0; i < annotatedClass.getFields().size(); i++) {
+        for (AnnotatedField f: annotatedClass.getFields()) {
             if (count++ != 0)
                 sb.append(",");
-            sb.append("?");
+            if (f.isPrimaryKey())
+                sb.append("null");
+            else
+                sb.append("?");
         }
 
         sb.append(")");
@@ -82,7 +83,7 @@ class QueryFactory {
     private static String getFieldNames(AnnotatedClass annotatedClass, boolean isTypeInfo) {
         StringBuilder query = new StringBuilder();
         int count = 0;
-        for (AnnotationField f : annotatedClass.getFields()) {
+        for (AnnotatedField f : annotatedClass.getFields()) {
             if (count++ != 0) {
                 query.append(", ");
             }
@@ -95,17 +96,17 @@ class QueryFactory {
         return query.toString();
     }
 
-    private static String getFieldString(AnnotationField field) {
+    private static String getFieldString(AnnotatedField field) {
         if (field == null)
             throw new IllegalArgumentException();
 
         StringBuilder sb = new StringBuilder(field.getName());
-        Class<?> type = field.getType();
+
+        String sqlType = sqlTypes.get(field.getType());
 
         if (field.isPrimaryKey()) {
             sb.append(ID_FIELD);
         } else {
-            String sqlType = SQLtypes.get(type);
 
             if (sqlType != null)
                 sb.append(" ").append(sqlType);
@@ -115,25 +116,25 @@ class QueryFactory {
         return sb.toString();
     }
 
-    private static Map<Class<?>, String> SQLtypes = new HashMap<>();
+    private static final Map<Class<?>, String> sqlTypes = new HashMap<>();
 
     static {
-        SQLtypes.put(boolean.class, "BIT");
-        SQLtypes.put(Boolean.class, "BIT");
-        SQLtypes.put(byte.class, "SMALLINT");
-        SQLtypes.put(Byte.class, "SMALLINT");
-        SQLtypes.put(short.class, "SMALLINT");
-        SQLtypes.put(Short.class, "SMALLINT");
-        SQLtypes.put(char.class, "CHAR");
-        SQLtypes.put(Character.class, "CHAR");
-        SQLtypes.put(int.class, "INT");
-        SQLtypes.put(Integer.class, "INT");
-        SQLtypes.put(long.class, "BIGINT");
-        SQLtypes.put(Long.class, "BIGINT");
-        SQLtypes.put(float.class, "FLOAT");
-        SQLtypes.put(Float.class, "FLOAT");
-        SQLtypes.put(double.class, "DOUBLE");
-        SQLtypes.put(Double.class, "DOUBLE");
-        SQLtypes.put(String.class, "VARCHAR(256)");
+        sqlTypes.put(boolean.class, "BIT");
+        sqlTypes.put(Boolean.class, "BIT");
+        sqlTypes.put(byte.class, "tinyint");
+        sqlTypes.put(Byte.class, "tinyint");
+        sqlTypes.put(short.class, "SMALLINT");
+        sqlTypes.put(Short.class, "SMALLINT");
+        sqlTypes.put(char.class, "VARCHAR");
+        sqlTypes.put(Character.class, "VARCHAR");
+        sqlTypes.put(int.class, "INT");
+        sqlTypes.put(Integer.class, "INT");
+        sqlTypes.put(long.class, "BIGINT");
+        sqlTypes.put(Long.class, "BIGINT");
+        sqlTypes.put(float.class, "FLOAT");
+        sqlTypes.put(Float.class, "FLOAT");
+        sqlTypes.put(double.class, "DOUBLE");
+        sqlTypes.put(Double.class, "DOUBLE");
+        sqlTypes.put(String.class, "VARCHAR(256)");
     }
 }

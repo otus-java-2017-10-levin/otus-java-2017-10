@@ -1,4 +1,4 @@
-package ru.otus.xml;
+package ru.otus.persistence.xml;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -24,7 +24,7 @@ class MyErrorHandler implements ErrorHandler {
                 + spe.getLineNumber() + ": " + spe.getMessage();
     }
 
-    public void warning(SAXParseException spe) throws SAXException {
+    public void warning(SAXParseException spe) {
         out.println("Warning: " + getParseExceptionInfo(spe));
     }
 

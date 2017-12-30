@@ -1,4 +1,4 @@
-package ru.otus.xml;
+package ru.otus.persistence.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.URL;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PersistenceParams {
 
@@ -22,6 +21,7 @@ public class PersistenceParams {
         CLASSES
     }
 
+    @SuppressWarnings("unchecked")
     public PersistenceParams(Map parameters) {
         this.parameters = (Map<ParamTypes, Object>)parameters;
     }

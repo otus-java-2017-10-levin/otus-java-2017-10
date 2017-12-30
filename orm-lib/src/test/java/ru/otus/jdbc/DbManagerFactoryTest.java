@@ -19,7 +19,7 @@ class DbManagerFactoryTest {
 
     @Test
     void createTest() {
-        DbManager dbManager = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties);
+        DbManagerFactory.createDataBaseManager(JdbcTestParams.properties);
     }
 
     @Test

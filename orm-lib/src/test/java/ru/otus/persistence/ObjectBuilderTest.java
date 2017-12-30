@@ -10,11 +10,11 @@ class ObjectBuilderTest {
     @Test
     void addFields() {
         UsersDataSet res  = new ObjectBuilder<>(UsersDataSet.class)
-            .set("id", 1L)
-            .set("name", "Flow")
-            .build();
+                .set("id", 1L)
+                .set("name", "Flow")
+                .build();
 
-            assertEquals(1L, res.getId());
-            assertEquals("Flow", res.getName());
+        assertEquals(1L, res.getId());
+        assertEquals("Flow", res.getName());
     }
 }

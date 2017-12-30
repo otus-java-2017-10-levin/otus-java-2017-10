@@ -1,4 +1,4 @@
-package ru.otus.xml;
+package ru.otus.persistence.xml;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersistenceParamsTest {
 
-    private final String persistenceUnit = "otusJPAMySQL";
+    private final String persistenceUnit = "otusJPAH2";
     private final String persistencePath = "META-INF/persistence.xml";
 
     @Test
@@ -26,8 +26,8 @@ class PersistenceParamsTest {
     @Test
     void parseXMLWithEmptyAnswer() {
         PersistenceParams result = new PersistenceParams(persistenceUnit +"1", persistencePath);
-        Map<String, String> properties = (Map<String, String>)result.getConnectionData();
-        Set<String> classes = (Set<String>)result.getEntityClasses();
+        Map<String, String> properties = result.getConnectionData();
+        Set<String> classes = result.getEntityClasses();
         assertEquals(0, properties.size());
         assertEquals(0, classes.size());
     }
@@ -45,10 +45,10 @@ class PersistenceParamsTest {
         Map<String, String> properties = persistenceXml.getConnectionData();
         Map<String, String> expected = new HashMap<>();
 
-        expected.put("javax.persistence.jdbc.driver", "com.mysql.cj.jdbc.Driver");
-        expected.put("javax.persistence.jdbc.url", "jdbc:mysql://localhost:3306/db_example");
-        expected.put("javax.persistence.jdbc.user", "Flow");
-        expected.put("javax.persistence.jdbc.password", "grandmaster");
+        expected.put("javax.persistence.jdbc.driver", "org.h2.Driver");
+        expected.put("javax.persistence.jdbc.url", "jdbc:h2:~/test");
+        expected.put("javax.persistence.jdbc.user", "sa");
+        expected.put("javax.persistence.jdbc.password", "");
 
         assertEquals(true, expected.equals(properties));
 
@@ -56,9 +56,10 @@ class PersistenceParamsTest {
         Set<String> expectedClasses = new HashSet<>();
 
         expectedClasses.add("ru.otus.base.UsersDataSet");
-        expectedClasses.add("ru.otus.base.UsersDataSet1");
+        expectedClasses.add("ru.otus.base.PrimitiveDataSet");
+        expectedClasses.add("ru.otus.base.PhoneDataSet");
+        expectedClasses.add("ru.otus.base.WrapperDataSet");
 
         assertEquals(expectedClasses, classes);
     }
-
 }

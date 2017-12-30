@@ -1,9 +1,8 @@
 package ru.otus.base;
 
-
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Id;
 
 @Data
 public class PhoneDataSet {
@@ -12,12 +11,15 @@ public class PhoneDataSet {
     private String phone;
     private int houseNumber;
 
+
     public PhoneDataSet() {}
 
-    public PhoneDataSet(String phone) {this.phone = phone;}
-
-    public PhoneDataSet(long id, String phone) {
-        this.id = id;
-        this.phone = phone;
+    public PhoneDataSet(String name, int houseNumber) {
+        this.phone = name; this.houseNumber = houseNumber;
     }
+
+    public PhoneDataSet(String name) {
+        this.phone = name;
+    }
+
 }

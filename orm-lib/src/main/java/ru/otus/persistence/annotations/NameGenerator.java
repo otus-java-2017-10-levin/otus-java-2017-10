@@ -1,4 +1,4 @@
-package ru.otus.annotations;
+package ru.otus.persistence.annotations;
 
 @FunctionalInterface
 interface NameGenerator {

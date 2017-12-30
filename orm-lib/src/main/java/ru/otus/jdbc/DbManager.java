@@ -5,5 +5,7 @@ package ru.otus.jdbc;
  */
 public interface DbManager {
 
-    DBConnection createConnection() throws IllegalArgumentException;
+    DBConnection getConnection() throws IllegalArgumentException;
+    void close();
+    boolean isOpen();
 }
