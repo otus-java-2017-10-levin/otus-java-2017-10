@@ -1,7 +1,7 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.base.UsersDataSet;
+import ru.otus.base.UserDataSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,7 +11,7 @@ class PersistenceHelperTest {
     void getMethodFromFieldName() {
         String expected = "getId";
 
-        assertEquals(expected, PersistenceHelper.setterFromField(UsersDataSet.class, "id", true));
+        assertEquals(expected, PersistenceHelper.setterFromField(UserDataSet.class, "id", true));
     }
 
     @Test
@@ -19,10 +19,10 @@ class PersistenceHelperTest {
         Exception e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(null, "a", true));
         assertEquals(null, e.getMessage());
 
-        e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(UsersDataSet.class, null, true));
+        e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(UserDataSet.class, null, true));
         assertEquals(null, e.getMessage());
 
-        e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(UsersDataSet.class, "a", true));
+        e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(UserDataSet.class, "a", true));
         assertEquals("No setter for field a", e.getMessage());
     }
 
@@ -30,7 +30,7 @@ class PersistenceHelperTest {
     void getMethodFromFieldNameWithoutCheck() {
         String expected = "getId";
 
-        assertEquals(expected, PersistenceHelper.setterFromField(UsersDataSet.class, "id", false));
+        assertEquals(expected, PersistenceHelper.setterFromField(UserDataSet.class, "id", false));
     }
 
     @Test
@@ -38,7 +38,7 @@ class PersistenceHelperTest {
         Exception e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(null, "a", false));
         assertEquals(null, e.getMessage());
 
-        e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(UsersDataSet.class, null, false));
+        e = assertThrows(IllegalArgumentException.class, () -> PersistenceHelper.setterFromField(UserDataSet.class, null, false));
         assertEquals(null, e.getMessage());
     }
 

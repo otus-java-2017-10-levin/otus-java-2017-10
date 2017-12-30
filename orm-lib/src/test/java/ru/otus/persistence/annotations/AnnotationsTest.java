@@ -3,7 +3,7 @@ package ru.otus.persistence.annotations;
 
 import org.junit.jupiter.api.Test;
 import ru.otus.base.PhoneDataSet;
-import ru.otus.base.UsersDataSet;
+import ru.otus.base.UserDataSet;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AnnotationsTest {
 
-    private final AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+    private final AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
     @Test
     void loadAnnotations() {
@@ -26,14 +26,14 @@ class AnnotationsTest {
     void getArrayOfFields() {
         List<AnnotatedField> fields = annotatedClass.getFields();
 
-        assertEquals(2, fields.size());
+        assertEquals(3, fields.size());
     }
 
     @Test
     void ifObjectIsEntity() {
-        UsersDataSet set = new UsersDataSet("Flow");
+        UserDataSet set = new UserDataSet("Flow");
         PhoneDataSet phone = new PhoneDataSet("100", 1);
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
         assertEquals(true, annotatedClass.is(set));
         assertEquals(false, annotatedClass.is(phone));
@@ -41,15 +41,15 @@ class AnnotationsTest {
 
     @Test
     void getSimpleClassName() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
-        assertEquals("UsersDataSet", annotatedClass.getSimpleName());
+        assertEquals("UserDataSet", annotatedClass.getSimpleName());
     }
 
     @Test
     void testCache() {
-        AnnotatedClass anno1 = AnnotatedClass.of(UsersDataSet.class);
-        AnnotatedClass anno2 = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass anno1 = AnnotatedClass.of(UserDataSet.class);
+        AnnotatedClass anno2 = AnnotatedClass.of(UserDataSet.class);
 
         assertEquals(anno1, anno2);
     }
@@ -63,7 +63,7 @@ class AnnotationsTest {
 
     @Test
     void getFieldByNameInBase() {
-        AnnotatedClass user = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass user = AnnotatedClass.of(UserDataSet.class);
 
         String dbName = "NAME";
         AnnotatedField f = user.getField(dbName);

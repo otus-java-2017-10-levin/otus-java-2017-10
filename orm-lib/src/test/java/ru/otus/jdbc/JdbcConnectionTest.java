@@ -7,7 +7,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Before;
 import org.junit.jupiter.api.*;
 import ru.otus.H2Db;
-import ru.otus.base.UsersDataSet;
+import ru.otus.base.UserDataSet;
 
 import java.sql.SQLException;
 
@@ -37,8 +37,8 @@ class JdbcConnectionTest extends H2DatabaseTest {
     @Test
     void testSelect() throws SQLException {
         connection.execQuery(INSERT);
-        UsersDataSet set = connection.execQuery("SELECT * FROM "+TABLE_NAME + " WHERE ID = 1", result -> {
-            UsersDataSet user = new UsersDataSet();
+        UserDataSet set = connection.execQuery("SELECT * FROM "+TABLE_NAME + " WHERE ID = 1", result -> {
+            UserDataSet user = new UserDataSet();
             result.next();
             user.setId(result.getLong("id"));
             user.setName(result.getString("name"));

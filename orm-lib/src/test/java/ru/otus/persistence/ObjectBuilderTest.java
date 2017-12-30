@@ -1,7 +1,7 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.base.UsersDataSet;
+import ru.otus.base.UserDataSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,7 +9,7 @@ class ObjectBuilderTest {
 
     @Test
     void addFields() {
-        UsersDataSet res  = new ObjectBuilder<>(UsersDataSet.class)
+        UserDataSet res  = new ObjectBuilder<>(UserDataSet.class)
                 .set("id", 1L)
                 .set("name", "Flow")
                 .build();

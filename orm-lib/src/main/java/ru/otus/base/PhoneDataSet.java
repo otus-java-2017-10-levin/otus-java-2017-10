@@ -5,9 +5,7 @@ import lombok.Data;
 import javax.persistence.Id;
 
 @Data
-public class PhoneDataSet {
-    @Id
-    private long id;
+public class PhoneDataSet extends DataSet {
     private String phone;
     private int houseNumber;
 

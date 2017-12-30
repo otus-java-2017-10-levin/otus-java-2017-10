@@ -1,7 +1,7 @@
 package ru.otus;
 
 import org.h2.tools.Server;
-import ru.otus.base.WrapperDataSet;
+import ru.otus.base.UserDataSet;
 import ru.otus.persistence.xml.PersistenceParams;
 
 import javax.persistence.EntityManager;
@@ -22,19 +22,15 @@ class App {
 
     private void run() {
         startServer();
-        WrapperDataSet primitives = WrapperDataSet.builder()
-                .aBoolean(true).aByte((byte)1)
-                .aChar('A').aShort((short)11)
-                .anInt(100).aFloat(0.2f)
-                .aLong(1000L).aDouble(3.1415)
-                .build();
+        UserDataSet user = new UserDataSet("Flow");
+        user.setAge(10);
 
-        System.out.println("Before persist:\n"+ primitives);
-        em.persist(primitives);
+        System.out.println("Before persist:\n"+ user);
+        em.persist(user);
         em.flush();
-        System.out.println("After flush:\n"+primitives);
+        System.out.println("After flush:\n"+user);
 
-        WrapperDataSet fromDB = em.find(WrapperDataSet.class, primitives.getId());
+        UserDataSet fromDB = em.find(UserDataSet.class, user.getId());
         System.out.println("After find by id:\n"+fromDB);
         factory.close();
 

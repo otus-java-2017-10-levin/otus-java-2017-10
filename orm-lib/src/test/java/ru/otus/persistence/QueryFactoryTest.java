@@ -3,7 +3,7 @@ package ru.otus.persistence;
 import org.junit.jupiter.api.Test;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.base.PhoneDataSet;
-import ru.otus.base.UsersDataSet;
+import ru.otus.base.UserDataSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,30 +12,30 @@ class QueryFactoryTest {
 
     @Test
     void createTableFromEntity() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
         String actualQuery = QueryFactory.createTableQuery(annotatedClass);
-        String expectedQuery = "CREATE TABLE IF NOT EXISTS USERSDATASET (ID BIGINT AUTO_INCREMENT, NAME VARCHAR(256), PRIMARY KEY (ID))";
+        String expectedQuery = "CREATE TABLE IF NOT EXISTS USERDATASET (NAME VARCHAR(256), AGE INT, ID BIGINT AUTO_INCREMENT, PRIMARY KEY (ID))";
 
         assertEquals(expectedQuery, actualQuery);
     }
 
     @Test
     void insertTest() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
         String actualQuery = QueryFactory.getInsertQuery(annotatedClass);
-        String expectedQuery = "INSERT INTO USERSDATASET (ID, NAME) VALUES (NULL,?)";
+        String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, ID) VALUES (?,?,NULL)";
 
         assertEquals(expectedQuery, actualQuery);
     }
 
     @Test
     void dropTables() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
         String actualQuery = QueryFactory.getDropTableQuery(annotatedClass);
-        String expectedQuery = "DROP TABLE USERSDATASET IF EXISTS";
+        String expectedQuery = "DROP TABLE USERDATASET IF EXISTS";
 
         assertEquals(expectedQuery, actualQuery);
 
@@ -43,10 +43,10 @@ class QueryFactoryTest {
 
     @Test
     void getSelectQuery() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UsersDataSet.class);
+        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
 
         String actualQuery = QueryFactory.getSelectQuery(annotatedClass, 1);
-        String expectedQuery = "SELECT ID, NAME FROM USERSDATASET WHERE ID = 1";
+        String expectedQuery = "SELECT NAME, AGE, ID FROM USERDATASET WHERE ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
 
@@ -55,7 +55,7 @@ class QueryFactoryTest {
         AnnotatedClass annotatedClass = AnnotatedClass.of(PhoneDataSet.class);
 
         String actualQuery = QueryFactory.getSelectQuery(annotatedClass, 1);
-        String expectedQuery = "SELECT ID, PHONE, HOUSENUMBER FROM PHONEDATASET WHERE ID = 1";
+        String expectedQuery = "SELECT PHONE, HOUSENUMBER, ID FROM PHONEDATASET WHERE ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
 }

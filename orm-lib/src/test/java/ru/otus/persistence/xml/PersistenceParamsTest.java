@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PersistenceParamsTest {
 
     private final String persistenceUnit = "otusJPAH2";
-    private final String persistencePath = "META-INF/persistence.xml";
+    private final String persistencePath = "persistenceTest.xml";
 
     @Test
     void parseXMLWithNull() {
@@ -55,10 +55,8 @@ class PersistenceParamsTest {
         Set<String> classes = persistenceXml.getEntityClasses();
         Set<String> expectedClasses = new HashSet<>();
 
-        expectedClasses.add("ru.otus.base.UsersDataSet");
-        expectedClasses.add("ru.otus.base.PrimitiveDataSet");
+        expectedClasses.add("ru.otus.base.UserDataSet");
         expectedClasses.add("ru.otus.base.PhoneDataSet");
-        expectedClasses.add("ru.otus.base.WrapperDataSet");
 
         assertEquals(expectedClasses, classes);
     }

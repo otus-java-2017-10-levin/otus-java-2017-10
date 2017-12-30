@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import ru.otus.base.PhoneDataSet;
-import ru.otus.base.UsersDataSet;
+import ru.otus.base.UserDataSet;
 import ru.otus.jdbc.H2DatabaseTest;
 import ru.otus.jdbc.JdbcTestParams;
 
@@ -29,14 +29,14 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
     @Test
     void persistTest() throws Exception {
-        UsersDataSet set = new UsersDataSet("Flow");
+        UserDataSet set = new UserDataSet("Flow");
 
         assertEquals(0, set.getId());
         em.persist(set);
         em.close();
 
         IDataSet databaseDataSet = getConnection().createDataSet();
-        String TABLE_NAME = "USERSDATASET";
+        String TABLE_NAME = "USERDATASET";
         ITable actualTable = databaseDataSet.getTable(TABLE_NAME);
 
         IDataSet expectedDataSet = getDataSet();
@@ -55,7 +55,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
         @Test
         void findOnClosedManager() {
             em.close();
-            Exception e = assertThrows(IllegalStateException.class, () -> em.find(UsersDataSet.class, 1L));
+            Exception e = assertThrows(IllegalStateException.class, () -> em.find(UserDataSet.class, 1L));
             assertEquals(null, e.getMessage());
         }
 
@@ -67,20 +67,20 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
         @Test
         void findWithWrongIdClass() {
-            Exception e = assertThrows(IllegalArgumentException.class, () -> em.find(UsersDataSet.class,1));
+            Exception e = assertThrows(IllegalArgumentException.class, () -> em.find(UserDataSet.class,1));
             assertEquals(null, e.getMessage());
         }
 
         @Test
         void findTest() {
-            UsersDataSet set = new UsersDataSet("Flow");
+            UserDataSet set = new UserDataSet("Flow");
 
             em.persist(set);
             em.flush();
 
             set.setName("Flow1");
             long id = set.getId();
-            set = em.find(UsersDataSet.class, id);
+            set = em.find(UserDataSet.class, id);
             em.close();
 
             assertEquals("Flow", set.getName());

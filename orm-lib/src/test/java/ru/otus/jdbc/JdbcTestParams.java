@@ -6,7 +6,7 @@ import java.util.Map;
 
 public final class JdbcTestParams {
     private static final String persistenceUnit = "otusJPAH2";
-    private static final String persistencePath = "META-INF/persistence.xml";
+    private static final String persistencePath = "persistenceTest.xml";
 
     public static final PersistenceParams persistenceXml = new PersistenceParams(persistenceUnit, persistencePath);
 

@@ -1,5 +1,7 @@
 package ru.otus.persistence.annotations;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
+
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -64,7 +66,8 @@ public class AnnotatedClass {
 
     private void parse() {
         boolean hasId = false;
-        for (Field f : annotatedClass.getDeclaredFields()) {
+        annotatedClass.getFields();
+        for (Field f : FieldUtils.getAllFields(annotatedClass)) {
             AnnotatedField af = new AnnotatedField(f);
             fields.put(generator.generate(f.getName()), af);
             if (af.isPrimaryKey()) {
