@@ -2,6 +2,7 @@ package ru.otus;
 
 import org.h2.tools.Server;
 import ru.otus.base.UserDataSet;
+import ru.otus.dao.UserDataSetDAO;
 import ru.otus.persistence.xml.PersistenceParams;
 
 import javax.persistence.EntityManager;
@@ -13,7 +14,7 @@ class App {
 
     private final String jpa = "otusJPAH2";
     private final EntityManagerFactory factory = Persistence.createEntityManagerFactory(jpa);
-    private final EntityManager em = factory.createEntityManager(new PersistenceParams(jpa, "META-INF/persistence.xml").getParameters());
+    private final PersistenceParams params = new PersistenceParams(jpa, "META-INF/persistence.xml");
 
 
     public static void main(String[] args) {
@@ -25,17 +26,14 @@ class App {
         UserDataSet user = new UserDataSet("Flow");
         user.setAge(10);
 
-        System.out.println("Before persist:\n"+ user);
-        em.persist(user);
-        em.flush();
+        UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
+        dao.save(user);
         System.out.println("After flush:\n"+user);
 
-        UserDataSet fromDB = em.find(UserDataSet.class, user.getId());
+        UserDataSet fromDB = dao.load(user.getId());
         System.out.println("After find by id:\n"+fromDB);
         factory.close();
 
-        System.out.println("EntityManagerFactory is open: " + factory.isOpen());
-        System.out.println("EntityManager is open:        " + em.isOpen());
         System.exit(0);
     }
 

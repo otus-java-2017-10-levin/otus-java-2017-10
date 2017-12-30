@@ -11,6 +11,9 @@ class MyEntityManagerFactory implements EntityManagerFactory {
     private final List<EntityManager> managers = new ArrayList<>();
     private boolean isOpen = true;
 
+    public MyEntityManagerFactory() {
+    }
+
     @Override
     public EntityManager createEntityManager() {
         return createEntityManager(null);

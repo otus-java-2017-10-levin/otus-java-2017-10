@@ -5,6 +5,8 @@ package ru.otus.persistence;
     Description here
  */
 
+import ru.otus.persistence.xml.PersistenceParams;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
@@ -16,7 +18,7 @@ public class MyPersistenceProvider implements PersistenceProvider {
      * Called by Persistence class when an {@link EntityManagerFactory}
      * is to be created.
      *
-     * @param emName The phone of the persistence unit
+     * @param emName The name of the persistence unit
      * @param map    A Map of properties for use by the
      *               persistence provider. These properties may be used to
      *               override the values of the corresponding elements in
