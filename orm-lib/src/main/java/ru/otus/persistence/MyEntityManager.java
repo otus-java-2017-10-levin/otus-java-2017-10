@@ -238,7 +238,7 @@ class MyEntityManager implements EntityManager {
                 int count = 1;
                 for (AnnotatedField field : annotatedClass.getFields()) {
                     try {
-                        if (!field.isPrimaryKey())
+                        if (!field.contains(Id.class))
                             statement.setString(count++, FieldUtils.readField(field.getField(), object, true).toString());
 
                     } catch (IllegalAccessException e) {

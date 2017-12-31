@@ -3,6 +3,7 @@ package ru.otus.persistence;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
+import javax.persistence.Id;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ class QueryFactory {
         for (AnnotatedField f: annotatedClass.getFields()) {
             if (count++ != 0)
                 sb.append(",");
-            if (f.isPrimaryKey())
+            if (f.contains(Id.class))
                 sb.append("null");
             else
                 sb.append("?");
@@ -104,7 +105,7 @@ class QueryFactory {
 
         String sqlType = sqlTypes.get(field.getType());
 
-        if (field.isPrimaryKey()) {
+        if (field.contains(Id.class)) {
             sb.append(ID_FIELD);
         } else {
 

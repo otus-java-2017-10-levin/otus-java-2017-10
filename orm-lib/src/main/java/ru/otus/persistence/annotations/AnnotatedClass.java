@@ -2,6 +2,7 @@ package ru.otus.persistence.annotations;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+import javax.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -70,7 +71,7 @@ public class AnnotatedClass {
         for (Field f : FieldUtils.getAllFields(annotatedClass)) {
             AnnotatedField af = new AnnotatedField(f);
             fields.put(generator.generate(f.getName()), af);
-            if (af.isPrimaryKey()) {
+            if (af.contains(Id.class)) {
                 if (hasId)
                     throw new IllegalStateException("Class has more that one @Id");
 
