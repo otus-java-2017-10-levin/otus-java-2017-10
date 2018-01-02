@@ -21,22 +21,21 @@ class MyEntityManager implements EntityManager {
 
     private final DbManager manager;
     private final DBConnection connection;
-    private final PersistenceParams persistenceParams;
     private AnnotationManager annotationManager;
     private final static Class<? extends Annotation> idClass = Id.class;
     private boolean isOpen;
-    private final Map<AnnotatedClass, Set<Object>> objects = new HashMap<>();
+    private final Map<Class<?>, Set<Object>> objects = new HashMap<>();
 
     MyEntityManager(Map persistenceParams) {
-        this.persistenceParams = new PersistenceParams(persistenceParams);
-        manager = DbManagerFactory.createDataBaseManager(this.persistenceParams.getConnectionData());
+        PersistenceParams persistenceParams1 = new PersistenceParams(persistenceParams);
+        manager = DbManagerFactory.createDataBaseManager(persistenceParams1.getConnectionData());
         connection = manager.getConnection();
 
-        if (persistenceParams == null || this.persistenceParams.getEntityClasses().size() == 0)
+        if (persistenceParams == null || persistenceParams1.getEntityClasses().size() == 0)
             throw new IllegalStateException("There is no entity classes in persistence.xml");
 
         try {
-            annotationManager = new AnnotationManager(idClass, this.persistenceParams.getEntityClasses().toArray(new String[0]));
+            annotationManager = new AnnotationManager(idClass, persistenceParams1.getEntityClasses().toArray(new String[0]));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -50,23 +49,22 @@ class MyEntityManager implements EntityManager {
         if (!isOpen)
             throw new IllegalStateException("EntityManager is closed");
 
-        AnnotatedClass cl = checkEntity(entity);
+        checkEntity(entity);
+        Class<?> entityClass = entity.getClass();
 
-        Set<Object> set = objects.containsKey(cl) ? objects.get(cl) : new HashSet<>();
+        Set<Object> set = objects.containsKey(entityClass) ? objects.get(entityClass) : new HashSet<>();
 
         if (set.contains(entity))
             throw new EntityExistsException();
 
         set.add(entity);
-        objects.put(cl, set);
+        objects.put(entityClass, set);
     }
 
     // if this object is instance of annotated class
-    private AnnotatedClass checkEntity(Object entity) {
+    private void checkEntity(Object entity) {
         if (!annotationManager.contains(entity.getClass()))
             throw new IllegalArgumentException("is not an entity");
-
-        return annotationManager.getAnnotatedClass(entity.getClass());
     }
 
     @Override
@@ -96,7 +94,6 @@ class MyEntityManager implements EntityManager {
         if (!isOpen)
             throw new IllegalStateException();
 
-        final AnnotatedClass cl = annotationManager.getAnnotatedClass(entityClass);
         if (!annotationManager.contains(entityClass))
             throw new IllegalArgumentException("wrong entity class");
 
@@ -118,7 +115,7 @@ class MyEntityManager implements EntityManager {
 
         T cls = null;
         try {
-            cls = connection.execQuery(QueryFactory.getSelectQuery(cl, idClass, id), result -> {
+            cls = connection.execQuery(QueryFactory.getSelectQuery(annotationManager, entityClass, id), result -> {
 
                 ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
                 ResultSetMetaData rsmd = result.getMetaData();
@@ -232,17 +229,17 @@ class MyEntityManager implements EntityManager {
     }
 
     private void saveObjects() {
-        for (Map.Entry<AnnotatedClass, Set<Object>> entry : objects.entrySet()) {
+        for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
             saveObject(entry.getKey(), entry.getValue());
         }
     }
 
-    private void saveObject(AnnotatedClass annotatedClass, Set<Object> objects) {
-        String query = QueryFactory.getInsertQuery(annotatedClass, idClass);
+    private void saveObject(Class<?> entityClass, Set<Object> objects) {
+        String query = QueryFactory.getInsertQuery(annotationManager, entityClass);
         connection.execQuery(query, statement -> {
             for (Object object : objects) {
                 int count = 1;
-                for (AnnotatedField field : annotatedClass.getFields()) {
+                for (AnnotatedField field : annotationManager.getAnnotatedClass(entityClass).getFields()) {
                     try {
                         if (!field.contains(Id.class))
                             statement.setString(count++, FieldUtils.readField(field.getField(), object, true).toString());
@@ -253,16 +250,15 @@ class MyEntityManager implements EntityManager {
                 }
                 statement.execute();
                 long id = connection.getLastInsertedId();
-                saveObjectId(annotatedClass, object, id);
+                saveObjectId(entityClass, object, id);
             }
         });
     }
 
-    private void saveObjectId(AnnotatedClass annotatedClass, Object object, long id) {
+    private void saveObjectId(Class<?> entityClass, Object object, long id) {
 
-        Class<?> cl = annotatedClass.getAnnotatedClass();
         try {
-            Method m = cl.getMethod("setId", long.class);
+            Method m = entityClass.getMethod("setId", long.class);
             try {
                 m.invoke(object, id);
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -275,15 +271,15 @@ class MyEntityManager implements EntityManager {
     }
 
     private void dropTables() {
-        for (AnnotatedClass cl : annotationManager.getAllClasses()) {
-            String query = QueryFactory.getDropTableQuery(cl);
+        for (Class<?> cl : annotationManager.getAllClasses()) {
+            String query = QueryFactory.getDropTableQuery(annotationManager, cl);
             connection.execQuery(query);
         }
     }
 
     private void createTables() {
-        for (AnnotatedClass cl : annotationManager.getAllClasses()) {
-            String query = QueryFactory.createTableQuery(cl, idClass);
+        for (Class<?> cl : annotationManager.getAllClasses()) {
+            String query = QueryFactory.createTableQuery(annotationManager, cl);
             connection.execQuery(query);
         }
     }

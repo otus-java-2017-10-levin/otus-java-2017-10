@@ -62,7 +62,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
         @Test
         void findWithWrongEntityClass() {
             Exception e = assertThrows(IllegalArgumentException.class, () -> em.find(String.class, 1L));
-            assertEquals("class is not in annotated classes list", e.getMessage());
+            assertEquals("wrong entity class", e.getMessage());
         }
 
         @Test

@@ -33,6 +33,11 @@ public class AnnotationManager extends AbstractAnnotationManager {
         return fields.get(0);
     }
 
+    @NotNull
+    public Class<? extends Annotation> getIdAnnotation() {
+        return id;
+    }
+
     @Override
     protected void validateClass(@NotNull AnnotatedClass ac) {
 

@@ -45,8 +45,8 @@ public abstract class AbstractAnnotationManager {
         return annotatedClasses.containsKey(cl);
     }
 
-    public Set<AnnotatedClass> getAllClasses() {
-        return new HashSet<>(annotatedClasses.values());
+    public Set<Class<?>> getAllClasses() {
+        return new HashSet<>(annotatedClasses.keySet());
     }
 
     @NotNull

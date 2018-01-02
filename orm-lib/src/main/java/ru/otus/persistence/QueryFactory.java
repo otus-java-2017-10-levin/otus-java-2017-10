@@ -28,44 +28,50 @@ class QueryFactory {
             For simplicity support only long indexes
      */
     @NotNull
-    public static String getSelectQuery(@NotNull AnnotatedClass annotatedClass,
-                                        @NotNull Class<? extends Annotation> id,
+    public static String getSelectQuery(@NotNull AnnotationManager man,
+                                        @NotNull Class<?> entityClass,
                                         long key) {
+        AnnotatedClass ac = man.getAnnotatedClass(entityClass);
 
         StringBuilder sb = new StringBuilder(SELECT).append(" ");
-        sb.append(getFieldNames(annotatedClass, id,false)).append(" ");
+        sb.append(getFieldNames(man, entityClass,false)).append(" ");
 
-        sb.append(FROM).append(" ").append(annotatedClass.getSimpleName()).append(" ");
+        sb.append(FROM).append(" ").append(ac.getSimpleName()).append(" ");
         sb.append(WHERE_ID).append(key);
         return sb.toString().toUpperCase();
     }
 
     @NotNull
-    public static String createTableQuery(@NotNull AnnotatedClass annotatedClass, @NotNull Class<? extends Annotation> id) {
+    public static String createTableQuery(@NotNull AnnotationManager manager,
+                                          @NotNull Class<?> entityClass) {
 
         StringBuilder query = new StringBuilder(CREATE_IF_NOT_EXIST);
 
-        query.append(annotatedClass.getSimpleName()).append(" (");
 
-        query.append(getFieldNames(annotatedClass, id, true));
+        query.append(manager.getAnnotatedClass(entityClass).getSimpleName()).append(" (");
 
-        query.append(", ").append(PRIMARY_KEY).append(id.getSimpleName()).append("))");
+        query.append(getFieldNames(manager, entityClass, true));
+
+        query.append(", ").append(PRIMARY_KEY).append(manager.getId(entityClass).getName()).append("))");
         return query.toString().toUpperCase();
     }
 
     @NotNull
-    public static String getInsertQuery(@NotNull AnnotatedClass annotatedClass, @NotNull Class<? extends Annotation> id) {
+    public static String getInsertQuery(@NotNull AnnotationManager manager,
+                                        @NotNull Class<?> entityClass) {
+
+        AnnotatedClass annotatedClass = manager.getAnnotatedClass(entityClass);
 
         StringBuilder sb = new StringBuilder(INSERT);
         sb.append(annotatedClass.getSimpleName()).append(" (");
-        sb.append(getFieldNames(annotatedClass, id, false)).append(") ");
+        sb.append(getFieldNames(manager, entityClass, false)).append(") ");
         sb.append(VALUES).append("(");
 
         int count = 0;
         for (AnnotatedField f: annotatedClass.getFields()) {
             if (count++ != 0)
                 sb.append(",");
-            if (f.contains(id))
+            if (f.contains(manager.getIdAnnotation()))
                 sb.append("null");
             else
                 sb.append("?");
@@ -77,23 +83,24 @@ class QueryFactory {
     }
 
     @NotNull
-    public static String getDropTableQuery(@NotNull AnnotatedClass annotatedClass) {
+    public static String getDropTableQuery(@NotNull AnnotationManager manager, Class<?> entityClass) {
 
-        return (DROP_TABLE + annotatedClass.getSimpleName() + IF_EXIST).toUpperCase();
+        return (DROP_TABLE + manager.getAnnotatedClass(entityClass).getSimpleName() + IF_EXIST).toUpperCase();
     }
 
     @NotNull
-    private static String getFieldNames(@NotNull AnnotatedClass annotatedClass,
-                                        @NotNull Class<? extends Annotation> id,
+    private static String getFieldNames(@NotNull AnnotationManager manager,
+                                        @NotNull Class<?> entityClass,
                                         boolean isTypeInfo) {
+
         StringBuilder query = new StringBuilder();
         int count = 0;
-        for (AnnotatedField f : annotatedClass.getFields()) {
+        for (AnnotatedField f : manager.getAnnotatedClass(entityClass).getFields()) {
             if (count++ != 0) {
                 query.append(", ");
             }
             if (isTypeInfo) {
-                query.append(getFieldString(f, id));
+                query.append(getFieldString(f, manager.getIdAnnotation()));
             } else {
                 query.append(f.getName());
             }
