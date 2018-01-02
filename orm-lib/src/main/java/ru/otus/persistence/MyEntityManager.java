@@ -4,7 +4,6 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
-import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.jdbc.DbManagerFactory;
 import ru.otus.persistence.xml.PersistenceParams;
@@ -77,18 +76,6 @@ class MyEntityManager implements EntityManager {
 
     }
 
-    /**
-     * Find by primary key.
-     * @param entityClass -
-     * @param primaryKey -
-     * @return the found entity instance or null
-     *    if the entity does not exist
-     * @throws IllegalStateException if this EntityManager has been closed.
-     * @throws IllegalArgumentException if the first argument does
-     *    not denote an entity type or the second
-     *    argument is not a valid type for that
-     *    entity's primary key
-     */
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey) {
         if (!isOpen)
@@ -113,26 +100,7 @@ class MyEntityManager implements EntityManager {
             e.printStackTrace();
         }
 
-        T cls = null;
-        try {
-            cls = connection.execQuery(QueryFactory.getSelectQuery(annotationManager, entityClass, id), result -> {
-
-                ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
-                ResultSetMetaData rsmd = result.getMetaData();
-                result.next();
-
-                int count = rsmd.getColumnCount();
-                for (int i = 1; i <= count; i++) {
-                    String name = rsmd.getColumnName(i);
-                    AnnotatedField field = annotationManager.getField(entityClass, name);
-                    builder.set(field, result.getObject(i));
-                }
-                return builder.build();
-            });
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return cls;
+        return PersistenceHelper.find(connection, annotationManager, entityClass, id);
     }
 
     @Override
@@ -230,45 +198,11 @@ class MyEntityManager implements EntityManager {
 
     private void saveObjects() {
         for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
-            saveObject(entry.getKey(), entry.getValue());
+            PersistenceHelper.saveObjects(connection, annotationManager, entry.getKey(), entry.getValue());
         }
     }
 
-    private void saveObject(Class<?> entityClass, Set<Object> objects) {
-        String query = QueryFactory.getInsertQuery(annotationManager, entityClass);
-        connection.execQuery(query, statement -> {
-            for (Object object : objects) {
-                int count = 1;
-                for (AnnotatedField field : annotationManager.getAnnotatedClass(entityClass).getFields()) {
-                    try {
-                        if (!field.contains(Id.class))
-                            statement.setString(count++, FieldUtils.readField(field.getField(), object, true).toString());
 
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-                statement.execute();
-                long id = connection.getLastInsertedId();
-                saveObjectId(entityClass, object, id);
-            }
-        });
-    }
-
-    private void saveObjectId(Class<?> entityClass, Object object, long id) {
-
-        try {
-            Method m = entityClass.getMethod("setId", long.class);
-            try {
-                m.invoke(object, id);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void dropTables() {
         for (Class<?> cl : annotationManager.getAllClasses()) {

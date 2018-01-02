@@ -5,46 +5,93 @@ import ru.otus.persistence.annotations.AbstractAnnotationManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
-import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-public class AnnotationManager extends AbstractAnnotationManager {
+class AnnotationManager extends AbstractAnnotationManager {
 
-    private final Class<? extends Annotation> id;
-
-    public AnnotationManager(Class<? extends Annotation> idAnnotation, Class<?>... classes) {
-        super(classes);
-        this.id = idAnnotation;
+    AnnotationManager(Class<? extends Annotation> idAnnotation, Class<?>... classes) {
+        super(idAnnotation, classes);
     }
 
-    public AnnotationManager(Class<? extends Annotation> idAnnotation, String... classes) throws ClassNotFoundException {
-        super(classes);
-        this.id = idAnnotation;
+    AnnotationManager(Class<? extends Annotation> idAnnotation, String... classes) throws ClassNotFoundException {
+        super(idAnnotation, classes);
     }
 
-    public AnnotatedField getId(Class<?> cl) {
+    AnnotatedField getId(Class<?> cl) {
         AnnotatedClass ac = getAnnotatedClass(cl);
 
-        List<AnnotatedField> fields = ac.getFields(id);
+        List<AnnotatedField> fields = ac.getFields(idAnnotation);
 
         assert fields.size() > 0;
         return fields.get(0);
     }
 
-    @NotNull
-    public Class<? extends Annotation> getIdAnnotation() {
-        return id;
-    }
-
     @Override
     protected void validateClass(@NotNull AnnotatedClass ac) {
+        if (!isSingleId(ac))
+            throw new IllegalArgumentException("No or multiple @Id in "+ac.getSimpleName()+" class");
+    }
 
+    private boolean isSingleId(@NotNull AnnotatedClass ac) {
+        return ac.getFields(idAnnotation).size() == 1;
     }
 
     @Override
     protected void validateClasses() {
 
+
+/*
+    We must verify OneToMany - ManyToOne relations
+    Algorithm:
+    Run through all classes in annotatedClasses. For every class do the following:
+    1. Find for @ManyToOne.
+    2. If found:
+        2.1 go to the type below @ManyToOne annotation
+        2.2 in class search for @OneToMany annotation
+        2.3 If found - compare mappedBy parameter for name of variable in 2.1
+        2.4 If not found - throw error
+    3. If not found throw error
+* */
+
+        for (Map.Entry<Class<?>, AnnotatedClass> entry: annotatedClasses.entrySet()) {
+            AnnotatedClass cl = entry.getValue();
+
+            validateOneToOne(cl);
+            validateManyToOne(cl);
+        }
+    }
+
+    private void validateOneToOne(@NotNull AnnotatedClass cl) {
+        List<AnnotatedField> oneyToOne = cl.getFields(OneToOne.class);
+        for (AnnotatedField field: oneyToOne) {
+            Class<?> oneClass = field.getType();
+            if (!contains(oneClass))
+                throw new IllegalArgumentException(oneClass.getSimpleName()+" is not an entity");
+        }
+    }
+
+    private void validateManyToOne(AnnotatedClass cl) {
+        List<AnnotatedField> manyToOne = cl.getFields(ManyToOne.class);
+        for (AnnotatedField field: manyToOne) {
+            Class<?> manyClass = field.getType();
+            final String name = field.getName();
+            if (!contains(manyClass))
+                throw new IllegalArgumentException("Class in @ManyToOne relationship is not an entity.");
+
+            /// there can be several one to many relationship
+            AnnotatedClass onetoManyClass = getAnnotatedClass(manyClass);
+
+            long count = onetoManyClass.getFields(OneToMany.class).stream().filter(f -> {
+                OneToMany anno = f.getAnnotation(OneToMany.class);
+                return name.equals(anno.mappedBy());
+            }).count();
+            if (count != 1)
+                throw new IllegalArgumentException("No or duplicate @OneToMany");
+        }
     }
 }

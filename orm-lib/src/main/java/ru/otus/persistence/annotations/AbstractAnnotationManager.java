@@ -17,20 +17,30 @@ import java.util.Set;
 
 public abstract class AbstractAnnotationManager {
     protected Map<Class<?>, AnnotatedClass> annotatedClasses;
+    protected Class<? extends Annotation> idAnnotation;
 
-    public AbstractAnnotationManager(@NotNull Class<?>... classes) {
+    public AbstractAnnotationManager(@NotNull Class<? extends Annotation> idAnnotation,
+                                     @NotNull Class<?>... classes) {
+        this.idAnnotation = idAnnotation;
         for (Class<?> cl : classes) {
             addClass(cl);
         }
         validateClasses();
     }
 
-    public AbstractAnnotationManager(@NotNull String... classes) throws ClassNotFoundException {
+    public AbstractAnnotationManager(@NotNull Class<? extends Annotation> idAnnotation,
+                                     @NotNull String... classes) throws ClassNotFoundException {
+        this.idAnnotation = idAnnotation;
         for (String cl : classes) {
             Class<?> loadedClass = Class.forName(cl);
             addClass(loadedClass);
         }
         validateClasses();
+    }
+
+    @NotNull
+    public Class<? extends Annotation> getIdAnnotation() {
+        return idAnnotation;
     }
 
     @NotNull
