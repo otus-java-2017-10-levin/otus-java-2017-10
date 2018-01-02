@@ -9,7 +9,6 @@ import ru.otus.classes.TestDataSet;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,15 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AnnotationsTest {
 
-    private final AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
-
-    @Test
-    void loadAnnotations() {
-
-        AnnotatedField idField = annotatedClass.getId();
-
-        assertEquals(true, idField.getName().equals("id"));
-    }
+    private final AnnotatedClass annotatedClass = AnnotatedClassImpl.of(UserDataSet.class);
 
     @Test
     void getArrayOfFields() {
@@ -38,37 +29,30 @@ class AnnotationsTest {
     void ifObjectIsEntity() {
         UserDataSet set = new UserDataSet("Flow");
         PhoneDataSet phone = new PhoneDataSet("100", 1);
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
+        AnnotatedClass AnnotatedClass = AnnotatedClassImpl.of(UserDataSet.class);
 
-        assertEquals(true, annotatedClass.is(set));
-        assertEquals(false, annotatedClass.is(phone));
+        assertEquals(true, AnnotatedClass.is(set));
+        assertEquals(false, AnnotatedClass.is(phone));
     }
 
     @Test
     void getSimpleClassName() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
+        AnnotatedClass AnnotatedClass = AnnotatedClassImpl.of(UserDataSet.class);
 
-        assertEquals("UserDataSet", annotatedClass.getSimpleName());
+        assertEquals("UserDataSet", AnnotatedClass.getSimpleName());
     }
 
     @Test
     void testCache() {
-        AnnotatedClass anno1 = AnnotatedClass.of(UserDataSet.class);
-        AnnotatedClass anno2 = AnnotatedClass.of(UserDataSet.class);
+        AnnotatedClass anno1 = AnnotatedClassImpl.of(UserDataSet.class);
+        AnnotatedClass anno2 = AnnotatedClassImpl.of(UserDataSet.class);
 
         assertEquals(anno1, anno2);
     }
 
-
-    @Test
-    void createWithWrongClass() {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> AnnotatedClass.of(String.class));
-        assertEquals(null, e.getMessage());
-    }
-
     @Test
     void getFieldByNameInBase() {
-        AnnotatedClass user = AnnotatedClass.of(UserDataSet.class);
+        AnnotatedClass user = AnnotatedClassImpl.of(UserDataSet.class);
 
         String dbName = "NAME";
         AnnotatedField f = user.getField(dbName);
@@ -78,10 +62,9 @@ class AnnotationsTest {
 
     @Test
     void containsAnnotationTest() {
-        AnnotatedClass cl = AnnotatedClass.of(TestDataSet.class);
+        AnnotatedClass cl = AnnotatedClassImpl.of(TestDataSet.class);
 
         AnnotatedField field = cl.getField("age");
-        assert field != null;
 
         assertEquals(true, field.contains(Column.class));
         assertEquals(true, field.contains(OneToMany.class));
@@ -92,10 +75,9 @@ class AnnotationsTest {
 
     @Test
     void getAnnotationTest() {
-        AnnotatedClass cl = AnnotatedClass.of(TestDataSet.class);
+        AnnotatedClass cl = AnnotatedClassImpl.of(TestDataSet.class);
 
         AnnotatedField field = cl.getField("age");
-        assert field != null;
 
         Id id = field.getAnnotation(Id.class);
         assertEquals(null, id);

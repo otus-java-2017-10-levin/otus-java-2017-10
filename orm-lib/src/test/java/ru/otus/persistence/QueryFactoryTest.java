@@ -5,16 +5,22 @@ import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.base.PhoneDataSet;
 import ru.otus.base.UserDataSet;
 
+import javax.persistence.Id;
+import java.lang.annotation.Annotation;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("SpellCheckingInspection")
 class QueryFactoryTest {
 
+    private final static Class<? extends Annotation> idClass = Id.class;
+
     @Test
     void createTableFromEntity() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
+        AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
+        AnnotatedClass annotatedClass = man.getAnnotatedClass(UserDataSet.class);
 
-        String actualQuery = QueryFactory.createTableQuery(annotatedClass);
+        String actualQuery = QueryFactory.createTableQuery(annotatedClass, idClass);
         String expectedQuery = "CREATE TABLE IF NOT EXISTS USERDATASET (NAME VARCHAR(256), AGE INT, ID BIGINT AUTO_INCREMENT, PRIMARY KEY (ID))";
 
         assertEquals(expectedQuery, actualQuery);
@@ -22,9 +28,10 @@ class QueryFactoryTest {
 
     @Test
     void insertTest() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
+        AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
+        AnnotatedClass annotatedClass = man.getAnnotatedClass(UserDataSet.class);
 
-        String actualQuery = QueryFactory.getInsertQuery(annotatedClass);
+        String actualQuery = QueryFactory.getInsertQuery(annotatedClass, idClass);
         String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, ID) VALUES (?,?,NULL)";
 
         assertEquals(expectedQuery, actualQuery);
@@ -32,7 +39,8 @@ class QueryFactoryTest {
 
     @Test
     void dropTables() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
+        AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
+        AnnotatedClass annotatedClass = man.getAnnotatedClass(UserDataSet.class);
 
         String actualQuery = QueryFactory.getDropTableQuery(annotatedClass);
         String expectedQuery = "DROP TABLE USERDATASET IF EXISTS";
@@ -43,19 +51,11 @@ class QueryFactoryTest {
 
     @Test
     void getSelectQuery() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(UserDataSet.class);
+        AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
+        AnnotatedClass annotatedClass = man.getAnnotatedClass(UserDataSet.class);
 
-        String actualQuery = QueryFactory.getSelectQuery(annotatedClass, 1);
+        String actualQuery = QueryFactory.getSelectQuery(annotatedClass, Id.class, 1);
         String expectedQuery = "SELECT NAME, AGE, ID FROM USERDATASET WHERE ID = 1";
-        assertEquals(expectedQuery, actualQuery);
-    }
-
-    @Test
-    void getSelectMultipleQuery() {
-        AnnotatedClass annotatedClass = AnnotatedClass.of(PhoneDataSet.class);
-
-        String actualQuery = QueryFactory.getSelectQuery(annotatedClass, 1);
-        String expectedQuery = "SELECT PHONE, HOUSENUMBER, ID FROM PHONEDATASET WHERE ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
 }

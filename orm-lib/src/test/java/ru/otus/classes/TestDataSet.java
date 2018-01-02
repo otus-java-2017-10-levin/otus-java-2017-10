@@ -10,4 +10,7 @@ public class TestDataSet extends DataSet {
     @Column(name = "age")
     @OneToMany(mappedBy = "test")
     private int age;
+
+    @Column(name = "city")
+    private String city;
 }

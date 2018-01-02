@@ -1,46 +1,25 @@
 package ru.otus.persistence.annotations;
 
-import javax.persistence.Id;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.stream.Collectors;
 
-public final class AnnotatedField {
-    private final Field field;
-    private final Map<Class<? extends Annotation>, ? extends Annotation> annotations;
+public interface AnnotatedField {
+    @NotNull
+    String getName();
 
-    AnnotatedField(Field field) {
-        if (field == null)
-            throw new IllegalArgumentException();
+    @NotNull
+    Class<?> getType();
 
-        annotations = Arrays.stream(field.getDeclaredAnnotations())
-                .collect(Collectors.toMap(Annotation::annotationType, annotation -> annotation));
+    @NotNull
+    Field getField();
 
-        this.field = field;
-    }
+    boolean contains(@NotNull Class<? extends Annotation> annotation);
 
-    public String getName() {
-        return field.getName();
-    }
+    int getAnnotationCount();
 
-    public Class<?> getType() {
-        return field.getType();
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    public boolean contains(Class<? extends Annotation> annotation) {
-        return annotations.containsKey(annotation);
-    }
-
-    public int getAnnotationCount() {
-        return annotations.size();
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        return annotationClass.cast(annotations.get(annotationClass));
-    }
+    @Nullable
+    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
 }

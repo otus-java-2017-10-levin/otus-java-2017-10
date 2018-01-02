@@ -24,14 +24,13 @@ final class ObjectBuilder<T> {
 
     /**
      * Set {@code value} for the field {@code fieldName}
-     * @param fieldName - string name of field
+     * @param field -
      * @param value - new value for the {@code fieldName}
      * @param <R> -
      * @return -
      */
-    public <R> ObjectBuilder<T> set(String fieldName, R value) {
+    public <R> ObjectBuilder<T> set(AnnotatedField field, R value) {
         try {
-            AnnotatedField field = AnnotatedClass.of(object.getClass()).getField(fieldName);
             PersistenceHelper.setFieldValue(object, field, value);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

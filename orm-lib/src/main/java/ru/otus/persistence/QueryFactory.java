@@ -1,9 +1,10 @@
 package ru.otus.persistence;
 
+import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
-import javax.persistence.Id;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,49 +24,48 @@ class QueryFactory {
     private static final String WHERE_ID = "WHERE ID = ";
 
 
-    public static String getSelectQuery(AnnotatedClass annotatedClass, long key) {
-        if (annotatedClass == null || key < 1)
-            throw new IllegalArgumentException();
+    /*
+            For simplicity support only long indexes
+     */
+    @NotNull
+    public static String getSelectQuery(@NotNull AnnotatedClass annotatedClass,
+                                        @NotNull Class<? extends Annotation> id,
+                                        long key) {
 
         StringBuilder sb = new StringBuilder(SELECT).append(" ");
-        sb.append(getFieldNames(annotatedClass, false)).append(" ");
+        sb.append(getFieldNames(annotatedClass, id,false)).append(" ");
 
         sb.append(FROM).append(" ").append(annotatedClass.getSimpleName()).append(" ");
         sb.append(WHERE_ID).append(key);
         return sb.toString().toUpperCase();
     }
 
-    public static String createTableQuery(AnnotatedClass annotatedClass) {
-        if (annotatedClass == null)
-            throw new IllegalArgumentException();
+    @NotNull
+    public static String createTableQuery(@NotNull AnnotatedClass annotatedClass, @NotNull Class<? extends Annotation> id) {
 
         StringBuilder query = new StringBuilder(CREATE_IF_NOT_EXIST);
 
         query.append(annotatedClass.getSimpleName()).append(" (");
 
-        AnnotatedField id = annotatedClass.getId();
-        if (id == null)
-            throw new IllegalArgumentException("no @Id field");
+        query.append(getFieldNames(annotatedClass, id, true));
 
-        query.append(getFieldNames(annotatedClass, true));
-
-
-        query.append(", ").append(PRIMARY_KEY).append(id.getName()).append("))");
+        query.append(", ").append(PRIMARY_KEY).append(id.getSimpleName()).append("))");
         return query.toString().toUpperCase();
     }
 
-    public static String getInsertQuery(AnnotatedClass annotatedClass) {
+    @NotNull
+    public static String getInsertQuery(@NotNull AnnotatedClass annotatedClass, @NotNull Class<? extends Annotation> id) {
 
         StringBuilder sb = new StringBuilder(INSERT);
         sb.append(annotatedClass.getSimpleName()).append(" (");
-        sb.append(getFieldNames(annotatedClass, false)).append(") ");
+        sb.append(getFieldNames(annotatedClass, id, false)).append(") ");
         sb.append(VALUES).append("(");
 
         int count = 0;
         for (AnnotatedField f: annotatedClass.getFields()) {
             if (count++ != 0)
                 sb.append(",");
-            if (f.contains(Id.class))
+            if (f.contains(id))
                 sb.append("null");
             else
                 sb.append("?");
@@ -76,12 +76,16 @@ class QueryFactory {
         return sb.toString().toUpperCase();
     }
 
-    public static String getDropTableQuery(AnnotatedClass annotatedClass) {
+    @NotNull
+    public static String getDropTableQuery(@NotNull AnnotatedClass annotatedClass) {
 
         return (DROP_TABLE + annotatedClass.getSimpleName() + IF_EXIST).toUpperCase();
     }
 
-    private static String getFieldNames(AnnotatedClass annotatedClass, boolean isTypeInfo) {
+    @NotNull
+    private static String getFieldNames(@NotNull AnnotatedClass annotatedClass,
+                                        @NotNull Class<? extends Annotation> id,
+                                        boolean isTypeInfo) {
         StringBuilder query = new StringBuilder();
         int count = 0;
         for (AnnotatedField f : annotatedClass.getFields()) {
@@ -89,7 +93,7 @@ class QueryFactory {
                 query.append(", ");
             }
             if (isTypeInfo) {
-                query.append(getFieldString(f));
+                query.append(getFieldString(f, id));
             } else {
                 query.append(f.getName());
             }
@@ -97,15 +101,14 @@ class QueryFactory {
         return query.toString();
     }
 
-    private static String getFieldString(AnnotatedField field) {
-        if (field == null)
-            throw new IllegalArgumentException();
+    @NotNull
+    private static String getFieldString(@NotNull AnnotatedField field, @NotNull Class<? extends Annotation> id) {
 
         StringBuilder sb = new StringBuilder(field.getName());
 
         String sqlType = sqlTypes.get(field.getType());
 
-        if (field.contains(Id.class)) {
+        if (field.contains(id)) {
             sb.append(ID_FIELD);
         } else {
 

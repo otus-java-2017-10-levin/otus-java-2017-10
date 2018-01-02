@@ -10,6 +10,7 @@ import ru.otus.jdbc.DbManagerFactory;
 import ru.otus.persistence.xml.PersistenceParams;
 
 import javax.persistence.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSetMetaData;
@@ -20,37 +21,28 @@ class MyEntityManager implements EntityManager {
 
     private final DbManager manager;
     private final DBConnection connection;
-    private final PersistenceParams params;
-    private final List<AnnotatedClass> annotatedClass = new ArrayList<>();
+    private final PersistenceParams persistenceParams;
+    private AnnotationManager annotationManager;
+    private final static Class<? extends Annotation> idClass = Id.class;
     private boolean isOpen;
     private final Map<AnnotatedClass, Set<Object>> objects = new HashMap<>();
 
-    MyEntityManager(Map params) {
-        this.params = new PersistenceParams(params);
-        manager = DbManagerFactory.createDataBaseManager(this.params.getConnectionData());
+    MyEntityManager(Map persistenceParams) {
+        this.persistenceParams = new PersistenceParams(persistenceParams);
+        manager = DbManagerFactory.createDataBaseManager(this.persistenceParams.getConnectionData());
         connection = manager.getConnection();
+
+        if (persistenceParams == null || this.persistenceParams.getEntityClasses().size() == 0)
+            throw new IllegalStateException("There is no entity classes in persistence.xml");
+
         try {
-            loadEntityClasses();
+            annotationManager = new AnnotationManager(idClass, this.persistenceParams.getEntityClasses().toArray(new String[0]));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         isOpen = true;
         dropTables();
         createTables();
-    }
-
-    private void loadEntityClasses() throws ClassNotFoundException {
-        if (params == null || params.getEntityClasses().size() == 0)
-            throw new IllegalStateException("There is no entity classes in persistence.xml");
-
-        for (String className : params.getEntityClasses()) {
-            if (className == null)
-                throw new IllegalArgumentException("className is null");
-
-            AnnotatedClass cl = AnnotatedClass.of(Class.forName(className));
-
-            annotatedClass.add(cl);
-        }
     }
 
     @Override
@@ -69,13 +61,12 @@ class MyEntityManager implements EntityManager {
         objects.put(cl, set);
     }
 
+    // if this object is instance of annotated class
     private AnnotatedClass checkEntity(Object entity) {
-        for (AnnotatedClass cl : annotatedClass) {
-            if (cl.is(entity)) {
-                return cl;
-            }
-        }
-        throw new IllegalArgumentException("is not an entity");
+        if (!annotationManager.contains(entity.getClass()))
+            throw new IllegalArgumentException("is not an entity");
+
+        return annotationManager.getAnnotatedClass(entity.getClass());
     }
 
     @Override
@@ -88,19 +79,33 @@ class MyEntityManager implements EntityManager {
 
     }
 
+    /**
+     * Find by primary key.
+     * @param entityClass -
+     * @param primaryKey -
+     * @return the found entity instance or null
+     *    if the entity does not exist
+     * @throws IllegalStateException if this EntityManager has been closed.
+     * @throws IllegalArgumentException if the first argument does
+     *    not denote an entity type or the second
+     *    argument is not a valid type for that
+     *    entity's primary key
+     */
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey) {
         if (!isOpen)
             throw new IllegalStateException();
 
-        final AnnotatedClass cl = AnnotatedClass.of(entityClass);
+        final AnnotatedClass cl = annotationManager.getAnnotatedClass(entityClass);
+        if (!annotationManager.contains(entityClass))
+            throw new IllegalArgumentException("wrong entity class");
 
-        Class<?> cl1 = cl.getId().getType();
-        if (cl1.isPrimitive())
-            cl1 = ClassUtils.primitiveToWrapper(cl1);
+        Class<?> idType = annotationManager.getId(entityClass).getType();
+
+        idType = ClassUtils.primitiveToWrapper(idType);
+
         Class<?> cl2 = primaryKey.getClass();
-        if (!annotatedClass.contains(cl) ||
-                !cl1.equals(cl2)) {
+        if (!idType.equals(cl2)) {
             throw new IllegalArgumentException();
         }
 
@@ -113,7 +118,7 @@ class MyEntityManager implements EntityManager {
 
         T cls = null;
         try {
-            cls = connection.execQuery(QueryFactory.getSelectQuery(cl, id), result -> {
+            cls = connection.execQuery(QueryFactory.getSelectQuery(cl, idClass, id), result -> {
 
                 ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
                 ResultSetMetaData rsmd = result.getMetaData();
@@ -122,7 +127,8 @@ class MyEntityManager implements EntityManager {
                 int count = rsmd.getColumnCount();
                 for (int i = 1; i <= count; i++) {
                     String name = rsmd.getColumnName(i);
-                    builder.set(cl.getField(name).getName(), result.getObject(i));
+                    AnnotatedField field = annotationManager.getField(entityClass, name);
+                    builder.set(field, result.getObject(i));
                 }
                 return builder.build();
             });
@@ -232,7 +238,7 @@ class MyEntityManager implements EntityManager {
     }
 
     private void saveObject(AnnotatedClass annotatedClass, Set<Object> objects) {
-        String query = QueryFactory.getInsertQuery(annotatedClass);
+        String query = QueryFactory.getInsertQuery(annotatedClass, idClass);
         connection.execQuery(query, statement -> {
             for (Object object : objects) {
                 int count = 1;
@@ -269,15 +275,15 @@ class MyEntityManager implements EntityManager {
     }
 
     private void dropTables() {
-        for (AnnotatedClass cl : annotatedClass) {
+        for (AnnotatedClass cl : annotationManager.getAllClasses()) {
             String query = QueryFactory.getDropTableQuery(cl);
             connection.execQuery(query);
         }
     }
 
     private void createTables() {
-        for (AnnotatedClass cl : annotatedClass) {
-            String query = QueryFactory.createTableQuery(cl);
+        for (AnnotatedClass cl : annotationManager.getAllClasses()) {
+            String query = QueryFactory.createTableQuery(cl, idClass);
             connection.execQuery(query);
         }
     }
