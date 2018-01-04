@@ -6,6 +6,7 @@ import ru.otus.persistence.annotations.AnnotatedField;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class QueryFactory {
@@ -23,6 +24,19 @@ class QueryFactory {
     private static final String FROM = "FROM";
     private static final String WHERE_ID = "WHERE ID = ";
 
+    private static final String ALTER = "alter table ";
+    private static final String ADD_CONSTRAINT = " add constraint ";
+    private static final String REFERENCES = " foreign key (%s) references ";
+
+//    private static final String ALTER_TABLE = "alter table %s add constraint %s foreign key (%s) references %s";
+
+    /*
+    one to one
+create table AddressDataSet (id bigint not null, city varchar(255), street varchar(255), primary key (id))
+create table UserDataSet (id bigint not null, address_id bigint, primary key (id))
+alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (address_id) references AddressDataSet
+
+     */
 
     /*
             For simplicity support only long indexes
@@ -34,7 +48,7 @@ class QueryFactory {
         AnnotatedClass ac = man.getAnnotatedClass(entityClass);
 
         StringBuilder sb = new StringBuilder(SELECT).append(" ");
-        sb.append(getFieldNames(man, entityClass,false)).append(" ");
+        sb.append(getFieldNames(man, entityClass, false)).append(" ");
 
         sb.append(FROM).append(" ").append(ac.getSimpleName()).append(" ");
         sb.append(WHERE_ID).append(key);
@@ -52,7 +66,19 @@ class QueryFactory {
 
         query.append(getFieldNames(manager, entityClass, true));
 
-        query.append(", ").append(PRIMARY_KEY).append(manager.getId(entityClass).getName()).append("))");
+        query.append(", ").append(PRIMARY_KEY);
+        int counter = 0;
+        AnnotatedClass annotatedClass = manager.getAnnotatedClass(entityClass);
+        for (AnnotatedField af : annotatedClass.getFields(manager.getIdAnnotation())) {
+            if (counter != 0)
+                query.append(",");
+
+            query.append(af.getName());
+            counter++;
+        }
+
+        query.append("))");
+        System.out.println(query.toString());
         return query.toString().toUpperCase();
     }
 
@@ -68,18 +94,33 @@ class QueryFactory {
         sb.append(VALUES).append("(");
 
         int count = 0;
-        for (AnnotatedField f: annotatedClass.getFields()) {
+        for (AnnotatedField f : annotatedClass.getFields()) {
             if (count++ != 0)
                 sb.append(",");
             if (f.contains(manager.getIdAnnotation()))
-                sb.append("null");
+                sb.append("NULL");
             else
                 sb.append("?");
         }
 
         sb.append(")");
-
+        System.out.println(sb.toString());
         return sb.toString().toUpperCase();
+    }
+
+    @NotNull
+    public static String getDropSequenceQuery() {
+        return "drop sequence if exists hibernate_sequence";
+    }
+
+    @NotNull
+    public static String createSequenceQuery() {
+        return "create sequence hibernate_sequence start with 1 increment by 1";
+    }
+
+    @NotNull
+    public static String getNextInSequenceQuery() {
+        return "call next value for hibernate_sequence";
     }
 
     @NotNull

@@ -1,8 +1,6 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.persistence.annotations.AnnotatedClass;
-import ru.otus.base.PhoneDataSet;
 import ru.otus.base.UserDataSet;
 
 import javax.persistence.Id;
@@ -20,7 +18,7 @@ class QueryFactoryTest {
         AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
 
         String actualQuery = QueryFactory.createTableQuery(man, UserDataSet.class);
-        String expectedQuery = "CREATE TABLE IF NOT EXISTS USERDATASET (NAME VARCHAR(256), AGE INT, ID BIGINT AUTO_INCREMENT, PRIMARY KEY (ID))";
+        String expectedQuery = "CREATE TABLE IF NOT EXISTS USERDATASET (NAME VARCHAR(256), AGE INT, EMPLOYEEID BIGINT, ID BIGINT AUTO_INCREMENT, PRIMARY KEY (ID))";
 
         assertEquals(expectedQuery, actualQuery);
     }
@@ -30,7 +28,7 @@ class QueryFactoryTest {
         AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
 
         String actualQuery = QueryFactory.getInsertQuery(man, UserDataSet.class);
-        String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, ID) VALUES (?,?,NULL)";
+        String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, EMPLOYEEID, ID) VALUES (?,?,?,?)";
 
         assertEquals(expectedQuery, actualQuery);
     }
@@ -51,7 +49,7 @@ class QueryFactoryTest {
         AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class);
 
         String actualQuery = QueryFactory.getSelectQuery(man, UserDataSet.class, 1);
-        String expectedQuery = "SELECT NAME, AGE, ID FROM USERDATASET WHERE ID = 1";
+        String expectedQuery = "SELECT NAME, AGE, EMPLOYEEID, ID FROM USERDATASET WHERE ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
 }

@@ -56,7 +56,7 @@ class PersistenceParamsTest {
         Set<String> expectedClasses = new HashSet<>();
 
         expectedClasses.add("ru.otus.base.UserDataSet");
-        expectedClasses.add("ru.otus.base.PhoneDataSet");
+        expectedClasses.add("ru.otus.base.PhonesDataSet");
 
         assertEquals(expectedClasses, classes);
     }

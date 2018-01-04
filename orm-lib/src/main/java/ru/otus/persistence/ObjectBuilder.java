@@ -31,8 +31,8 @@ final class ObjectBuilder<T> {
      */
     public <R> ObjectBuilder<T> set(AnnotatedField field, R value) {
         try {
-            PersistenceHelper.setFieldValue(object, field, value);
-        } catch (NoSuchMethodException e) {
+            field.setFieldValue(object, value);
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return this;

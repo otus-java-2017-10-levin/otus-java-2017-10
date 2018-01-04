@@ -21,8 +21,8 @@ class AnnotatedClassImpl implements AnnotatedClass {
         return annotatedClass;
     }
 
-    private AnnotatedClassImpl(Class<?> annotatedClass, NameGenerator nameGenerator) {
-        this.annotatedClass = annotatedClass;
+    private AnnotatedClassImpl(Class<?> cl, NameGenerator nameGenerator) {
+        this.annotatedClass = cl;
         generator = nameGenerator;
         parse();
     }
@@ -34,7 +34,7 @@ class AnnotatedClassImpl implements AnnotatedClass {
      * @return - instance of AnnotatedClassImpl
      * @throws IllegalArgumentException - if class has no @Id field
      */
-    public static AnnotatedClass of(Class<?> key) {
+    public static <T> AnnotatedClass of(Class<T> key) {
         if (cacheClasses == null)
             cacheClasses = new HashMap<>();
 

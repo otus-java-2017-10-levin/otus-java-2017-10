@@ -3,6 +3,7 @@ package ru.otus.persistence.annotations;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
@@ -21,5 +22,10 @@ public interface AnnotatedField {
     int getAnnotationCount();
 
     @Nullable
-    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    <S extends Annotation> S getAnnotation(Class<S> annotationClass);
+
+    @Nullable
+    Object getFieldValue(@NotNull Object object) throws IllegalAccessException;
+
+    void setFieldValue(@NotNull Object target, @NotNull Object value) throws IllegalAccessException;
 }

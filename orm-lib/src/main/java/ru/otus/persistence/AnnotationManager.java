@@ -12,7 +12,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
-class AnnotationManager extends AbstractAnnotationManager {
+public class AnnotationManager extends AbstractAnnotationManager {
 
     AnnotationManager(Class<? extends Annotation> idAnnotation, Class<?>... classes) {
         super(idAnnotation, classes);
@@ -27,14 +27,15 @@ class AnnotationManager extends AbstractAnnotationManager {
 
         List<AnnotatedField> fields = ac.getFields(idAnnotation);
 
-        assert fields.size() > 0;
+        if (fields.size() != 1)
+            throw new IllegalArgumentException("@id fields count != 1");
         return fields.get(0);
     }
 
     @Override
     protected void validateClass(@NotNull AnnotatedClass ac) {
-        if (!isSingleId(ac))
-            throw new IllegalArgumentException("No or multiple @Id in "+ac.getSimpleName()+" class");
+//        if (!isSingleId(ac))
+//            throw new IllegalArgumentException("No or multiple @Id in "+ac.getSimpleName()+" class");
     }
 
     private boolean isSingleId(@NotNull AnnotatedClass ac) {

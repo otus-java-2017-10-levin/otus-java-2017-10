@@ -12,6 +12,6 @@ public class PhoneDataSet extends DataSet {
 
     String number;
 
-    @ManyToOne
+//    @ManyToOne
     EmployeeDataSet owner;
 }

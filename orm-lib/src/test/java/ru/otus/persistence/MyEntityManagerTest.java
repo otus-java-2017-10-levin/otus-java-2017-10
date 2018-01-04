@@ -4,10 +4,13 @@ import org.dbunit.Assertion;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import ru.otus.base.PhoneDataSet;
+import ru.otus.H2Db;
+import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
 import ru.otus.jdbc.H2DatabaseTest;
 import ru.otus.jdbc.JdbcTestParams;
@@ -15,6 +18,8 @@ import ru.otus.jdbc.JdbcTestParams;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -26,6 +31,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
     MyEntityManagerTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());
     }
+
 
     @Test
     void persistTest() throws Exception {
@@ -89,7 +95,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
         @Test
         void findTestMultipleTypes() {
-            PhoneDataSet set = new PhoneDataSet("Flow");
+            PhonesDataSet set = new PhonesDataSet("Flow");
             set.setHouseNumber(11);
 
             em.persist(set);
@@ -97,7 +103,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
             set.setPhone("Flow1");
             long id = set.getId();
-            set = em.find(PhoneDataSet.class, id);
+            set = em.find(PhonesDataSet.class, id);
             em.close();
 
             assertEquals("Flow", set.getPhone());

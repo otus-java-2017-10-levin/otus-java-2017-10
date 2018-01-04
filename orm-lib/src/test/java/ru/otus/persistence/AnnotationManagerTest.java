@@ -27,13 +27,6 @@ class AnnotationManagerTest {
     }
 
     @Test
-    void validateClass() {
-        Exception e = assertThrows(IllegalArgumentException.class,
-                () -> new AnnotationManager(Id.class, MultipleIdDataSet.class));
-        assertEquals("No or multiple @Id in MultipleIdDataSet class", e.getMessage());
-    }
-
-    @Test
     void validateClasses() {
         new AnnotationManager(Id.class, EmployeeDataSet.class, PhoneDataSet.class, AddressDataSet.class);
     }

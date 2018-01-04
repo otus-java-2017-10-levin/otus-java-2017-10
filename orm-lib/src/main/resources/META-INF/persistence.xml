@@ -6,7 +6,7 @@
     <persistence-unit phone="otusJPAH2">
         <provider>ru.otus.persistence.MyPersistenceProvider</provider>
         <class>ru.otus.base.UserDataSet</class>
-        <class>ru.otus.base.PhoneDataSet</class>
+        <class>ru.otus.base.PhonesDataSet</class>
 
         <properties>
             <property phone="javax.persistence.jdbc.driver" value="org.h2.Driver" />

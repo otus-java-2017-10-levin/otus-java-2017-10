@@ -9,4 +9,5 @@ import ru.otus.base.DataSet;
 public class AddressDataSet extends DataSet {
     String city;
     String street;
+    PhoneDataSet phone;
 }

@@ -13,6 +13,7 @@ class JdbcConnection implements  DBConnection {
     @Override
     public void close() throws Exception {
         connection.close();
+        System.out.println("close");
     }
 
     @Override
@@ -28,7 +29,7 @@ class JdbcConnection implements  DBConnection {
     @Override
     public void execQuery(String query, ExecutionHandler handler) {
         try {
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             handler.accept(stmt);
         } catch (SQLException e) {
             e.printStackTrace();

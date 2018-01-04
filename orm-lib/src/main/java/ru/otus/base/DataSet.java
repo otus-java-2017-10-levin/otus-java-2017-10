@@ -7,5 +7,5 @@ import javax.persistence.*;
 @Data
 public abstract class DataSet {
     @Id
-    private long id;
+    protected long id;
 }

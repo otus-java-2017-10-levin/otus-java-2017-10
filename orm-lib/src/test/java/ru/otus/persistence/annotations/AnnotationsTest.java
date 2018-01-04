@@ -2,7 +2,7 @@ package ru.otus.persistence.annotations;
 
 
 import org.junit.jupiter.api.Test;
-import ru.otus.base.PhoneDataSet;
+import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
 import ru.otus.classes.TestDataSet;
 
@@ -22,13 +22,13 @@ class AnnotationsTest {
     void getArrayOfFields() {
         List<AnnotatedField> fields = annotatedClass.getFields();
 
-        assertEquals(3, fields.size());
+        assertEquals(4, fields.size());
     }
 
     @Test
     void ifObjectIsEntity() {
         UserDataSet set = new UserDataSet("Flow");
-        PhoneDataSet phone = new PhoneDataSet("100", 1);
+        PhonesDataSet phone = new PhonesDataSet("100", 1);
         AnnotatedClass AnnotatedClass = AnnotatedClassImpl.of(UserDataSet.class);
 
         assertEquals(true, AnnotatedClass.is(set));

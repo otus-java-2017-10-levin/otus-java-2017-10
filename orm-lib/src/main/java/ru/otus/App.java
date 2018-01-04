@@ -8,6 +8,7 @@ import ru.otus.persistence.xml.PersistenceParams;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.lang.reflect.Executable;
 import java.sql.SQLException;
 
 class App {
@@ -17,31 +18,28 @@ class App {
     private final PersistenceParams params = new PersistenceParams(jpa, "META-INF/persistence.xml");
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         new App().run();
     }
 
-    private void run() {
+    private void run() throws SQLException {
+
         startServer();
         UserDataSet user = new UserDataSet("Flow");
         user.setAge(10);
 
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
         dao.save(user);
-        System.out.println("After flush:\n"+user);
 
         UserDataSet fromDB = dao.load(user.getId());
-        System.out.println("After find by id:\n"+fromDB);
+        System.out.println("After find by id:\n" + fromDB);
         factory.close();
 
-        System.exit(0);
+//        System.exit(0);
     }
 
-    private void startServer() {
-        try {
-            Server.createWebServer("-web","-webAllowOthers","-webPort","8082").start();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void startServer() throws SQLException {
+        Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
+
     }
 }

@@ -1,34 +1,29 @@
 package ru.otus.persistence;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
-import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.jdbc.DbManagerFactory;
 import ru.otus.persistence.xml.PersistenceParams;
 
 import javax.persistence.*;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.*;
 
 class MyEntityManager implements EntityManager {
 
     private final DbManager manager;
-    private final DBConnection connection;
     private AnnotationManager annotationManager;
     private final static Class<? extends Annotation> idClass = Id.class;
     private boolean isOpen;
     private final Map<Class<?>, Set<Object>> objects = new HashMap<>();
 
+    private FlushModeType flushModeType = FlushModeType.COMMIT;
+    private Persister persister;
+
     MyEntityManager(Map persistenceParams) {
         PersistenceParams persistenceParams1 = new PersistenceParams(persistenceParams);
         manager = DbManagerFactory.createDataBaseManager(persistenceParams1.getConnectionData());
-        connection = manager.getConnection();
 
         if (persistenceParams == null || persistenceParams1.getEntityClasses().size() == 0)
             throw new IllegalStateException("There is no entity classes in persistence.xml");
@@ -39,8 +34,20 @@ class MyEntityManager implements EntityManager {
             e.printStackTrace();
         }
         isOpen = true;
-        dropTables();
-        createTables();
+        try (DBConnection connection = manager.getConnection()) {
+            dropTables(connection);
+            dropSequence(connection);
+            createTables(connection);
+            createSequence(connection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        createPersister();
+    }
+
+    private void createPersister() {
+        persister = new PersisterImpl.Builder().setAnnotationManager(annotationManager).setDbManager(manager).build();
     }
 
     @Override
@@ -50,6 +57,9 @@ class MyEntityManager implements EntityManager {
 
         checkEntity(entity);
         Class<?> entityClass = entity.getClass();
+
+//        AnnotatedClass ac = annotationManager.getAnnotatedClass(entity.getClass());
+
 
         Set<Object> set = objects.containsKey(entityClass) ? objects.get(entityClass) : new HashSet<>();
 
@@ -61,6 +71,7 @@ class MyEntityManager implements EntityManager {
     }
 
     // if this object is instance of annotated class
+
     private void checkEntity(Object entity) {
         if (!annotationManager.contains(entity.getClass()))
             throw new IllegalArgumentException("is not an entity");
@@ -100,7 +111,7 @@ class MyEntityManager implements EntityManager {
             e.printStackTrace();
         }
 
-        return PersistenceHelper.find(connection, annotationManager, entityClass, id);
+        return persister.find(entityClass, id);
     }
 
     @Override
@@ -119,12 +130,12 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public void setFlushMode(FlushModeType flushMode) {
-
+        flushModeType = flushMode;
     }
 
     @Override
     public FlushModeType getFlushMode() {
-        return null;
+        return flushModeType;
     }
 
     @Override
@@ -198,20 +209,26 @@ class MyEntityManager implements EntityManager {
 
     private void saveObjects() {
         for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
-            PersistenceHelper.saveObjects(connection, annotationManager, entry.getKey(), entry.getValue());
+            entry.getValue().forEach(object -> persister.saveOrUpdate(object));
         }
     }
 
-
-
-    private void dropTables() {
+    private void dropTables(DBConnection connection) {
         for (Class<?> cl : annotationManager.getAllClasses()) {
             String query = QueryFactory.getDropTableQuery(annotationManager, cl);
             connection.execQuery(query);
         }
     }
 
-    private void createTables() {
+    private void dropSequence(DBConnection connection) {
+        connection.execQuery(QueryFactory.getDropSequenceQuery());
+    }
+
+    private void createSequence(DBConnection connection) {
+        connection.execQuery(QueryFactory.createSequenceQuery());
+    }
+
+    private void createTables(DBConnection connection) {
         for (Class<?> cl : annotationManager.getAllClasses()) {
             String query = QueryFactory.createTableQuery(annotationManager, cl);
             connection.execQuery(query);
