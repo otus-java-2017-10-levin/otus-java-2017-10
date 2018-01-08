@@ -4,6 +4,8 @@ import org.apache.commons.lang3.ClassUtils;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.jdbc.DbManagerFactory;
+import ru.otus.persistence.annotations.AnnotatedClass;
+import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.persistence.xml.PersistenceParams;
 
 import javax.persistence.*;
@@ -36,9 +38,8 @@ class MyEntityManager implements EntityManager {
         isOpen = true;
         try (DBConnection connection = manager.getConnection()) {
             dropTables(connection);
-            dropSequence(connection);
             createTables(connection);
-            createSequence(connection);
+            addConstraints(connection);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,9 +58,6 @@ class MyEntityManager implements EntityManager {
 
         checkEntity(entity);
         Class<?> entityClass = entity.getClass();
-
-//        AnnotatedClass ac = annotationManager.getAnnotatedClass(entity.getClass());
-
 
         Set<Object> set = objects.containsKey(entityClass) ? objects.get(entityClass) : new HashSet<>();
 
@@ -84,7 +82,7 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -146,7 +144,7 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public void refresh(Object entity) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -156,7 +154,7 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public boolean contains(Object entity) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
 
@@ -174,27 +172,27 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public Query createNativeQuery(String sqlString) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Query createNativeQuery(String sqlString, Class resultClass) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Query createNativeQuery(String sqlString, String resultSetMapping) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void joinTransaction() {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object getDelegate() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -209,7 +207,10 @@ class MyEntityManager implements EntityManager {
 
     private void saveObjects() {
         for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
-            entry.getValue().forEach(object -> persister.saveOrUpdate(object));
+            entry.getValue().forEach(object -> {
+                if (persister.save(object) == -1)
+                    throw new IllegalStateException("id is -1");
+            });
         }
     }
 
@@ -220,20 +221,30 @@ class MyEntityManager implements EntityManager {
         }
     }
 
-    private void dropSequence(DBConnection connection) {
-        connection.execQuery(QueryFactory.getDropSequenceQuery());
-    }
-
-    private void createSequence(DBConnection connection) {
-        connection.execQuery(QueryFactory.createSequenceQuery());
-    }
-
     private void createTables(DBConnection connection) {
         for (Class<?> cl : annotationManager.getAllClasses()) {
             String query = QueryFactory.createTableQuery(annotationManager, cl);
             connection.execQuery(query);
         }
     }
+
+    private void addConstraints(DBConnection connection) {
+        annotationManager.getAllClasses().forEach(entityClass -> addConstraint(connection, entityClass));
+    }
+
+    private void addConstraint(DBConnection connection, Class<?> entityClass) {
+        AnnotatedClass ac = annotationManager.getAnnotatedClass(entityClass);
+
+        for (AnnotatedField f: ac.getFields(OneToOne.class)) {
+            if (!annotationManager.contains(f.getType()))
+                throw new IllegalArgumentException("class is not an entity: " + f.getType());
+            connection.execQuery(QueryFactory.getFKey(annotationManager, entityClass, f.getName(), f.getType()));
+//            connection.execQuery(QueryFactory.getFKey(annotationManager, f.getType(), f.getName(), entityClass));
+        }
+    }
+    // alter table UserDataSet add constraint foreign key (address_id) references AddressDataSet
+    // ALTER TABLE USERDATASET ADD CONSTRAINT FOREIGN KEY (PHONE) REFERENCES PHONESDATASET
+
 
     @Override
     public boolean isOpen() {

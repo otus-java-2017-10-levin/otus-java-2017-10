@@ -66,4 +66,12 @@ final class AnnotatedFieldImpl implements AnnotatedField {
     public void setFieldValue(@NotNull Object target, @NotNull Object value) throws IllegalAccessException {
         FieldUtils.writeField(field, target, value, true);
     }
+
+    @Override
+    public String toString() {
+        return "AnnotatedFieldImpl{" +
+                "field=" + field +
+                ", annotations=" + annotations +
+                '}';
+    }
 }

@@ -77,14 +77,6 @@ class JdbcConnectionTest extends H2DatabaseTest {
         }
     }
 
-    @Test
-    void getLastInsertedIdInConnection() {
-        connection.execQuery(INSERT);
-
-        long id = connection.getLastInsertedId();
-        assertEquals(1, id);
-    }
-
     @AfterEach
     void closeServer() {
         connection.execQuery("drop table user if exists");

@@ -1,16 +1,20 @@
 package ru.otus.base;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
+
+@Setter
+@Getter
+@ToString
 public class PhonesDataSet extends DataSet {
     private String phone;
     private int houseNumber;
 
+    @OneToOne
+    private UserDataSet user;
 
     public PhonesDataSet() {}
 

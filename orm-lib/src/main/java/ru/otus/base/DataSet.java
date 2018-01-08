@@ -1,11 +1,16 @@
 package ru.otus.base;
 
-import lombok.Data;
-
 import javax.persistence.*;
 
-@Data
 public abstract class DataSet {
     @Id
     protected long id;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 }

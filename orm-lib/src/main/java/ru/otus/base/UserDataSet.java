@@ -4,13 +4,15 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Setter
+@Getter
 public class UserDataSet extends DataSet {
     private String name;
     private int age;
     private long employeeId;
 
+    @OneToOne
+    private PhonesDataSet phone;
 
     public UserDataSet() {}
 

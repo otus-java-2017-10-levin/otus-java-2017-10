@@ -1,6 +1,7 @@
 package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
@@ -11,7 +12,8 @@ import java.util.Map;
 
 class QueryFactory {
     private static final String CREATE_IF_NOT_EXIST = "create table if not exists ";
-    private static final String ID_FIELD = " bigint auto_increment";
+    private static final String ID_FIELD = "bigint";
+    private static final String AUTO_INCREMENT = "auto_increment";
     private static final String PRIMARY_KEY = "primary key (";
 
     private static final String INSERT = "INSERT INTO ";
@@ -24,9 +26,9 @@ class QueryFactory {
     private static final String FROM = "FROM";
     private static final String WHERE_ID = "WHERE ID = ";
 
-    private static final String ALTER = "alter table ";
-    private static final String ADD_CONSTRAINT = " add constraint ";
-    private static final String REFERENCES = " foreign key (%s) references ";
+    private static final String ALTER = "alter table";
+    private static final String ADD_CONSTRAINT = "add constraint";
+    private static final String REFERENCES = "foreign key (%s) references";
 
 //    private static final String ALTER_TABLE = "alter table %s add constraint %s foreign key (%s) references %s";
 
@@ -78,7 +80,6 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
         }
 
         query.append("))");
-        System.out.println(query.toString());
         return query.toString().toUpperCase();
     }
 
@@ -104,23 +105,7 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
         }
 
         sb.append(")");
-        System.out.println(sb.toString());
         return sb.toString().toUpperCase();
-    }
-
-    @NotNull
-    public static String getDropSequenceQuery() {
-        return "drop sequence if exists hibernate_sequence";
-    }
-
-    @NotNull
-    public static String createSequenceQuery() {
-        return "create sequence hibernate_sequence start with 1 increment by 1";
-    }
-
-    @NotNull
-    public static String getNextInSequenceQuery() {
-        return "call next value for hibernate_sequence";
     }
 
     @NotNull
@@ -141,7 +126,7 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
                 query.append(", ");
             }
             if (isTypeInfo) {
-                query.append(getFieldString(f, manager.getIdAnnotation()));
+                query.append(getFieldString(manager, entityClass, f.getName()));
             } else {
                 query.append(f.getName());
             }
@@ -149,20 +134,41 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
         return query.toString();
     }
 
-    @NotNull
-    private static String getFieldString(@NotNull AnnotatedField field, @NotNull Class<? extends Annotation> id) {
+    public static String getFKey(@NotNull AnnotationManager manager,
+                                 @NotNull Class<?> entityClass,
+                                 @NotNull String field,
+                                 @NotNull Class<?> foreignClass) {
+        //alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (address_id) references AddressDataSet
 
+        AnnotatedField fkeyField = manager.getId(foreignClass);
+        StringBuilder sb = new StringBuilder(ALTER);
+        sb.append(" ").append(entityClass.getSimpleName()).append(" ");
+        sb.append(ADD_CONSTRAINT).append(" ");
+        String constraintName = "FK"+entityClass.getSimpleName()+foreignClass.getSimpleName()+fkeyField.getName();
+        sb.append(constraintName).append(" ").append(String.format(REFERENCES, field)).append(" ");
+        sb.append(foreignClass.getSimpleName());
+        return sb.toString().toUpperCase();
+    }
+
+    @NotNull
+    private static String getFieldString(@NotNull AnnotationManager manager,
+                                         @NotNull Class<?> entityClass,
+                                         @NotNull String name) {
+
+        AnnotatedField field = manager.getField(entityClass, name);
         StringBuilder sb = new StringBuilder(field.getName());
 
         String sqlType = sqlTypes.get(field.getType());
 
-        if (field.contains(id)) {
-            sb.append(ID_FIELD);
+        if (field.contains(manager.getIdAnnotation())) {
+            sb.append(" ").append(ID_FIELD).append(" ").append(AUTO_INCREMENT);
         } else {
 
             if (sqlType != null)
                 sb.append(" ").append(sqlType);
-            else
+            else if (manager.contains(entityClass)) {
+                sb.append(" ").append(ID_FIELD);
+            } else
                 throw new IllegalStateException("no supported type " + field.getType());
         }
         return sb.toString();

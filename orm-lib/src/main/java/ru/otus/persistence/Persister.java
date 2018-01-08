@@ -12,9 +12,10 @@ public interface Persister {
     /**
      * Save or update Object.
      * @param object - object to save
+     * @return object id
      */
 
-    void saveOrUpdate(@NotNull Object object);
+    long save(@NotNull Object object);
 
     /**
      *  Find object by {@code entityClass} any it's primary key.

@@ -47,6 +47,15 @@ class AnnotatedClassImpl implements AnnotatedClass {
         }
     }
 
+    @Override
+    public String toString() {
+        return "AnnotatedClassImpl{" +
+                "annotatedClass=" + annotatedClass +
+                ", generator=" + generator +
+                ", fields=" + fields +
+                '}';
+    }
+
     @NotNull
     @Override
     public List<AnnotatedField> getFields() {

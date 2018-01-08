@@ -34,8 +34,8 @@ public class AnnotationManager extends AbstractAnnotationManager {
 
     @Override
     protected void validateClass(@NotNull AnnotatedClass ac) {
-//        if (!isSingleId(ac))
-//            throw new IllegalArgumentException("No or multiple @Id in "+ac.getSimpleName()+" class");
+        if (!isSingleId(ac))
+            throw new IllegalArgumentException("No or multiple @Id in "+ac.getSimpleName()+" class");
     }
 
     private boolean isSingleId(@NotNull AnnotatedClass ac) {
@@ -44,21 +44,6 @@ public class AnnotationManager extends AbstractAnnotationManager {
 
     @Override
     protected void validateClasses() {
-
-
-/*
-    We must verify OneToMany - ManyToOne relations
-    Algorithm:
-    Run through all classes in annotatedClasses. For every class do the following:
-    1. Find for @ManyToOne.
-    2. If found:
-        2.1 go to the type below @ManyToOne annotation
-        2.2 in class search for @OneToMany annotation
-        2.3 If found - compare mappedBy parameter for name of variable in 2.1
-        2.4 If not found - throw error
-    3. If not found throw error
-* */
-
         for (Map.Entry<Class<?>, AnnotatedClass> entry: annotatedClasses.entrySet()) {
             AnnotatedClass cl = entry.getValue();
 
@@ -68,8 +53,8 @@ public class AnnotationManager extends AbstractAnnotationManager {
     }
 
     private void validateOneToOne(@NotNull AnnotatedClass cl) {
-        List<AnnotatedField> oneyToOne = cl.getFields(OneToOne.class);
-        for (AnnotatedField field: oneyToOne) {
+        List<AnnotatedField> oneToOne = cl.getFields(OneToOne.class);
+        for (AnnotatedField field: oneToOne) {
             Class<?> oneClass = field.getType();
             if (!contains(oneClass))
                 throw new IllegalArgumentException(oneClass.getSimpleName()+" is not an entity");

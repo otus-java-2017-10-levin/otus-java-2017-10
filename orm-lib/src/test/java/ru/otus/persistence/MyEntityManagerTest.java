@@ -36,6 +36,10 @@ class MyEntityManagerTest extends H2DatabaseTest {
     @Test
     void persistTest() throws Exception {
         UserDataSet set = new UserDataSet("Flow");
+        PhonesDataSet phone = new PhonesDataSet();
+        phone.setHouseNumber(1);
+        phone.setPhone("111");
+        set.setPhone(phone);
 
         assertEquals(0, set.getId());
         em.persist(set);

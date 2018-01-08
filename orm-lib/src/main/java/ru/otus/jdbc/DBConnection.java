@@ -2,7 +2,7 @@ package ru.otus.jdbc;
 
 import java.sql.SQLException;
 
-public interface DBConnection extends DBConnectionInfo, AutoCloseable {
+public interface DBConnection extends AutoCloseable {
 
     void execQuery(String query)  throws IllegalArgumentException;
     void execQuery(String query, ExecutionHandler handler);
