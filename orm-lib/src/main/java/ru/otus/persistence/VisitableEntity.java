@@ -1,5 +1,5 @@
 package ru.otus.persistence;
 
-public interface VisitableEntity {
+interface VisitableEntity {
     long apply(EntityVisitor entityVisitor) throws IllegalAccessException;
 }

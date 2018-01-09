@@ -4,20 +4,17 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.Constraint;
 
-import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class AnnotatedClassImpl implements AnnotatedClass {
+final class AnnotatedClassImpl implements AnnotatedClass {
 
     private static Map<Class<?>, AnnotatedClass> cacheClasses;
     private final Class<?> annotatedClass;
     private final NameGenerator generator;
     private final Map<String, AnnotatedField> fields = new LinkedHashMap<>();
-    private final List<Constraint> constraints = new ArrayList<>();
-
 
     @NotNull
     @Override

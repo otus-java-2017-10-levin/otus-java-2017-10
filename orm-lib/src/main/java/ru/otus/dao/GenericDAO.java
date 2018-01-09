@@ -3,10 +3,10 @@ package ru.otus.dao;
 import javax.persistence.EntityManager;
 
 public abstract class GenericDAO<T> {
-    protected Class<T> daoClass;
-    protected EntityManager manager;
+    private final Class<T> daoClass;
+    final EntityManager manager;
 
-    protected GenericDAO(Class<T> daoClass, EntityManager manager) {
+    GenericDAO(Class<T> daoClass, EntityManager manager) {
         this.daoClass = daoClass;
         this.manager = manager;
     }

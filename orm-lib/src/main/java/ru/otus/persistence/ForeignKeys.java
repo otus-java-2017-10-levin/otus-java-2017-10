@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ForeignKeys implements VisitableEntity {
-    private long id;
-    private Class<?> entityClass;
-    private Map<String, Long> keys = new HashMap<>();
+    private final long id;
+    private final Class<?> entityClass;
+    private final Map<String, Long> keys = new HashMap<>();
 
     public ForeignKeys(long id, Class<?> entityClass) {
         this.id = id;

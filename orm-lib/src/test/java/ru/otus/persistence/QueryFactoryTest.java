@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
 import ru.otus.persistence.annotations.AnnotatedClass;
-import ru.otus.persistence.annotations.AnnotatedField;
 
 import javax.persistence.Id;
 import java.lang.annotation.Annotation;

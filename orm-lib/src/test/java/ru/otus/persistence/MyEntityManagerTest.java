@@ -1,17 +1,13 @@
 package ru.otus.persistence;
 
 import org.dbunit.Assertion;
-import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import ru.otus.H2Db;
 import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
 import ru.otus.jdbc.H2DatabaseTest;
@@ -20,8 +16,6 @@ import ru.otus.jdbc.JdbcTestParams;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
-import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

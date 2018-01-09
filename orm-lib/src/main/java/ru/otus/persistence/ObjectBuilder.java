@@ -1,6 +1,5 @@
 package ru.otus.persistence;
 
-import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
 import java.lang.reflect.InvocationTargetException;

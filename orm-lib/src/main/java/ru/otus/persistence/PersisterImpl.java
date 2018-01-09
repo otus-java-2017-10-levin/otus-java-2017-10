@@ -8,7 +8,6 @@ import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.persistence.fields.*;
 
 import javax.persistence.OneToOne;
-import java.util.*;
 
 public class PersisterImpl implements Persister {
 

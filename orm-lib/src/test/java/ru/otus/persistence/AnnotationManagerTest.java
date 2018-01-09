@@ -5,7 +5,6 @@ import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
 import ru.otus.classes.AddressDataSet;
 import ru.otus.classes.EmployeeDataSet;
-import ru.otus.classes.MultipleIdDataSet;
 import ru.otus.classes.PhoneDataSet;
 
 import javax.persistence.Id;

@@ -2,7 +2,6 @@ package ru.otus.persistence;
 
 import ru.otus.persistence.annotations.AnnotatedClass;
 
-//alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (address_id) references AddressDataSet
 public interface Constraint {
 
     /**

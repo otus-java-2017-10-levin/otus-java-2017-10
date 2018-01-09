@@ -2,7 +2,6 @@ package ru.otus.base;
 
 import lombok.*;
 
-import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 

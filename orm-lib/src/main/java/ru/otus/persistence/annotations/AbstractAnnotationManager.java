@@ -12,10 +12,10 @@ import java.util.*;
 
 public abstract class AbstractAnnotationManager {
     protected Map<Class<?>, AnnotatedClass> annotatedClasses;
-    protected Class<? extends Annotation> idAnnotation;
+    protected final Class<? extends Annotation> idAnnotation;
 
-    public AbstractAnnotationManager(@NotNull Class<? extends Annotation> idAnnotation,
-                                     @NotNull Class<?>... classes) {
+    protected AbstractAnnotationManager(@NotNull Class<? extends Annotation> idAnnotation,
+                                        @NotNull Class<?>... classes) {
         this.idAnnotation = idAnnotation;
         for (Class<?> cl : classes) {
             addClass(cl);
@@ -23,8 +23,8 @@ public abstract class AbstractAnnotationManager {
         validateClasses();
     }
 
-    public AbstractAnnotationManager(@NotNull Class<? extends Annotation> idAnnotation,
-                                     @NotNull String... classes) throws ClassNotFoundException {
+    protected AbstractAnnotationManager(@NotNull Class<? extends Annotation> idAnnotation,
+                                        @NotNull String... classes) throws ClassNotFoundException {
         this.idAnnotation = idAnnotation;
         for (String cl : classes) {
             Class<?> loadedClass = Class.forName(cl);

@@ -1,17 +1,16 @@
 package ru.otus.persistence.fields;
 
-import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 abstract class AbstractField<T> implements Field<T> {
-    private  T value;
-    private Class<?> fieldClass;
-    private String name;
+    private final T value;
+    private final Class<?> fieldClass;
+    private final String name;
 
-    public AbstractField(@NotNull String name,
-                         @Nullable T value,
-                         @NotNull Class<?> fieldClass) {
+    AbstractField(@NotNull String name,
+                  @Nullable T value,
+                  @NotNull Class<?> fieldClass) {
         this.name = name;
         this.value = value;
         this.fieldClass = fieldClass;

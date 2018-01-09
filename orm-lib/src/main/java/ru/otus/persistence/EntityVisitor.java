@@ -1,7 +1,7 @@
 package ru.otus.persistence;
 
 
-public interface EntityVisitor {
-    void visit(ForeignKeys keys) throws IllegalAccessException;
+interface EntityVisitor {
+    void visit(ForeignKeys keys);
     long visit(EntityStructure structure) throws IllegalAccessException;
 }

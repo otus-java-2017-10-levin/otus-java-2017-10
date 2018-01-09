@@ -3,14 +3,10 @@ package ru.otus.persistence.fields;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-
 class ArrayFieldImpl<T> implements ArrayField<T> {
-    private String name;
-    private T[] value;
-    private Class fieldClass;
+    private final String name;
+    private final T[] value;
+    private final Class fieldClass;
 
     @Override
     public void add(T t) {

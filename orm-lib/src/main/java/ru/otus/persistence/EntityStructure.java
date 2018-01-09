@@ -3,11 +3,6 @@ package ru.otus.persistence;
 import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.annotations.AnnotatedClass;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class EntityStructure implements VisitableEntity {
 
     private final Object entity;

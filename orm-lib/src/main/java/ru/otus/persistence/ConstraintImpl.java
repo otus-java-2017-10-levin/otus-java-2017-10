@@ -4,16 +4,15 @@ import ru.otus.persistence.annotations.AnnotatedClass;
 
 public class ConstraintImpl implements Constraint {
 
-    private AnnotatedClass table;
-    private AnnotatedClass foreignTable;
-    private String fieldName;
+    private final AnnotatedClass table;
+    private final AnnotatedClass foreignTable;
+    private final String fieldName;
 
     public ConstraintImpl(AnnotatedClass table, AnnotatedClass foreignTable, String fieldName) {
         this.table = table;
         this.foreignTable = foreignTable;
         this.fieldName = fieldName;
     }
-
     /**
      * Gets table of constraint
      *
@@ -44,15 +43,3 @@ public class ConstraintImpl implements Constraint {
         return this.foreignTable;
     }
 }
-
-
-/*
-            A
-
-         B      C
-
-      D     E      F
-
-
-
-*/

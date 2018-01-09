@@ -5,8 +5,6 @@ package ru.otus.persistence;
     Description here
  */
 
-import ru.otus.persistence.xml.PersistenceParams;
-
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
