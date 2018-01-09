@@ -7,13 +7,8 @@ package ru.otus.persistence.annotations;
  */
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractAnnotationManager {
     protected Map<Class<?>, AnnotatedClass> annotatedClasses;
@@ -76,6 +71,7 @@ public abstract class AbstractAnnotationManager {
         validateClass(ac);
         annotatedClasses.put(cl, ac);
     }
+
 
     protected abstract void validateClass(@NotNull AnnotatedClass ac);
 

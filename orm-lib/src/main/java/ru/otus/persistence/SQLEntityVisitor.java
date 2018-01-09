@@ -14,15 +14,15 @@ public class SQLEntityVisitor implements EntityVisitor {
     private final AnnotationManager annotationManager;
     private final DbManager dbManager;
 
-    public SQLEntityVisitor(AnnotationManager annotationManager, DbManager dbManager) {
+    SQLEntityVisitor(AnnotationManager annotationManager, DbManager dbManager) {
         this.annotationManager = annotationManager;
         this.dbManager = dbManager;
     }
 
     @Override
-    public long visit(VisitableEntity visitable) throws IllegalAccessException {
-        AnnotatedClass annotatedClass = visitable.getEntityClass();
-        Object entity = visitable.getEntity();
+    public long visit(EntityStructure structure) throws IllegalAccessException {
+        AnnotatedClass annotatedClass = structure.getEntityClass();
+        Object entity = structure.getEntity();
         AnnotatedField idField = annotationManager.getId(annotatedClass.getAnnotatedClass());
         try (DBConnection connection = dbManager.getConnection()) {
             connection.execQuery(QueryFactory.getInsertQuery(annotationManager, annotatedClass.getAnnotatedClass()), statement -> {
@@ -31,9 +31,9 @@ public class SQLEntityVisitor implements EntityVisitor {
                     try {
                         Object value = Objects.requireNonNull(f.getFieldValue(entity));
                         if (!f.contains(OneToOne.class) &&
-                            !f.contains(OneToMany.class) &&
-                            !f.contains(ManyToOne.class) &&
-                            !f.contains(annotationManager.getIdAnnotation())) {
+                                !f.contains(OneToMany.class) &&
+                                !f.contains(ManyToOne.class) &&
+                                !f.contains(annotationManager.getIdAnnotation())) {
                             statement.setString(pos++, value.toString());
                         }
                     } catch (IllegalAccessException e) {
@@ -51,6 +51,22 @@ public class SQLEntityVisitor implements EntityVisitor {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return (long) idField.getFieldValue(entity);
+    }
+
+    @Override
+    public void visit(ForeignKeys keys) {
+        try (DBConnection connection = dbManager.getConnection()) {
+            connection.execQuery(QueryFactory.getUpdateKeysQuery(annotationManager, keys.getEntityClass()), statement -> {
+                int pos = 1;
+                for (Long l: keys.getKeys().values())
+                        statement.setLong(pos++, l);
+                statement.setLong(pos, keys.getId());
+                statement.execute();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

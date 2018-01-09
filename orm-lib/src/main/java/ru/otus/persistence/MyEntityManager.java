@@ -212,6 +212,16 @@ class MyEntityManager implements EntityManager {
                     throw new IllegalStateException("id is -1");
             });
         }
+
+        for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
+            entry.getValue().forEach(object -> {
+                try {
+                    persister.updateKeys(object);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void dropTables(DBConnection connection) {
@@ -238,8 +248,9 @@ class MyEntityManager implements EntityManager {
         for (AnnotatedField f: ac.getFields(OneToOne.class)) {
             if (!annotationManager.contains(f.getType()))
                 throw new IllegalArgumentException("class is not an entity: " + f.getType());
-            connection.execQuery(QueryFactory.getFKey(annotationManager, entityClass, f.getName(), f.getType()));
-//            connection.execQuery(QueryFactory.getFKey(annotationManager, f.getType(), f.getName(), entityClass));
+
+            AnnotatedClass foreignClass = annotationManager.getAnnotatedClass(f.getType());
+            connection.execQuery(QueryFactory.getFKey(new ConstraintImpl(ac, foreignClass, f.getName())));
         }
     }
     // alter table UserDataSet add constraint foreign key (address_id) references AddressDataSet

@@ -22,7 +22,7 @@ class AnnotationsTest {
     void getArrayOfFields() {
         List<AnnotatedField> fields = annotatedClass.getFields();
 
-        assertEquals(4, fields.size());
+        assertEquals(5, fields.size());
     }
 
     @Test

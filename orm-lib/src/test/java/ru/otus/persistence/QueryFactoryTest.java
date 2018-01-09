@@ -3,6 +3,7 @@ package ru.otus.persistence;
 import org.junit.jupiter.api.Test;
 import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
+import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
 import javax.persistence.Id;
@@ -49,8 +50,18 @@ class QueryFactoryTest {
 
     @Test
     void getFKeyQuery() {
-        String actualQuery = QueryFactory.getFKey(man, UserDataSet.class, "phone", PhonesDataSet.class);
-        String expectedQuery = "alter table UserDataSet add constraint FKUSERDATASETPHONESDATASETID foreign key (phone) references PhonesDataSet";
+        AnnotatedClass annotatedClass = man.getAnnotatedClass(UserDataSet.class);
+        AnnotatedClass annotatedClass1 = man.getAnnotatedClass(PhonesDataSet.class);
+        ConstraintImpl constraint = new ConstraintImpl(annotatedClass, annotatedClass1, "phone");
+        String actualQuery = QueryFactory.getFKey(constraint);
+        String expectedQuery = "alter table UserDataSet add constraint FKUSERDATASETPHONESDATASET foreign key (phone) references PhonesDataSet";
+        assertEquals(expectedQuery.toUpperCase(), actualQuery);
+    }
+
+    @Test
+    void getUpdateKeysQuery() {
+        String expectedQuery = "update UserDataSet set phone=? where id=?";
+        String actualQuery = QueryFactory.getUpdateKeysQuery(man, UserDataSet.class);
         assertEquals(expectedQuery.toUpperCase(), actualQuery);
     }
 }

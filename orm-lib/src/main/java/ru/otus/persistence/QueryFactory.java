@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
+import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -16,45 +17,18 @@ class QueryFactory {
     private static final String AUTO_INCREMENT = "auto_increment";
     private static final String PRIMARY_KEY = "primary key (";
 
-    private static final String INSERT = "INSERT INTO ";
-    private static final String VALUES = "VALUES ";
-
-    private static final String DROP_TABLE = "DROP TABLE ";
-    private static final String IF_EXIST = " IF EXISTS";
-
-    private static final String SELECT = "SELECT";
-    private static final String FROM = "FROM";
-    private static final String WHERE_ID = "WHERE ID = ";
-
-    private static final String ALTER = "alter table";
-    private static final String ADD_CONSTRAINT = "add constraint";
-    private static final String REFERENCES = "foreign key (%s) references";
-
-//    private static final String ALTER_TABLE = "alter table %s add constraint %s foreign key (%s) references %s";
-
-    /*
-    one to one
-create table AddressDataSet (id bigint not null, city varchar(255), street varchar(255), primary key (id))
-create table UserDataSet (id bigint not null, address_id bigint, primary key (id))
-alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (address_id) references AddressDataSet
-
-     */
-
-    /*
-            For simplicity support only long indexes
-     */
     @NotNull
     public static String getSelectQuery(@NotNull AnnotationManager man,
                                         @NotNull Class<?> entityClass,
                                         long key) {
+        String SELECT = "SELECT %s FROM %s WHERE ID = %s";
         AnnotatedClass ac = man.getAnnotatedClass(entityClass);
 
-        StringBuilder sb = new StringBuilder(SELECT).append(" ");
-        sb.append(getFieldNames(man, entityClass, false)).append(" ");
 
-        sb.append(FROM).append(" ").append(ac.getSimpleName()).append(" ");
-        sb.append(WHERE_ID).append(key);
-        return sb.toString().toUpperCase();
+        return String.format(SELECT,
+                getFieldNames(man, entityClass, false),
+                ac.getSimpleName(),
+                key).toUpperCase();
     }
 
     @NotNull
@@ -88,30 +62,30 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
                                         @NotNull Class<?> entityClass) {
 
         AnnotatedClass annotatedClass = manager.getAnnotatedClass(entityClass);
+        String INSERT = "INSERT INTO %s (%s) VALUES (%s)";
 
-        StringBuilder sb = new StringBuilder(INSERT);
-        sb.append(annotatedClass.getSimpleName()).append(" (");
-        sb.append(getFieldNames(manager, entityClass, false)).append(") ");
-        sb.append(VALUES).append("(");
-
+        StringBuilder values = new StringBuilder();
         int count = 0;
         for (AnnotatedField f : annotatedClass.getFields()) {
             if (count++ != 0)
-                sb.append(",");
+                values.append(",");
             if (f.contains(manager.getIdAnnotation()))
-                sb.append("NULL");
+                values.append("NULL");
             else
-                sb.append("?");
+                values.append("?");
         }
 
-        sb.append(")");
-        return sb.toString().toUpperCase();
+        return String.format(INSERT,
+                annotatedClass.getSimpleName(),
+                getFieldNames(manager, entityClass, false),
+                values).toUpperCase();
     }
 
     @NotNull
     public static String getDropTableQuery(@NotNull AnnotationManager manager, Class<?> entityClass) {
 
-        return (DROP_TABLE + manager.getAnnotatedClass(entityClass).getSimpleName() + IF_EXIST).toUpperCase();
+        String DROP = "DROP TABLE %s IF EXISTS";
+        return String.format(DROP, manager.getAnnotatedClass(entityClass).getSimpleName()).toUpperCase();
     }
 
     @NotNull
@@ -134,20 +108,17 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
         return query.toString();
     }
 
-    public static String getFKey(@NotNull AnnotationManager manager,
-                                 @NotNull Class<?> entityClass,
-                                 @NotNull String field,
-                                 @NotNull Class<?> foreignClass) {
+    public static String getFKey(@NotNull Constraint constraint) {
         //alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (address_id) references AddressDataSet
+        String ALTER = "alter table %s add constraint %s foreign key (%s) references %s";
+        String constraintName = "FK" + constraint.getTable().getSimpleName()
+                                + constraint.getForeignTable().getSimpleName();
 
-        AnnotatedField fkeyField = manager.getId(foreignClass);
-        StringBuilder sb = new StringBuilder(ALTER);
-        sb.append(" ").append(entityClass.getSimpleName()).append(" ");
-        sb.append(ADD_CONSTRAINT).append(" ");
-        String constraintName = "FK"+entityClass.getSimpleName()+foreignClass.getSimpleName()+fkeyField.getName();
-        sb.append(constraintName).append(" ").append(String.format(REFERENCES, field)).append(" ");
-        sb.append(foreignClass.getSimpleName());
-        return sb.toString().toUpperCase();
+        return String.format(ALTER,
+                constraint.getTable().getSimpleName(),
+                constraintName,
+                constraint.getFieldName(),
+                constraint.getForeignTable().getSimpleName()).toUpperCase();
     }
 
     @NotNull
@@ -194,5 +165,27 @@ alter table UserDataSet add constraint FKhqati05jw18942yayxofpgh2y foreign key (
         sqlTypes.put(double.class, "DOUBLE");
         sqlTypes.put(Double.class, "DOUBLE");
         sqlTypes.put(String.class, "VARCHAR(256)");
+    }
+
+    public static String getUpdateKeysQuery(@NotNull AnnotationManager manager,
+                                            @NotNull Class<?> cl) {
+//      "update UserDataSet set address_id=? where invoiceId=? and aLong=?";
+        String UPDATE = "update %s set %s where %s=?";
+
+        StringBuilder fields = new StringBuilder();
+        AnnotatedClass annotatedClass1 = manager.getAnnotatedClass(cl);
+        int count =0;
+        for (AnnotatedField f: annotatedClass1.getFields(OneToOne.class)) {
+            if (count++> 0)
+                fields.append(" and ");
+            fields.append(f.getName()).append("=?");
+        }
+
+        return String.format(UPDATE,
+                cl.getSimpleName(),
+                fields,
+                manager.getId(cl).getName()
+                ).toUpperCase();
+
     }
 }

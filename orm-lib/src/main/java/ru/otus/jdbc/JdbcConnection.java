@@ -12,7 +12,6 @@ class JdbcConnection implements  DBConnection {
     @Override
     public void close() throws Exception {
         connection.close();
-        System.out.println("close");
     }
 
     @Override

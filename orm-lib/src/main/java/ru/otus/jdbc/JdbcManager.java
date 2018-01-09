@@ -29,7 +29,6 @@ class JdbcManager implements DbManager {
     public DBConnection getConnection() throws IllegalArgumentException {
         DBConnection con = getConnection(connectionData);
         connections.add(con);
-        System.out.println("open");
         return con;
     }
 

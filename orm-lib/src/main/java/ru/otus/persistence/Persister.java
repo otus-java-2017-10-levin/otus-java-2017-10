@@ -17,6 +17,8 @@ public interface Persister {
 
     long save(@NotNull Object object);
 
+    void updateKeys(@NotNull Object object) throws IllegalAccessException;
+
     /**
      *  Find object by {@code entityClass} any it's primary key.
      *  If composite key is used, for find you should use @Embedded id class

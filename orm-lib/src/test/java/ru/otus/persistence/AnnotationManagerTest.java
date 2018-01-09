@@ -1,6 +1,7 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
+import ru.otus.base.PhonesDataSet;
 import ru.otus.base.UserDataSet;
 import ru.otus.classes.AddressDataSet;
 import ru.otus.classes.EmployeeDataSet;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AnnotationManagerTest {
 
-    private final AnnotationManager man = new AnnotationManager(Id.class, UserDataSet.class);
+    private final AnnotationManager man = new AnnotationManager(Id.class, UserDataSet.class, PhonesDataSet.class);
 
     @Test
     void getId() {

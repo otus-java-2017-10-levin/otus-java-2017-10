@@ -1,30 +1,36 @@
 package ru.otus.persistence;
 
+import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.annotations.AnnotatedClass;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class EntityStructure implements VisitableEntity {
 
     private final Object entity;
     private final AnnotatedClass entityClass;
 
-    public EntityStructure(Object entity, AnnotatedClass entityClass) {
+
+    EntityStructure(@NotNull Object entity,
+                    @NotNull AnnotatedClass entityClass) {
         this.entity = entity;
         this.entityClass = entityClass;
     }
 
     @Override
+    public long apply(EntityVisitor entityVisitor) throws IllegalAccessException {
+        return entityVisitor.visit(this);
+    }
+
     public Object getEntity() {
         return entity;
     }
 
-    @Override
     public AnnotatedClass getEntityClass() {
         return entityClass;
-    }
-
-    @Override
-    public long visit(EntityVisitor entityVisitor) throws IllegalAccessException {
-        return entityVisitor.visit(this);
     }
 
     @Override

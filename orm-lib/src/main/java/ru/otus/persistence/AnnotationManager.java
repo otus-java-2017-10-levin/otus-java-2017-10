@@ -9,17 +9,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AnnotationManager extends AbstractAnnotationManager {
+    private final Map<Class<?>, List<Constraint>> constraints = new HashMap<>();
 
     AnnotationManager(Class<? extends Annotation> idAnnotation, Class<?>... classes) {
         super(idAnnotation, classes);
+        annotatedClasses.forEach((key, value) -> addConstraint(value));
     }
 
     AnnotationManager(Class<? extends Annotation> idAnnotation, String... classes) throws ClassNotFoundException {
         super(idAnnotation, classes);
+        annotatedClasses.forEach((key, value) -> addConstraint(value));
     }
 
     AnnotatedField getId(Class<?> cl) {
@@ -50,6 +52,24 @@ public class AnnotationManager extends AbstractAnnotationManager {
             validateOneToOne(cl);
             validateManyToOne(cl);
         }
+    }
+
+    public List<Constraint> getConstraints(Class<?> cl) {
+        if (!constraints.containsKey(cl))
+            throw new IllegalArgumentException();
+
+        return Collections.unmodifiableList(constraints.get(cl));
+    }
+
+    private void addConstraint(AnnotatedClass ac) {
+        Class<?> key = ac.getAnnotatedClass();
+        List<Constraint> list = new ArrayList<>();
+        for (AnnotatedField field: ac.getFields(OneToOne.class)) {
+
+            AnnotatedClass type = this.getAnnotatedClass(field.getType());
+            list.add(new ConstraintImpl(ac, type, field.getName()));
+        }
+        constraints.put(key, list);
     }
 
     private void validateOneToOne(@NotNull AnnotatedClass cl) {

@@ -2,27 +2,21 @@ package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.persistence.fields.*;
 
 import javax.persistence.OneToOne;
-import java.sql.ResultSetMetaData;
 import java.util.*;
 
 public class PersisterImpl implements Persister {
 
     private final AnnotationManager annotationManager;
-    private final DbManager dbManager;
     private final EntityVisitor visitor;
-    private EntityStructureQueueBuilder<VisitableEntity> queueBuilder;
-    private Set<Object> objectsWrite;
 
     private PersisterImpl(AnnotationManager annotationManager, DbManager dbManager) {
         this.annotationManager = annotationManager;
-        this.dbManager = dbManager;
         this.visitor = new SQLEntityVisitor(annotationManager, dbManager);
     }
 
@@ -39,47 +33,42 @@ public class PersisterImpl implements Persister {
 
     @Override
     public long save(@NotNull Object object) {
-        objectsWrite = new HashSet<>();
-        queueBuilder = new EntityStructureQueueBuilderImpl<>();
-        createObjectTree(object);
-        EntityStructureQueue<VisitableEntity> queue = queueBuilder.build();
-
-        queue.forEach(visitable -> {
-            try {
-                visitor.visit(visitable);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
-        AnnotatedField id = annotationManager.getId(object.getClass());
         try {
-            return (long) id.getFieldValue(object);
+            return writeObject(object);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return -1L;
     }
 
-    /*
-        Post order DFS
-     */
-    private void createObjectTree(@NotNull Object object) {
-        if (objectsWrite.contains(object))
-            return;
+    private long writeObject(@NotNull Object object) throws IllegalAccessException {
 
         AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(object.getClass());
-        objectsWrite.add(object);
 
-        for (AnnotatedField f : annotatedClass.getFields(OneToOne.class)) {
-            try {
-                Object value = Objects.requireNonNull(f.getFieldValue(object));
-                createObjectTree(value);
+        EntityStructure entityStructure = new EntityStructure(object, annotatedClass);
 
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        return entityStructure.apply(visitor);
+    }
+
+    @Override
+    public void updateKeys(@NotNull Object object) throws IllegalAccessException {
+        AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(object.getClass());
+
+        ForeignKeys key = new ForeignKeys(getId(object), object.getClass());
+
+        for (AnnotatedField f: annotatedClass.getFields(OneToOne.class)) {
+            Object value = f.getFieldValue(object);
+            if (value == null)
+                throw new IllegalAccessException();
+            long id = getId(value);
+            key.addKey(f.getName(), id);
         }
-        queueBuilder.add(new EntityStructure(object, annotatedClass));
+        key.apply(visitor);
+    }
+
+    private long getId(@NotNull Object object) throws IllegalAccessException {
+        AnnotatedField f = annotationManager.getId(object.getClass());
+        return  (long)f.getFieldValue(object);
     }
 
     @Override

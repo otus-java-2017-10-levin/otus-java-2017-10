@@ -1,6 +1,8 @@
 package ru.otus.persistence;
 
 import org.dbunit.Assertion;
+import org.dbunit.DatabaseUnitException;
+import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
@@ -32,6 +34,15 @@ class MyEntityManagerTest extends H2DatabaseTest {
         super(testInfo.getDisplayName());
     }
 
+    private void checkTables(String table) throws Exception {
+        IDataSet databaseDataSet = getConnection().createDataSet();
+        ITable actualTable = databaseDataSet.getTable(table);
+
+        IDataSet expectedDataSet = getDataSet();
+        ITable expectedTable = expectedDataSet.getTable(table);
+
+        Assertion.assertEquals(expectedTable, actualTable);
+    }
 
     @Test
     void persistTest() throws Exception {
@@ -39,22 +50,16 @@ class MyEntityManagerTest extends H2DatabaseTest {
         PhonesDataSet phone = new PhonesDataSet();
         phone.setHouseNumber(1);
         phone.setPhone("111");
+        phone.setUser(set);
         set.setPhone(phone);
 
         assertEquals(0, set.getId());
         em.persist(set);
+        em.persist(phone);
         em.close();
 
-        IDataSet databaseDataSet = getConnection().createDataSet();
-        String TABLE_NAME = "USERDATASET";
-        ITable actualTable = databaseDataSet.getTable(TABLE_NAME);
-
-        IDataSet expectedDataSet = getDataSet();
-        ITable expectedTable = expectedDataSet.getTable(TABLE_NAME);
-
-        Assertion.assertEquals(expectedTable, actualTable);
-
-        System.out.println(set.getId());
+        checkTables("USERDATASET");
+        checkTables("PHONESDATASET");
 
         assertEquals(true, set.getId() != 0);
     }
@@ -118,6 +123,11 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
     @Override
     protected IDataSet getDataSet() throws Exception {
-        return new FlatXmlDataSetBuilder().build(this.getClass().getResourceAsStream("/UsersDataSetPersist.xml"));
+        IDataSet[] datasets = new IDataSet[] {
+                new FlatXmlDataSetBuilder().build(this.getClass().getResourceAsStream("/UsersDataSetPersist.xml")),
+                new FlatXmlDataSetBuilder().build(this.getClass().getResourceAsStream("/PhonesDataSet.xml"))
+        };
+
+        return new CompositeDataSet(datasets);
     }
 }

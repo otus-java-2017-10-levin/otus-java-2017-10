@@ -2,7 +2,9 @@ package ru.otus.persistence.annotations;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
+import ru.otus.persistence.Constraint;
 
+import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -14,6 +16,8 @@ class AnnotatedClassImpl implements AnnotatedClass {
     private final Class<?> annotatedClass;
     private final NameGenerator generator;
     private final Map<String, AnnotatedField> fields = new LinkedHashMap<>();
+    private final List<Constraint> constraints = new ArrayList<>();
+
 
     @NotNull
     @Override
@@ -56,6 +60,8 @@ class AnnotatedClassImpl implements AnnotatedClass {
                 '}';
     }
 
+
+
     @NotNull
     @Override
     public List<AnnotatedField> getFields() {
@@ -85,6 +91,7 @@ class AnnotatedClassImpl implements AnnotatedClass {
     public List<AnnotatedField> getFields(@NotNull Class<? extends Annotation> annotation) {
         return fields.values().stream().filter(field -> field.contains(annotation)).collect(Collectors.toList());
     }
+
 
     private void parse() {
         for (Field f : FieldUtils.getAllFields(annotatedClass)) {
