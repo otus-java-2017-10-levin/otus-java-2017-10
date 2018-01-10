@@ -43,7 +43,22 @@ class QueryFactoryTest {
     @Test
     void getSelectQuery() {
         String actualQuery = QueryFactory.getSelectQuery(man, UserDataSet.class, 1);
-        String expectedQuery = "SELECT NAME, AGE, EMPLOYEEID, PHONE, ID FROM USERDATASET WHERE ID = 1";
+        String expectedQuery = "SELECT USERDATASET.NAME AS USERDATASET_NAME, USERDATASET.AGE AS USERDATASET_AGE, " +
+                "USERDATASET.EMPLOYEEID AS USERDATASET_EMPLOYEEID, USERDATASET.PHONE AS USERDATASET_PHONE, USERDATASET.ID AS USERDATASET_ID FROM USERDATASET WHERE USERDATASET.ID = 1";
+        assertEquals(expectedQuery, actualQuery);
+    }
+
+    @Test
+    void getJoinQuery() {
+        String actualQuery = QueryFactory.getSelectQuery(man, 1, UserDataSet.class);
+        String expectedQuery = "SELECT USERDATASET.NAME AS USERDATASET_NAME, USERDATASET.AGE AS USERDATASET_AGE, " +
+                "USERDATASET.EMPLOYEEID AS USERDATASET_EMPLOYEEID, USERDATASET.PHONE AS USERDATASET_PHONE, " +
+                "USERDATASET.ID AS USERDATASET_ID, PHONESDATASET.PHONE AS PHONESDATASET_PHONE, " +
+                "PHONESDATASET.HOUSENUMBER AS PHONESDATASET_HOUSENUMBER, PHONESDATASET.USER AS PHONESDATASET_USER, " +
+                "PHONESDATASET.ID AS PHONESDATASET_ID " +
+                "FROM USERDATASET LEFT OUTER JOIN PHONESDATASET ON " +
+                "USERDATASET.ID = PHONESDATASET.USER " +
+                "WHERE USERDATASET.ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
 

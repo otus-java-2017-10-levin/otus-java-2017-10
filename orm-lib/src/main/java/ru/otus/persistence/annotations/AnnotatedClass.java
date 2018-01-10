@@ -5,9 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-/**
- *
- */
 public interface AnnotatedClass {
     @NotNull
     Class<?> getAnnotatedClass();

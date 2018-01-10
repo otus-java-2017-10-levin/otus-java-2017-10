@@ -16,7 +16,6 @@ class App {
     private final EntityManagerFactory factory = Persistence.createEntityManagerFactory(jpa);
     private final PersistenceParams params = new PersistenceParams(jpa, "META-INF/persistence.xml");
 
-
     public static void main(String[] args) throws SQLException {
         new App().run();
     }
@@ -33,8 +32,8 @@ class App {
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
         dao.save(user);
 
-        UserDataSet fromDB = dao.load(user.getId());
-        System.out.println("After find by id:\n" + fromDB);
+      //  UserDataSet fromDB = dao.load(user.getId());
+        //System.out.println("After find by id:\n" + fromDB);
         factory.close();
 
     }

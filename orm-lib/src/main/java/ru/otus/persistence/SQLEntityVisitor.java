@@ -1,5 +1,6 @@
 package ru.otus.persistence;
 
+import org.jetbrains.annotations.NotNull;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
@@ -8,7 +9,12 @@ import ru.otus.persistence.annotations.AnnotatedField;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.sql.ResultSetMetaData;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SQLEntityVisitor implements EntityVisitor {
     private final AnnotationManager annotationManager;
@@ -56,6 +62,42 @@ public class SQLEntityVisitor implements EntityVisitor {
     }
 
     @Override
+    public <T> T load(@NotNull Class<T> entityClass, long primaryKey) {
+
+
+        try {
+            try (DBConnection connection = dbManager.getConnection()) {
+
+                String selectQuery = QueryFactory.getSelectQuery(annotationManager, primaryKey, entityClass);
+                return connection.execQuery(selectQuery, result -> {
+
+                    ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
+                    ResultSetMetaData rsmd = result.getMetaData();
+
+                    result.next();
+                    for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                        rsmd.getColumnName(i);
+
+                    }
+                    return builder.build();
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        throw new IllegalStateException("object not found");
+    }
+
+    private <T> T buildObject(@NotNull Class<T> entityClass, Map<String, Object> params) {
+        ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
+        params.forEach((s, object) ->{
+            AnnotatedField field = annotationManager.getField(entityClass, s);
+            builder.set(field, object);
+        });
+        return builder.build();
+    }
+
+    @Override
     public void visit(ForeignKeys keys) {
         try (DBConnection connection = dbManager.getConnection()) {
             connection.execQuery(QueryFactory.getUpdateKeysQuery(annotationManager, keys.getEntityClass()), statement -> {
@@ -69,4 +111,6 @@ public class SQLEntityVisitor implements EntityVisitor {
             e.printStackTrace();
         }
     }
+
+
 }

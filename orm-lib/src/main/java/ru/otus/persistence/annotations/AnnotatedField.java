@@ -12,10 +12,10 @@ public interface AnnotatedField {
     String getName();
 
     @NotNull
-    Class<?> getType();
+    String getFullName(String separator);
 
     @NotNull
-    Field getField();
+    Class<?> getType();
 
     boolean contains(@NotNull Class<? extends Annotation> annotation);
 

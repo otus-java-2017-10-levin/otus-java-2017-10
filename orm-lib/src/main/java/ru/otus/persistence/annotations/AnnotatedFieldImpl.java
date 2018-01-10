@@ -12,32 +12,35 @@ import java.util.stream.Collectors;
 
 final class AnnotatedFieldImpl implements AnnotatedField {
     private final Field field;
+    private final String name;
+    private final AnnotatedClass annotatedClass;
+
 
     private final Map<Class<? extends Annotation>, ? extends Annotation> annotations;
 
-    AnnotatedFieldImpl(@NotNull Field field) {
+    AnnotatedFieldImpl(@NotNull Field field, @NotNull AnnotatedClass cl) {
         annotations = Arrays.stream(field.getDeclaredAnnotations())
                 .collect(Collectors.toMap(Annotation::annotationType, annotation -> annotation));
-
         this.field = field;
+        this.name = field.getName();
+        this.annotatedClass = cl;
     }
 
     @NotNull
     @Override
     public String getName() {
-        return field.getName();
+        return this.name;
     }
 
+    @NotNull
+    @Override
+    public String getFullName(String separator) {
+        return this.annotatedClass.getSimpleName()+separator+this.name;
+    }
     @NotNull
     @Override
     public Class getType() {
         return field.getType();
-    }
-
-    @NotNull
-    @Override
-    public Field getField() {
-        return field;
     }
 
     @Override

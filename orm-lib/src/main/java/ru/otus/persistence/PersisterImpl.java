@@ -2,12 +2,14 @@ package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.persistence.fields.*;
 
 import javax.persistence.OneToOne;
+import java.sql.ResultSetMetaData;
 
 public class PersisterImpl implements Persister {
 
@@ -74,26 +76,7 @@ public class PersisterImpl implements Persister {
     public <T> @Nullable T find(@NotNull Class<T> entityClass, long primaryKey) {
 
         T cls = null;
-//        try {
-//            try (DBConnection connection = dbManager.getConnection()) {
-//                cls = connection.execQuery(QueryFactory.getSelectQuery(annotationManager, entityClass, primaryKey), result -> {
-//
-//                    ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
-//                    ResultSetMetaData rsmd = result.getMetaData();
-//
-//                    result.next();
-//                    for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-//                        String name = rsmd.getColumnName(i);
-//                        AnnotatedField field = annotationManager.getField(entityClass, name);
-//                        builder.set(field, result.getObject(i));
-//                    }
-//                    return builder.build();
-//                });
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
+        visitor.load(entityClass, primaryKey);
         return cls;
     }
 
