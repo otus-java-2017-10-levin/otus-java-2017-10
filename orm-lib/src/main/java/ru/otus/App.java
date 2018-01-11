@@ -32,8 +32,9 @@ class App {
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
         dao.save(user);
 
-      //  UserDataSet fromDB = dao.load(user.getId());
-        //System.out.println("After find by id:\n" + fromDB);
+        UserDataSet fromDB = dao.load(user.getId());
+        System.out.println("After find by id:\n" + fromDB);
+        System.out.println(fromDB.getPhone());
         factory.close();
 
     }

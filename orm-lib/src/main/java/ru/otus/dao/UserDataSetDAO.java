@@ -14,5 +14,6 @@ public class UserDataSetDAO extends GenericDAO<UserDataSet> {
     public void save(UserDataSet user) {
         manager.persist(user);
         manager.persist(user.getPhone());
+        manager.flush();
     }
 }

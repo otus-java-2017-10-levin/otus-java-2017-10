@@ -100,7 +100,7 @@ public class PersistenceParams {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setIgnoringElementContentWhitespace(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        builder.setErrorHandler(new MyErrorHandler(System.out));
+        builder.setErrorHandler(new MyErrorHandler());
 
         return builder.parse(getResource(filename));
     }

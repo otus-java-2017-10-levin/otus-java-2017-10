@@ -73,7 +73,11 @@ public class AnnotationManager extends AbstractAnnotationManager {
 
             long count = onetoManyClass.getFields(OneToMany.class).stream().filter(f -> {
                 OneToMany anno = f.getAnnotation(OneToMany.class);
-                return name.equals(anno.mappedBy());
+                if (anno == null)
+                    return false;
+
+                String mappedBy = anno.mappedBy();
+                return name.equals(mappedBy);
             }).count();
             if (count != 1)
                 throw new IllegalArgumentException("No or duplicate @OneToMany");

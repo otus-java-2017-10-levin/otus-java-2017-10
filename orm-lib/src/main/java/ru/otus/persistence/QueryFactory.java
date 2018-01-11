@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 class QueryFactory {
     private static final String CREATE_IF_NOT_EXIST = "create table if not exists ";
     private static final String ID_FIELD = "bigint";

@@ -18,7 +18,8 @@ class QueryFactoryTest {
     @Test
     void createTableFromEntity() {
         String actualQuery = QueryFactory.createTableQuery(man, UserDataSet.class);
-        String expectedQuery = "CREATE TABLE IF NOT EXISTS USERDATASET (NAME VARCHAR(256), AGE INT, EMPLOYEEID BIGINT, PHONE BIGINT, ID BIGINT AUTO_INCREMENT, PRIMARY KEY (ID))";
+        String expectedQuery = "CREATE TABLE IF NOT EXISTS USERDATASET (NAME VARCHAR(256), AGE INT, " +
+                "EMPLOYEEID BIGINT, PHONE BIGINT, ID BIGINT AUTO_INCREMENT, PRIMARY KEY (ID))";
 
         assertEquals(expectedQuery, actualQuery);
     }
@@ -44,7 +45,8 @@ class QueryFactoryTest {
     void getSelectQuery() {
         String actualQuery = QueryFactory.getSelectQuery(man, UserDataSet.class, 1);
         String expectedQuery = "SELECT USERDATASET.NAME AS USERDATASET_NAME, USERDATASET.AGE AS USERDATASET_AGE, " +
-                "USERDATASET.EMPLOYEEID AS USERDATASET_EMPLOYEEID, USERDATASET.PHONE AS USERDATASET_PHONE, USERDATASET.ID AS USERDATASET_ID FROM USERDATASET WHERE USERDATASET.ID = 1";
+                "USERDATASET.EMPLOYEEID AS USERDATASET_EMPLOYEEID, USERDATASET.PHONE AS USERDATASET_PHONE, " +
+                "USERDATASET.ID AS USERDATASET_ID FROM USERDATASET WHERE USERDATASET.ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
 
@@ -68,7 +70,8 @@ class QueryFactoryTest {
         AnnotatedClass annotatedClass1 = man.getAnnotatedClass(PhonesDataSet.class);
         ConstraintImpl constraint = new ConstraintImpl(annotatedClass, annotatedClass1, "phone");
         String actualQuery = QueryFactory.getFKey(constraint);
-        String expectedQuery = "alter table UserDataSet add constraint FKUSERDATASETPHONESDATASET foreign key (phone) references PhonesDataSet";
+        String expectedQuery = "alter table UserDataSet add constraint FKUSERDATASETPHONESDATASET foreign key (phone) " +
+                "references PhonesDataSet";
         assertEquals(expectedQuery.toUpperCase(), actualQuery);
     }
 

@@ -2,7 +2,7 @@ package ru.otus.persistence;
 
 import ru.otus.persistence.annotations.AnnotatedClass;
 
-public interface Constraint {
+interface Constraint {
 
     /**
      * Gets tanle of constraint

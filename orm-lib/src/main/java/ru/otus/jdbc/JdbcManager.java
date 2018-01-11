@@ -47,11 +47,6 @@ class JdbcManager implements DbManager {
         isOpen = false;
     }
 
-    @Override
-    public boolean isOpen() {
-        return isOpen;
-    }
-
     private DBConnection getConnection(Map<String, String> data) {
         try {
 

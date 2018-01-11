@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 public interface AnnotatedField {
     @NotNull

@@ -19,6 +19,7 @@ import javax.persistence.Persistence;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings("ALL")
 class MyEntityManagerTest extends H2DatabaseTest {
 
     private final EntityManagerFactory factory = Persistence.createEntityManagerFactory("otusJPAH2");
@@ -82,36 +83,22 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
         @Test
         void findTest() {
-            UserDataSet set = new UserDataSet("Flow");
-
-            em.persist(set);
+            UserDataSet user = new UserDataSet("Flow");
+            PhonesDataSet phone = new PhonesDataSet("100", 1);
+            user.setPhone(phone);
+            phone.setUser(user);
+            em.persist(user);
+            em.persist(phone);
             em.flush();
 
-            set.setName("Flow1");
-            long id = set.getId();
-            set = em.find(UserDataSet.class, id);
+            user.setName("Flow1");
+            long id = user.getId();
+            user = em.find(UserDataSet.class, id);
             em.close();
 
-            assertEquals("Flow", set.getName());
-            assertEquals(id, set.getId());
-        }
-
-        @Test
-        void findTestMultipleTypes() {
-            PhonesDataSet set = new PhonesDataSet("Flow");
-            set.setHouseNumber(11);
-
-            em.persist(set);
-            em.flush();
-
-            set.setPhone("Flow1");
-            long id = set.getId();
-            set = em.find(PhonesDataSet.class, id);
-            em.close();
-
-            assertEquals("Flow", set.getPhone());
-            assertEquals(11, set.getHouseNumber());
-            assertEquals(id, set.getId());
+            assertEquals("Flow", user.getName());
+            assertEquals(id, user.getId());
+            assertEquals(1, user.getPhone().getHouseNumber());
         }
     }
 

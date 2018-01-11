@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+@SuppressWarnings("ALL")
 class MyEntityManager implements EntityManager {
 
     private final DbManager manager;

@@ -9,8 +9,8 @@ import java.io.PrintStream;
 class MyErrorHandler implements ErrorHandler {
     private final PrintStream out;
 
-    MyErrorHandler(PrintStream out) {
-        this.out = out;
+    MyErrorHandler() {
+        this.out = System.out;
     }
 
     private String getParseExceptionInfo(SAXParseException spe) {

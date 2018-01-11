@@ -2,14 +2,11 @@ package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
-import ru.otus.persistence.fields.*;
 
 import javax.persistence.OneToOne;
-import java.sql.ResultSetMetaData;
 
 public class PersisterImpl implements Persister {
 
@@ -19,17 +16,6 @@ public class PersisterImpl implements Persister {
     private PersisterImpl(AnnotationManager annotationManager, DbManager dbManager) {
         this.annotationManager = annotationManager;
         this.visitor = new SQLEntityVisitor(annotationManager, dbManager);
-    }
-
-    private Field<?> getObjectIdField(@NotNull Object object) {
-        AnnotatedField id = annotationManager.getId(object.getClass());
-        Field<?> field1 = null;
-        try {
-            field1 = Fields.getField(id, object);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return field1;
     }
 
     @Override
@@ -75,9 +61,7 @@ public class PersisterImpl implements Persister {
     @Override
     public <T> @Nullable T find(@NotNull Class<T> entityClass, long primaryKey) {
 
-        T cls = null;
-        visitor.load(entityClass, primaryKey);
-        return cls;
+        return visitor.load(entityClass, primaryKey);
     }
 
 

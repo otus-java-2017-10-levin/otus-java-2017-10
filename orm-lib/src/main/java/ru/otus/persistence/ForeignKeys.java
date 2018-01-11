@@ -33,7 +33,7 @@ public class ForeignKeys implements VisitableEntity {
     }
 
     @Override
-    public long apply(EntityVisitor visitableEntity) throws IllegalAccessException {
+    public long apply(EntityVisitor visitableEntity) {
         visitableEntity.visit(this);
         return 0;
     }

@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 public abstract class DataSet {
     @Id
-    protected long id;
+    long id;
 
     public long getId() {
         return id;

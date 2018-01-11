@@ -7,5 +7,4 @@ public interface DbManager {
 
     DBConnection getConnection() throws IllegalArgumentException;
     void close();
-    boolean isOpen();
 }

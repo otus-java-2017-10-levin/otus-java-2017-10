@@ -4,9 +4,7 @@ import org.dbunit.Assertion;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.Before;
 import org.junit.jupiter.api.*;
-import ru.otus.H2Db;
 import ru.otus.base.UserDataSet;
 
 import java.sql.SQLException;
@@ -20,11 +18,6 @@ class JdbcConnectionTest extends H2DatabaseTest {
 
     JdbcConnectionTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());
-    }
-
-    @Before
-    void start() throws SQLException {
-        H2Db.start();
     }
 
     @BeforeEach
