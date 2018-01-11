@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.HashMap;
 import java.util.List;
@@ -77,15 +79,17 @@ class QueryFactory {
         StringBuilder values = new StringBuilder();
         int count = 0;
         for (AnnotatedField f : annotatedClass.getFields()) {
+            if (f.contains(OneToMany.class))
+                continue;
             if (count++ != 0) {
                 values.append(",");
             }
-            if (f.contains(manager.getIdAnnotation())) {
-                values.append("NULL");
-            }
-            else {
+//            if (f.contains(manager.getIdAnnotation())) {
+//                values.append("NULL");
+//            }
+//            else {
                 values.append("?");
-            }
+//            }
         }
 
         return String.format(INSERT,
@@ -102,34 +106,6 @@ class QueryFactory {
         return String.format(DROP, manager.getAnnotatedClass(entityClass).getSimpleName()).toUpperCase();
     }
 
-    @NotNull
-    private static String getFieldNames(@NotNull AnnotationManager manager,
-                                        @NotNull Class<?> entityClass) {
-
-        StringBuilder query = new StringBuilder();
-        AnnotatedClass cl = manager.getAnnotatedClass(entityClass);
-
-        int count = 0;
-
-        for (AnnotatedField f : cl.getFields()) {
-            if (count++ != 0) {
-                query.append(", ");
-            }
-
-            if (state == State.INSERT) {
-                query.append(f.getName());
-            }
-            else if (state == State.CREATE) {
-                query.append(getFieldString(manager, entityClass, f.getName()));
-            } else {
-                    query.append(f.getFullName("."));
-                    if (state == State.SELECT)
-                    query.append(" as ").append(f.getFullName("_"));
-            }
-        }
-        return query.toString();
-    }
-
 
 
     public static String getFKey(@NotNull Constraint constraint) {
@@ -143,30 +119,6 @@ class QueryFactory {
                 constraintName,
                 constraint.getFieldName(),
                 constraint.getForeignTable().getSimpleName()).toUpperCase();
-    }
-
-    @NotNull
-    private static String getFieldString(@NotNull AnnotationManager manager,
-                                         @NotNull Class<?> entityClass,
-                                         @NotNull String name) {
-
-        AnnotatedField field = manager.getField(entityClass, name);
-        StringBuilder sb = new StringBuilder(field.getName());
-
-        String sqlType = sqlTypes.get(field.getType());
-
-        if (field.contains(manager.getIdAnnotation())) {
-            sb.append(" ").append(ID_FIELD).append(" ").append(AUTO_INCREMENT);
-        } else {
-
-            if (sqlType != null)
-                sb.append(" ").append(sqlType);
-            else if (manager.contains(entityClass)) {
-                sb.append(" ").append(ID_FIELD);
-            } else
-                throw new IllegalStateException("no supported type " + field.getType());
-        }
-        return sb.toString();
     }
 
     public static String getUpdateKeysQuery(@NotNull AnnotationManager manager,
@@ -223,6 +175,61 @@ class QueryFactory {
                 ac.getSimpleName() + joiner,
                 ac.getSimpleName() + "." + id.getName(),
                 i).toUpperCase();
+    }
+
+    @NotNull
+    private static String getFieldNames(@NotNull AnnotationManager manager,
+                                        @NotNull Class<?> entityClass) {
+
+        StringBuilder query = new StringBuilder();
+        AnnotatedClass cl = manager.getAnnotatedClass(entityClass);
+
+        int count = 0;
+
+        for (AnnotatedField f : cl.getFields()) {
+            if (f.contains(OneToMany.class))
+                continue;
+
+            if (count++ != 0) {
+                query.append(", ");
+            }
+
+            if (state == State.INSERT) {
+                query.append(f.getName());
+            }
+            else if (state == State.CREATE) {
+                query.append(getFieldString(manager, entityClass, f.getName()));
+            } else {
+                query.append(f.getFullName("."));
+                if (state == State.SELECT)
+                    query.append(" as ").append(f.getFullName("_"));
+            }
+        }
+        return query.toString();
+    }
+
+    @NotNull
+    private static String getFieldString(@NotNull AnnotationManager manager,
+                                         @NotNull Class<?> entityClass,
+                                         @NotNull String name) {
+
+        AnnotatedField field = manager.getField(entityClass, name);
+        StringBuilder sb = new StringBuilder(field.getName());
+
+        String sqlType = sqlTypes.get(field.getType());
+
+        if (field.contains(manager.getIdAnnotation())) {
+            sb.append(" ").append(ID_FIELD).append(" ").append(AUTO_INCREMENT);
+        } else {
+
+            if (sqlType != null)
+                sb.append(" ").append(sqlType);
+            else if (manager.contains(entityClass)) {
+                sb.append(" ").append(ID_FIELD);
+            } else
+                throw new IllegalStateException("no supported type " + field.getType());
+        }
+        return sb.toString();
     }
 
     private static final Map<Class<?>, String> sqlTypes = new HashMap<>();

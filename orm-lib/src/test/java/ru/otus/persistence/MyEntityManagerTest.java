@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import ru.otus.classes.Address;
+import ru.otus.classes.Phone;
 import ru.otus.classes.UserDataSet;
 import ru.otus.jdbc.H2DatabaseTest;
 import ru.otus.jdbc.JdbcTestParams;
@@ -46,6 +47,9 @@ class MyEntityManagerTest extends H2DatabaseTest {
         address.setAddress("111");
         address.setUser(set);
         set.setAddress(address);
+        set.addPhone(Phone.of(set, "100"));
+        set.addPhone(Phone.of(set, "200"));
+        set.addPhone(Phone.of(set, "300"));
 
         assertEquals(0, set.getId());
         em.persist(set);

@@ -7,6 +7,7 @@ public class EntityStructure implements VisitableEntity {
 
     private final Object entity;
     private final AnnotatedClass entityClass;
+    private long id;
 
 
     EntityStructure(@NotNull Object entity,
@@ -26,6 +27,14 @@ public class EntityStructure implements VisitableEntity {
 
     public AnnotatedClass getEntityClass() {
         return entityClass;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override

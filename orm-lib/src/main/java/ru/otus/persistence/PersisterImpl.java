@@ -6,7 +6,9 @@ import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.util.Collection;
 
 public class PersisterImpl implements Persister {
 
@@ -34,7 +36,34 @@ public class PersisterImpl implements Persister {
 
         EntityStructure entityStructure = new EntityStructure(object, annotatedClass);
 
-        return entityStructure.apply(visitor);
+
+        long id = entityStructure.apply(visitor);
+
+        for (AnnotatedField f: annotatedClass.getFields(OneToMany.class)) {
+            Object value = f.getFieldValue(object);
+            if (value == null)
+                throw new IllegalStateException("OneToMany field is null");
+
+            if (!Collection.class.isAssignableFrom(value.getClass()))
+                throw new IllegalStateException("Only collections supported to @OneToMany");
+
+            saveManyToOne((Collection<?>)value, id);
+        }
+        return id;
+    }
+
+    private void saveManyToOne(@NotNull Collection<?> value, long id) {
+        value.forEach(object -> {
+            Class<?> componentType = object.getClass();
+            AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(componentType);
+            EntityStructure str = new EntityStructure(object, annotatedClass);
+            str.setId(id);
+            try {
+                str.apply(visitor);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override

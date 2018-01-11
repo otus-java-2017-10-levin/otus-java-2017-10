@@ -2,6 +2,7 @@ package ru.otus;
 
 import org.h2.tools.Server;
 import ru.otus.base.Address;
+import ru.otus.base.Phone;
 import ru.otus.base.UserDataSet;
 import ru.otus.dao.UserDataSetDAO;
 import ru.otus.persistence.xml.PersistenceParams;
@@ -28,6 +29,9 @@ class App {
         user.setAddress(address);
         address.setUser(user);
         user.setAge(10);
+        user.addPhone(Phone.of(user, "100"));
+        user.addPhone(Phone.of(user, "200"));
+        user.addPhone(Phone.of(user, "300"));
 
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
         dao.save(user);

@@ -27,7 +27,7 @@ class QueryFactoryTest {
     @Test
     void insertTest() {
         String actualQuery = QueryFactory.getInsertQuery(man, UserDataSet.class);
-        String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, ADDRESS, ID) VALUES (?,?,?,NULL)";
+        String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, ADDRESS, ID) VALUES (?,?,?,?)";
 
         assertEquals(expectedQuery, actualQuery);
     }

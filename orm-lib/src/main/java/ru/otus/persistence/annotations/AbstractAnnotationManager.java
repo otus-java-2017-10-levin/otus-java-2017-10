@@ -41,7 +41,7 @@ public abstract class AbstractAnnotationManager {
     @NotNull
     public <T> AnnotatedClass getAnnotatedClass(@NotNull Class<T> cl) {
         if (!annotatedClasses.containsKey(cl))
-            throw new IllegalArgumentException("class is not in annotated classes list");
+            throw new IllegalArgumentException("class "+ cl.getName() +" is not in annotated classes list");
 
         return annotatedClasses.get(cl);
     }

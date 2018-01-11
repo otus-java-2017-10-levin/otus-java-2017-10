@@ -5,6 +5,7 @@ import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
+import ru.otus.persistence.caching.CacheUnit;
 
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -39,6 +40,12 @@ public class SQLEntityVisitor implements EntityVisitor {
                                 !f.contains(ManyToOne.class) &&
                                 !f.contains(annotationManager.getIdAnnotation())) {
                             statement.setString(pos++, value.toString());
+                        } else if (f.contains((annotationManager.getIdAnnotation()))) {
+                            if (structure.getId() != 0) {
+                                statement.setLong(pos++, structure.getId());
+                            } else {
+                                statement.setString(pos++, null);
+                            }
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -56,7 +63,9 @@ public class SQLEntityVisitor implements EntityVisitor {
             e.printStackTrace();
         }
 
-        return (long) idField.getFieldValue(entity);
+        long id = (long) idField.getFieldValue(entity);
+        structure.setId(id);
+        return id;
     }
 
     @Override

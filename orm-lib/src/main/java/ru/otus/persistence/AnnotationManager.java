@@ -61,17 +61,16 @@ public class AnnotationManager extends AbstractAnnotationManager {
     }
 
     private void validateManyToOne(AnnotatedClass cl) {
-        List<AnnotatedField> manyToOne = cl.getFields(ManyToOne.class);
-        for (AnnotatedField field: manyToOne) {
+        for (AnnotatedField field: cl.getFields(ManyToOne.class)) {
             Class<?> manyClass = field.getType();
             final String name = field.getName();
             if (!contains(manyClass))
                 throw new IllegalArgumentException("Class in @ManyToOne relationship is not an entity.");
 
             /// there can be several one to many relationship
-            AnnotatedClass onetoManyClass = getAnnotatedClass(manyClass);
+            AnnotatedClass oneToManyClass = getAnnotatedClass(manyClass);
 
-            long count = onetoManyClass.getFields(OneToMany.class).stream().filter(f -> {
+            long count = oneToManyClass.getFields(OneToMany.class).stream().filter(f -> {
                 OneToMany anno = f.getAnnotation(OneToMany.class);
                 if (anno == null)
                     return false;
