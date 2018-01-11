@@ -11,7 +11,7 @@ public abstract class H2DatabaseTest extends DBTestCase {
      javax.persistence.jdbc.password    "grandmaster" />
      *
      */
-//    private static final String JDBC_DRIVER = com.mysql.cj.jdbc.Driver.class.getPhone();
+//    private static final String JDBC_DRIVER = com.mysql.cj.jdbc.Driver.class.getAddress();
 //    private static final String JDBC_URL = "jdbc:mysql://localhost:3306";
 //    private static final String USER = "Flow";
 //    private static final String PASSWORD = "grandmaster";

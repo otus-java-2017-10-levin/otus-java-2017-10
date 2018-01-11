@@ -6,7 +6,7 @@
   <phone>orm-lib</phone>
   <version>1.0-SNAPSHOT</version>
   <build>
-    <finalName>${project.phone}</finalName>
+    <finalName>${project.address}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>

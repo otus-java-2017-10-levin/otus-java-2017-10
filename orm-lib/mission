@@ -2,7 +2,7 @@
 
 Создайте в базе таблицу с полями:
 id bigint(20) NOT NULL auto_increment
-phone varchar(255)
+address varchar(255)
 age int(3)
 
 Создайте абстрактный класс DataSet. Поместите long id в DataSet.

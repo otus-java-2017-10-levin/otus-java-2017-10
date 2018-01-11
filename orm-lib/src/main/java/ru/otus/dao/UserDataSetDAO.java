@@ -13,7 +13,7 @@ public class UserDataSetDAO extends GenericDAO<UserDataSet> {
     @Override
     public void save(UserDataSet user) {
         manager.persist(user);
-        manager.persist(user.getPhone());
+        manager.persist(user.getAddress());
         manager.flush();
     }
 }

@@ -15,15 +15,6 @@ class PersistenceParamsTest {
     private final String persistencePath = "persistenceTest.xml";
 
     @Test
-    void parseXMLWithNull() {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> new PersistenceParams(null, ""));
-        assertEquals("Argument is null", e.getMessage());
-
-        e = assertThrows(IllegalArgumentException.class, () -> new PersistenceParams(persistenceUnit, null));
-        assertEquals("Argument is null", e.getMessage());
-    }
-
-    @Test
     void parseXMLWithEmptyAnswer() {
         PersistenceParams result = new PersistenceParams(persistenceUnit +"1", persistencePath);
         Map<String, String> properties = result.getConnectionData();
@@ -55,8 +46,8 @@ class PersistenceParamsTest {
         Set<String> classes = persistenceXml.getEntityClasses();
         Set<String> expectedClasses = new HashSet<>();
 
-        expectedClasses.add("ru.otus.base.UserDataSet");
-        expectedClasses.add("ru.otus.base.PhonesDataSet");
+        expectedClasses.add("ru.otus.classes.UserDataSet");
+        expectedClasses.add("ru.otus.classes.Address");
 
         assertEquals(expectedClasses, classes);
     }

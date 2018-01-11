@@ -1,4 +1,4 @@
-package ru.otus.base;
+package ru.otus.classes;
 
 import lombok.*;
 

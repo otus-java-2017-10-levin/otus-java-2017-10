@@ -1,7 +1,7 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.base.PhonesDataSet;
+import ru.otus.base.Address;
 import ru.otus.base.UserDataSet;
 import ru.otus.persistence.annotations.AnnotatedClass;
 
@@ -13,7 +13,7 @@ class ObjectBuilderTest {
 
     @Test
     void addFields() {
-        AnnotationManager man = new AnnotationManager(Id.class, UserDataSet.class, PhonesDataSet.class);
+        AnnotationManager man = new AnnotationManager(Id.class, UserDataSet.class, Address.class);
         AnnotatedClass annotatedClass = man.getAnnotatedClass(UserDataSet.class);
 
         UserDataSet res  = new ObjectBuilder<>(UserDataSet.class)

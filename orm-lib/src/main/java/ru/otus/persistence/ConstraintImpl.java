@@ -8,7 +8,7 @@ public class ConstraintImpl implements Constraint {
     private final AnnotatedClass foreignTable;
     private final String fieldName;
 
-    public ConstraintImpl(AnnotatedClass table, AnnotatedClass foreignTable, String fieldName) {
+    ConstraintImpl(AnnotatedClass table, AnnotatedClass foreignTable, String fieldName) {
         this.table = table;
         this.foreignTable = foreignTable;
         this.fieldName = fieldName;

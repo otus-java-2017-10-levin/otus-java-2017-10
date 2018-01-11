@@ -8,8 +8,8 @@ import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import ru.otus.base.PhonesDataSet;
-import ru.otus.base.UserDataSet;
+import ru.otus.classes.Address;
+import ru.otus.classes.UserDataSet;
 import ru.otus.jdbc.H2DatabaseTest;
 import ru.otus.jdbc.JdbcTestParams;
 
@@ -42,19 +42,18 @@ class MyEntityManagerTest extends H2DatabaseTest {
     @Test
     void persistTest() throws Exception {
         UserDataSet set = new UserDataSet("Flow");
-        PhonesDataSet phone = new PhonesDataSet();
-        phone.setHouseNumber(1);
-        phone.setPhone("111");
-        phone.setUser(set);
-        set.setPhone(phone);
+        Address address = new Address();
+        address.setAddress("111");
+        address.setUser(set);
+        set.setAddress(address);
 
         assertEquals(0, set.getId());
         em.persist(set);
-        em.persist(phone);
+        em.persist(address);
         em.close();
 
         checkTables("USERDATASET");
-        checkTables("PHONESDATASET");
+        checkTables("ADDRESS");
 
         assertEquals(true, set.getId() != 0);
     }
@@ -84,11 +83,11 @@ class MyEntityManagerTest extends H2DatabaseTest {
         @Test
         void findTest() {
             UserDataSet user = new UserDataSet("Flow");
-            PhonesDataSet phone = new PhonesDataSet("100", 1);
-            user.setPhone(phone);
-            phone.setUser(user);
+            Address address = new Address("100");
+            user.setAddress(address);
+            address.setUser(user);
             em.persist(user);
-            em.persist(phone);
+            em.persist(address);
             em.flush();
 
             user.setName("Flow1");
@@ -98,7 +97,7 @@ class MyEntityManagerTest extends H2DatabaseTest {
 
             assertEquals("Flow", user.getName());
             assertEquals(id, user.getId());
-            assertEquals(1, user.getPhone().getHouseNumber());
+            assertEquals("100", user.getAddress().getAddress());
         }
     }
 

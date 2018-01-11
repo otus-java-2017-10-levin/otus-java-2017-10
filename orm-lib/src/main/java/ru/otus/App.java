@@ -1,7 +1,7 @@
 package ru.otus;
 
 import org.h2.tools.Server;
-import ru.otus.base.PhonesDataSet;
+import ru.otus.base.Address;
 import ru.otus.base.UserDataSet;
 import ru.otus.dao.UserDataSetDAO;
 import ru.otus.persistence.xml.PersistenceParams;
@@ -24,9 +24,9 @@ class App {
 
         startServer();
         UserDataSet user = new UserDataSet("Flow");
-        PhonesDataSet phone = new PhonesDataSet("100", 1);
-        user.setPhone(phone);
-        phone.setUser(user);
+        Address address = new Address("100");
+        user.setAddress(address);
+        address.setUser(user);
         user.setAge(10);
 
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
@@ -34,9 +34,8 @@ class App {
 
         UserDataSet fromDB = dao.load(user.getId());
         System.out.println("After find by id:\n" + fromDB);
-        System.out.println(fromDB.getPhone());
+        System.out.println(fromDB.getAddress());
         factory.close();
-
     }
 
     private void startServer() throws SQLException {

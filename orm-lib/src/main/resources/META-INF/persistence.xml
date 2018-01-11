@@ -3,17 +3,17 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0">
 
-    <persistence-unit phone="otusJPAH2">
+    <persistence-unit name="otusJPAH2">
         <provider>ru.otus.persistence.MyPersistenceProvider</provider>
         <class>ru.otus.base.UserDataSet</class>
-        <class>ru.otus.base.PhonesDataSet</class>
+        <class>ru.otus.base.Address</class>
 
         <properties>
-            <property phone="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-            <property phone="javax.persistence.jdbc.url"
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+            <property name="javax.persistence.jdbc.url"
                       value="jdbc:h2:~/test" />
-            <property phone="javax.persistence.jdbc.user" value="sa" />
-            <property phone="javax.persistence.jdbc.password" value="" />
+            <property name="javax.persistence.jdbc.user" value="sa" />
+            <property name="javax.persistence.jdbc.password" value="" />
         </properties>
     </persistence-unit>
 </persistence>
