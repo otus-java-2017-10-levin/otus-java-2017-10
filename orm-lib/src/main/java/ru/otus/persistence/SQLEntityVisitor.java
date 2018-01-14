@@ -1,6 +1,7 @@
 package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
@@ -10,7 +11,9 @@ import ru.otus.persistence.caching.CacheUnit;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,21 +33,20 @@ public class SQLEntityVisitor implements EntityVisitor {
         Object entity = structure.getEntity();
         AnnotatedField idField = annotationManager.getId(annotatedClass.getAnnotatedClass());
         try (DBConnection connection = dbManager.getConnection()) {
-            connection.execQuery(QueryFactory.getInsertQuery(annotationManager, annotatedClass.getAnnotatedClass()), statement -> {
+            connection.execQuery(QueryFactory.getInsertQuery(annotationManager, annotatedClass.getAnnotatedClass(), structure.getId() != 0), statement -> {
                 int pos = 1;
                 for (AnnotatedField f : annotatedClass.getFields()) {
                     try {
                         Object value = Objects.requireNonNull(f.getFieldValue(entity));
-                        if (!f.contains(OneToOne.class) &&
+                        if (f.contains(ManyToOne.class)) {
+                            statement.setLong(pos++, structure.getId());
+                        } else if (!f.contains(OneToOne.class) &&
                                 !f.contains(OneToMany.class) &&
-                                !f.contains(ManyToOne.class) &&
                                 !f.contains(annotationManager.getIdAnnotation())) {
                             statement.setString(pos++, value.toString());
                         } else if (f.contains((annotationManager.getIdAnnotation()))) {
-                            if (structure.getId() != 0) {
-                                statement.setLong(pos++, structure.getId());
-                            } else {
-                                statement.setString(pos++, null);
+                            if ((Long)value != 0) {
+                                statement.setLong(pos++, (Long)value);
                             }
                         }
                     } catch (IllegalAccessException e) {
@@ -81,15 +83,8 @@ public class SQLEntityVisitor implements EntityVisitor {
 
                 String selectQuery = QueryFactory.getSelectQuery(annotationManager, primaryKey, entityClass);
                 map = connection.execQuery(selectQuery, result -> {
-                    ResultSetMetaData rsmd = result.getMetaData();
-                    Map<String, Object> m = new HashMap<>();
-
                     result.next();
-                    for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                        String name = rsmd.getColumnLabel(i);
-                        m.put(name, result.getObject(i));
-                    }
-                    return m;
+                    return readResultLine(result);
                 });
             }
         } catch (Exception e) {
@@ -102,6 +97,38 @@ public class SQLEntityVisitor implements EntityVisitor {
         cacheObjects(foreignClasses, map, cache);
         setFKeys(cache, map);
         return entityClass.cast(cache.get(new CacheUnit(primaryKey, entityClass)));
+    }
+
+    private Map<String, Object> readResultLine(ResultSet result) throws SQLException {
+        ResultSetMetaData rsmd = result.getMetaData();
+        Map<String, Object> m = new HashMap<>();
+
+        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+            String name = rsmd.getColumnLabel(i);
+            m.put(name, result.getObject(i));
+        }
+        return m;
+    }
+
+    private <T> List<T> loadObjects(@NotNull final Class<T> entityClass,
+                                    @NotNull final AnnotatedField field,
+                                    final long value) {
+        List<T> result = new ArrayList<>();
+
+        try (DBConnection connection = dbManager.getConnection()) {
+            result = connection.execQuery(QueryFactory.getSelectQuery(annotationManager, entityClass, field, value), resultSet -> {
+                ArrayList<T> ts = new ArrayList<>();
+                // плохо ли создавать объекты пока не прочитаны все результаты из бд?
+                while (resultSet.next()) {
+                    ts.add(buildObject(entityClass, readResultLine(resultSet)));
+                }
+                return ts;
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     private void setFKeys(Map<CacheUnit, Object> cache, Map<String, Object> map) {
@@ -118,24 +145,52 @@ public class SQLEntityVisitor implements EntityVisitor {
                     e.printStackTrace();
                 }
             }
+
+            for (AnnotatedField f : ac.getFields(OneToMany.class)) {
+                try {
+                    Collection<?> col = (Collection)f.getFieldValue(object);
+                    String mappedBy = Objects.requireNonNull(f.getAnnotation(OneToMany.class)).mappedBy();
+                    if (mappedBy.equals(""))
+                        throw new IllegalStateException();
+
+                    if (col == null)
+                        continue;
+
+                    col.forEach(elem -> {
+                        if (elem == null)
+                            throw new IllegalArgumentException();
+                        AnnotatedField field = annotationManager.getAnnotatedClass(elem.getClass()).getField(mappedBy);
+                        try {
+                            field.setFieldValue(elem, object);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
         });
     }
+    private void cacheObjects(@NotNull List<Class<?>> foreignClass,
+                             @NotNull Map<String, Object> map,
+                             @NotNull Map<CacheUnit, Object> cache) {
+        foreignClass.forEach(aClass -> cacheObject(aClass, map, cache));
+    }
 
-    private void cacheObjects(@NotNull List<Class<?>> foreignClasses,
+    private void cacheObject(@NotNull Class<?> foreignClass,
                               @NotNull Map<String, Object> map,
                               @NotNull Map<CacheUnit, Object> cache) {
-        foreignClasses.forEach(aClass -> {
-            Object object = buildObject(aClass, map);
+
+            Object object = buildObject(foreignClass, map);
             Class<?> cl = object.getClass();
 
             CacheUnit id = createCacheUnit(cl, object);
             cache.put(id, object);
-
-        });
     }
 
-    private CacheUnit createCacheUnit(@NotNull Class<?> cl,
-                                      @NotNull Object object) {
+    private CacheUnit createCacheUnit(@NotNull final Class<?> cl,
+                                      @NotNull final Object object) {
         Object value = null;
         try {
             value = annotationManager.getId(cl).getFieldValue(object);
@@ -148,11 +203,27 @@ public class SQLEntityVisitor implements EntityVisitor {
         return new CacheUnit((Long) value, object.getClass());
     }
 
-    private <T> T buildObject(@NotNull Class<T> entityClass, Map<String, Object> params) {
+    private <T> T buildObject(@NotNull final Class<T> entityClass,
+                              @NotNull final Map<String, Object> params) {
         ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
         List<AnnotatedField> fields = annotationManager.getAnnotatedClass(entityClass).getFields();
         for (AnnotatedField f : fields) {
-            if (!f.contains(OneToOne.class)) {
+            if (f.contains(OneToMany.class)) {
+                String mappedBy = Objects.requireNonNull(f.getAnnotation(OneToMany.class)).mappedBy();
+                if (mappedBy.equals(""))
+                    throw new IllegalStateException();
+
+                Class<?> componentType = f.getComponentType();
+                if (componentType == null)
+                    throw new IllegalStateException();
+
+                AnnotatedClass component = annotationManager.getAnnotatedClass(componentType);
+                AnnotatedField field = component.getField(mappedBy);
+                String fullName = annotationManager.getId(entityClass).getFullName("_").toUpperCase();
+                Long value = (Long) params.get(fullName);
+                Collection<?> col = loadObjects(componentType, field, value);
+                builder.set(f, col);
+            } else if (!f.contains(OneToOne.class) && !f.contains(ManyToOne.class)) {
                 String fullName = f.getFullName("_").toUpperCase();
                 if (!params.containsKey(fullName))
                     throw new IllegalArgumentException();

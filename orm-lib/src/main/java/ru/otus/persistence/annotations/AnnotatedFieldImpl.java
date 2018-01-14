@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,7 @@ final class AnnotatedFieldImpl implements AnnotatedField {
     private final Field field;
     private final String name;
     private final AnnotatedClass annotatedClass;
+    private final Class<?> componentType;
 
 
     private final Map<Class<? extends Annotation>, ? extends Annotation> annotations;
@@ -24,6 +27,17 @@ final class AnnotatedFieldImpl implements AnnotatedField {
         this.field = field;
         this.name = field.getName();
         this.annotatedClass = cl;
+
+        Type type = field.getGenericType();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType par = (ParameterizedType) type;
+            Type[] fieldArgTypes = par.getActualTypeArguments();
+            if (fieldArgTypes.length == 0)
+                throw new IllegalStateException();
+
+            componentType = (Class) fieldArgTypes[0];
+        } else
+            componentType = null;
     }
 
     @NotNull
@@ -39,8 +53,13 @@ final class AnnotatedFieldImpl implements AnnotatedField {
     }
     @NotNull
     @Override
-    public Class getType() {
+    public Class<?> getType() {
         return field.getType();
+    }
+
+    @Override
+    public Class<?> getComponentType() {
+        return this.componentType;
     }
 
     @Override

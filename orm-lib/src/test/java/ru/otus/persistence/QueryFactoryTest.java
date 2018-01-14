@@ -1,9 +1,11 @@
 package ru.otus.persistence;
 
 import org.junit.jupiter.api.Test;
-import ru.otus.base.Address;
-import ru.otus.base.UserDataSet;
+import ru.otus.classes.Address;
+import ru.otus.classes.UserDataSet;
+import ru.otus.classes.Phone;
 import ru.otus.persistence.annotations.AnnotatedClass;
+import ru.otus.persistence.annotations.AnnotatedField;
 
 import javax.persistence.Id;
 import java.lang.annotation.Annotation;
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class QueryFactoryTest {
 
     private final static Class<? extends Annotation> idClass = Id.class;
-    private final AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class, Address.class);
+    private final AnnotationManager man = new AnnotationManager(idClass, UserDataSet.class, Address.class, Phone.class);
     @Test
     void createTableFromEntity() {
         String actualQuery = QueryFactory.createTableQuery(man, UserDataSet.class);
@@ -26,7 +28,7 @@ class QueryFactoryTest {
 
     @Test
     void insertTest() {
-        String actualQuery = QueryFactory.getInsertQuery(man, UserDataSet.class);
+        String actualQuery = QueryFactory.getInsertQuery(man, UserDataSet.class, true);
         String expectedQuery = "INSERT INTO USERDATASET (NAME, AGE, ADDRESS, ID) VALUES (?,?,?,?)";
 
         assertEquals(expectedQuery, actualQuery);
@@ -81,4 +83,18 @@ class QueryFactoryTest {
         String actualQuery = QueryFactory.getUpdateKeysQuery(man, UserDataSet.class);
         assertEquals(expectedQuery.toUpperCase(), actualQuery);
     }
+
+    @Test
+    void getSelectQueryWhere() {
+
+        Class<?> entity = Phone.class;
+        AnnotatedField id = man.getId(entity);
+        String actualQuery = QueryFactory.getSelectQuery(man, entity, id, 1);
+        String expectedQuery = "SELECT PHONE.OWNER AS PHONE_OWNER, " +
+                "PHONE.PHONE AS PHONE_PHONE, " +
+                "PHONE.ID AS PHONE_ID FROM PHONE WHERE PHONE.ID = 1";
+        assertEquals(expectedQuery, actualQuery);
+    }
+
+    //TODO: create test selecting complex object from db via foreign key. Ex. load UserDataSets as ManyToOne
 }

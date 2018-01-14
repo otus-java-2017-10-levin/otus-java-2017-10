@@ -37,9 +37,7 @@ class App {
         dao.save(user);
 
         UserDataSet fromDB = dao.load(user.getId());
-        System.out.println("After find by id:\n" + fromDB);
-        System.out.println(fromDB.getAddress());
-        factory.close();
+//        factory.close();
     }
 
     private void startServer() throws SQLException {

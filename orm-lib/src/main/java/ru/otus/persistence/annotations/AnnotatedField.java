@@ -16,6 +16,8 @@ public interface AnnotatedField {
     @NotNull
     Class<?> getType();
 
+    Class<?> getComponentType();
+
     boolean contains(@NotNull Class<? extends Annotation> annotation);
 
     int getAnnotationCount();
