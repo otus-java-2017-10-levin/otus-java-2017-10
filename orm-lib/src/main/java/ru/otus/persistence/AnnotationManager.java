@@ -11,6 +11,7 @@ import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+@SuppressWarnings("SameParameterValue")
 public class AnnotationManager extends AbstractAnnotationManager {
 
     AnnotationManager(Class<? extends Annotation> idAnnotation, Class<?>... classes) {

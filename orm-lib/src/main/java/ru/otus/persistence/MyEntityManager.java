@@ -223,6 +223,8 @@ class MyEntityManager implements EntityManager {
                 }
             });
         }
+
+        objects.clear();
     }
 
     private void dropTables(DBConnection connection) {

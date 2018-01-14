@@ -17,8 +17,13 @@ public class EntityStructure implements VisitableEntity {
     }
 
     @Override
-    public long apply(EntityVisitor entityVisitor) throws IllegalAccessException {
+    public long save(@NotNull final EntityVisitor entityVisitor) throws IllegalAccessException {
         return entityVisitor.visit(this);
+    }
+
+    @Override
+    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id) {
+        return entityVisitor.visit(entityClass, id);
     }
 
     public Object getEntity() {

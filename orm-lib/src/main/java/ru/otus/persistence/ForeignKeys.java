@@ -11,7 +11,7 @@ public class ForeignKeys implements VisitableEntity {
     private final Class<?> entityClass;
     private final Map<String, Long> keys = new HashMap<>();
 
-    public ForeignKeys(long id, Class<?> entityClass) {
+    ForeignKeys(long id, Class<?> entityClass) {
         this.id = id;
         this.entityClass = entityClass;
     }
@@ -33,8 +33,13 @@ public class ForeignKeys implements VisitableEntity {
     }
 
     @Override
-    public long apply(EntityVisitor visitableEntity) {
+    public long save(@NotNull final EntityVisitor visitableEntity) {
         visitableEntity.visit(this);
         return 0;
+    }
+
+    @Override
+    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id) {
+        throw new UnsupportedOperationException();
     }
 }

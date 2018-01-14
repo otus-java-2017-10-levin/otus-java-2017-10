@@ -16,4 +16,13 @@ public class Phone extends DataSet {
 
     @NonNull
     private String phone;
+
+    @Override
+    public String toString() {
+        return "Phone{" +
+                "owner=" + owner.getName() +
+                ", phone='" + phone + '\'' +
+                ", id=" + id +
+                '}';
+    }
 }

@@ -9,7 +9,6 @@ import java.util.List;
 
 @Setter
 @Getter
-@ToString(exclude = "address")
 public class UserDataSet extends DataSet {
     private String name;
     private int age;
@@ -30,7 +29,14 @@ public class UserDataSet extends DataSet {
         phones.add(phone);
     }
 
-    public List<Phone> getPhones() {
-        return phones;
+    @Override
+    public String toString() {
+        return "UserDataSet{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", address=" + address +
+                ", phones=" + phones +
+                ", id=" + id +
+                '}';
     }
 }

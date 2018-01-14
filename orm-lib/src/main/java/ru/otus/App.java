@@ -37,7 +37,8 @@ class App {
         dao.save(user);
 
         UserDataSet fromDB = dao.load(user.getId());
-//        factory.close();
+        System.out.println(fromDB);
+        factory.close();
     }
 
     private void startServer() throws SQLException {

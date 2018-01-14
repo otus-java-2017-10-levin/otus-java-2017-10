@@ -37,7 +37,7 @@ public class PersisterImpl implements Persister {
         EntityStructure entityStructure = new EntityStructure(object, annotatedClass);
 
 
-        long id = entityStructure.apply(visitor);
+        long id = entityStructure.save(visitor);
 
         for (AnnotatedField f: annotatedClass.getFields(OneToMany.class)) {
             Object value = f.getFieldValue(object);
@@ -59,7 +59,7 @@ public class PersisterImpl implements Persister {
             EntityStructure str = new EntityStructure(object, annotatedClass);
             str.setId(id);
             try {
-                str.apply(visitor);
+                str.save(visitor);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -79,7 +79,7 @@ public class PersisterImpl implements Persister {
             long id = getId(value);
             key.addKey(f.getName(), id);
         }
-        key.apply(visitor);
+        key.save(visitor);
     }
 
     private long getId(@NotNull Object object) throws IllegalAccessException {
@@ -89,8 +89,7 @@ public class PersisterImpl implements Persister {
 
     @Override
     public <T> @Nullable T find(@NotNull Class<T> entityClass, long primaryKey) {
-
-        return visitor.load(entityClass, primaryKey);
+        return visitor.visit(entityClass, primaryKey);
     }
 
 

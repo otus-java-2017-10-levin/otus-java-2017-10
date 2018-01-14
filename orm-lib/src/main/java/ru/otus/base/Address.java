@@ -7,7 +7,6 @@ import javax.persistence.OneToOne;
 
 @Setter
 @Getter
-@ToString
 public class Address extends DataSet {
     private String address;
 
@@ -18,5 +17,14 @@ public class Address extends DataSet {
 
     public Address(String name) {
         this.address = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "address='" + address + '\'' +
+                ", user=" + user.getName() +
+                ", id=" + id +
+                '}';
     }
 }

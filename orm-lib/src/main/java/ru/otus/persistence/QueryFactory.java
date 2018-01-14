@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.HashMap;

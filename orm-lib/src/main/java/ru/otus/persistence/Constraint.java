@@ -5,7 +5,7 @@ import ru.otus.persistence.annotations.AnnotatedClass;
 interface Constraint {
 
     /**
-     * Gets tanle of constraint
+     * Gets table of constraint
      * @return - class represent of a table
      */
     AnnotatedClass getTable();
@@ -22,5 +22,4 @@ interface Constraint {
      * @return - class represent of a foreign table
      */
     AnnotatedClass getForeignTable();
-
 }

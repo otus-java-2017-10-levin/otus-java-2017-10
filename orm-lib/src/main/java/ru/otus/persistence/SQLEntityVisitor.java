@@ -1,7 +1,6 @@
 package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
@@ -71,7 +70,7 @@ public class SQLEntityVisitor implements EntityVisitor {
     }
 
     @Override
-    public <T> T load(@NotNull Class<T> entityClass, long primaryKey) {
+    public <T> T visit(@NotNull Class<T> entityClass, long primaryKey) {
         List<Class<?>> foreignClasses = annotationManager.getAnnotatedClass(entityClass).getFields(OneToOne.class).stream().map(AnnotatedField::getType).collect(Collectors.toList());
         foreignClasses.add(entityClass);
 
@@ -97,6 +96,21 @@ public class SQLEntityVisitor implements EntityVisitor {
         cacheObjects(foreignClasses, map, cache);
         setFKeys(cache, map);
         return entityClass.cast(cache.get(new CacheUnit(primaryKey, entityClass)));
+    }
+
+    @Override
+    public void visit(ForeignKeys keys) {
+        try (DBConnection connection = dbManager.getConnection()) {
+            connection.execQuery(QueryFactory.getUpdateKeysQuery(annotationManager, keys.getEntityClass()), statement -> {
+                int pos = 1;
+                for (Long l : keys.getKeys().values())
+                    statement.setLong(pos++, l);
+                statement.setLong(pos, keys.getId());
+                statement.execute();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Map<String, Object> readResultLine(ResultSet result) throws SQLException {
@@ -130,7 +144,6 @@ public class SQLEntityVisitor implements EntityVisitor {
         }
         return result;
     }
-
     private void setFKeys(Map<CacheUnit, Object> cache, Map<String, Object> map) {
         cache.forEach((cacheUnit, object) -> {
             Class<?> aClass = object.getClass();
@@ -172,6 +185,7 @@ public class SQLEntityVisitor implements EntityVisitor {
             }
         });
     }
+
     private void cacheObjects(@NotNull List<Class<?>> foreignClass,
                              @NotNull Map<String, Object> map,
                              @NotNull Map<CacheUnit, Object> cache) {
@@ -232,21 +246,4 @@ public class SQLEntityVisitor implements EntityVisitor {
         }
         return builder.build();
     }
-
-    @Override
-    public void visit(ForeignKeys keys) {
-        try (DBConnection connection = dbManager.getConnection()) {
-            connection.execQuery(QueryFactory.getUpdateKeysQuery(annotationManager, keys.getEntityClass()), statement -> {
-                int pos = 1;
-                for (Long l : keys.getKeys().values())
-                    statement.setLong(pos++, l);
-                statement.setLong(pos, keys.getId());
-                statement.execute();
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }
