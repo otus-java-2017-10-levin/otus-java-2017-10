@@ -44,17 +44,8 @@ class QueryFactoryTest {
     }
 
     @Test
-    void getSelectQuery() {
-        String actualQuery = QueryFactory.getSelectQuery(man, UserDataSet.class, 1);
-        String expectedQuery = "SELECT USERDATASET.NAME AS USERDATASET_NAME, USERDATASET.AGE AS USERDATASET_AGE, " +
-                "USERDATASET.ADDRESS AS USERDATASET_ADDRESS, " +
-                "USERDATASET.ID AS USERDATASET_ID FROM USERDATASET WHERE USERDATASET.ID = 1";
-        assertEquals(expectedQuery, actualQuery);
-    }
-
-    @Test
     void getJoinQuery() {
-        String actualQuery = QueryFactory.getSelectQuery(man, 1, UserDataSet.class);
+        String actualQuery = QueryFactory.getSelectQuery(man, UserDataSet.class, man.getId(UserDataSet.class), 1);
         String expectedQuery = "SELECT USERDATASET.NAME AS USERDATASET_NAME, USERDATASET.AGE AS USERDATASET_AGE, " +
                 "USERDATASET.ADDRESS AS USERDATASET_ADDRESS, " +
                 "USERDATASET.ID AS USERDATASET_ID, ADDRESS.ADDRESS AS ADDRESS_ADDRESS, " +

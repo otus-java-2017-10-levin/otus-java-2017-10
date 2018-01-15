@@ -4,8 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,7 @@ class QueryFactory {
             if (!hasId && f.contains(manager.getIdAnnotation())) {
                 continue;
             }
-            if (f.contains(OneToMany.class))
+            if (f.contains(OneToOne.class) || f.contains(OneToMany.class))
                 continue;
             if (count++ != 0) {
                 values.append(",");
@@ -114,7 +116,7 @@ class QueryFactory {
         StringBuilder fields = new StringBuilder();
         AnnotatedClass annotatedClass1 = manager.getAnnotatedClass(cl);
         int count = 0;
-        for (AnnotatedField f : annotatedClass1.getFields(OneToOne.class)) {
+        for (AnnotatedField f : annotatedClass1.getFields(Arrays.asList(OneToOne.class, ManyToOne.class))) {
             if (count++ > 0)
                 fields.append(" and ");
             fields.append(f.getName()).append("=?");
@@ -127,54 +129,40 @@ class QueryFactory {
         ).toUpperCase();
 
     }
-
-    @NotNull
-    public static String getSelectQuery(@NotNull AnnotationManager man,
-                                        @NotNull Class<?> entityClass,
-                                        long key) {
-        state = State.SELECT;
-        AnnotatedClass ac = man.getAnnotatedClass(entityClass);
-        String SELECT = "SELECT %s FROM %s WHERE " + ac.getSimpleName() + ".ID = %s";
-
-        return String.format(SELECT,
-                getFieldNames(man, entityClass, true),
-                ac.getSimpleName(),
-                key).toUpperCase();
-    }
-
-    public static String getSelectQuery(AnnotationManager man, long i, Class<?> main) {
-        AnnotatedClass ac = man.getAnnotatedClass(main);
-        AnnotatedField id = man.getId(main);
-        String SELECT = "SELECT %s FROM %s WHERE %s = %s";
-
-        state = State.SELECT;
-
-        StringBuilder fields = new StringBuilder(getFieldNames(man, main, true));
-        List<Class<?>> classes = ac.getFields(OneToOne.class).stream().map(AnnotatedField::getType).collect(Collectors.toList());
-
-        for (Class<?> cl : classes) {
-            fields.append(", ").append(getFieldNames(man, cl, true));
-        }
-
-        String join = " left outer join %s on %s = %s";
-
-        StringBuilder joiner = new StringBuilder();
-        for (AnnotatedField f : ac.getFields(OneToOne.class)) {
-            AnnotatedClass foreign = man.getAnnotatedClass(f.getType());
-
-            foreign.getFields(OneToOne.class).stream().filter(field -> field.getType().equals(main)).findFirst().ifPresent(foreignField ->
-                    joiner.append(String.format(join,
-                            foreign.getSimpleName(),
-                            main.getSimpleName() + "." + id.getName(),
-                            foreign.getSimpleName() + "." + foreignField.getName())));
-        }
-
-        return String.format(SELECT,
-                fields,
-                ac.getSimpleName() + joiner,
-                ac.getSimpleName() + "." + id.getName(),
-                i).toUpperCase();
-    }
+//
+//    public static String getSelectQuery(AnnotationManager man, long i, Class<?> main) {
+//        AnnotatedClass ac = man.getAnnotatedClass(main);
+//        AnnotatedField id = man.getId(main);
+//        String SELECT = "SELECT %s FROM %s WHERE %s = %s";
+//
+//        state = State.SELECT;
+//
+//        StringBuilder fields = new StringBuilder(getFieldNames(man, main, true));
+//        List<Class<?>> classes = ac.getFields(OneToOne.class).stream().map(AnnotatedField::getType).collect(Collectors.toList());
+//
+//        for (Class<?> cl : classes) {
+//            fields.append(", ").append(getFieldNames(man, cl, true));
+//        }
+//
+//        String join = " left outer join %s on %s = %s";
+//
+//        StringBuilder joiner = new StringBuilder();
+//        for (AnnotatedField f : ac.getFields(OneToOne.class)) {
+//            AnnotatedClass foreign = man.getAnnotatedClass(f.getType());
+//
+//            foreign.getFields(OneToOne.class).stream().filter(field -> field.getType().equals(main)).findFirst().ifPresent(foreignField ->
+//                    joiner.append(String.format(join,
+//                            foreign.getSimpleName(),
+//                            main.getSimpleName() + "." + id.getName(),
+//                            foreign.getSimpleName() + "." + foreignField.getName())));
+//        }
+//
+//        return String.format(SELECT,
+//                fields,
+//                ac.getSimpleName() + joiner,
+//                ac.getSimpleName() + "." + id.getName(),
+//                i).toUpperCase();
+//    }
 
     public static String getSelectQuery(@NotNull final AnnotationManager man,
                                         @NotNull final Class<?> entityClass,
@@ -223,6 +211,9 @@ class QueryFactory {
 
         for (AnnotatedField f : cl.getFields()) {
             if (f.contains(OneToMany.class))
+                continue;
+
+            if (state == State.INSERT && f.contains(OneToOne.class))
                 continue;
 
             if (!hasId && f.contains(manager.getIdAnnotation()))

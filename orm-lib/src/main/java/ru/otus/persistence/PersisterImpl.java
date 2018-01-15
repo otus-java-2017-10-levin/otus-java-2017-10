@@ -6,9 +6,10 @@ import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import java.util.Collection;
+import java.util.Arrays;
 
 public class PersisterImpl implements Persister {
 
@@ -36,34 +37,7 @@ public class PersisterImpl implements Persister {
 
         EntityStructure entityStructure = new EntityStructure(object, annotatedClass);
 
-
-        long id = entityStructure.save(visitor);
-
-        for (AnnotatedField f: annotatedClass.getFields(OneToMany.class)) {
-            Object value = f.getFieldValue(object);
-            if (value == null)
-                throw new IllegalStateException("OneToMany field is null");
-
-            if (!Collection.class.isAssignableFrom(value.getClass()))
-                throw new IllegalStateException("Only collections supported to @OneToMany");
-
-            saveManyToOne((Collection<?>)value, id);
-        }
-        return id;
-    }
-
-    private void saveManyToOne(@NotNull Collection<?> value, long id) {
-        value.forEach(object -> {
-            Class<?> componentType = object.getClass();
-            AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(componentType);
-            EntityStructure str = new EntityStructure(object, annotatedClass);
-            str.setId(id);
-            try {
-                str.save(visitor);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
+        return entityStructure.save(visitor);
     }
 
     @Override
@@ -72,14 +46,17 @@ public class PersisterImpl implements Persister {
 
         ForeignKeys key = new ForeignKeys(getId(object), object.getClass());
 
-        for (AnnotatedField f: annotatedClass.getFields(OneToOne.class)) {
-            Object value = f.getFieldValue(object);
+        for (AnnotatedField field: annotatedClass.getFields(Arrays.asList(OneToOne.class, ManyToOne.class))) {
+            Object value = field.getFieldValue(object);
+
             if (value == null)
-                throw new IllegalAccessException();
+                    throw new IllegalAccessException();
+
             long id = getId(value);
-            key.addKey(f.getName(), id);
+            key.addKey(field.getName(), id);
         }
-        key.save(visitor);
+        if (key.getKeys().size() != 0)
+            key.save(visitor);
     }
 
     private long getId(@NotNull Object object) throws IllegalAccessException {

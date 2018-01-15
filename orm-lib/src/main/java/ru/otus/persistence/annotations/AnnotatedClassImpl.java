@@ -82,6 +82,18 @@ final class AnnotatedClassImpl implements AnnotatedClass {
 
     @NotNull
     @Override
+    public List<AnnotatedField> getFields(@NotNull List<Class<? extends Annotation>> annotation) {
+        return fields.values().stream().filter(field -> {
+            for (Class<? extends Annotation> ann: annotation) {
+                if (field.contains(ann))
+                    return true;
+            }
+            return false;
+        }).collect(Collectors.toList());
+    }
+
+    @NotNull
+    @Override
     public List<AnnotatedField> getFields(@NotNull Class<? extends Annotation> annotation) {
         return fields.values().stream().filter(field -> field.contains(annotation)).collect(Collectors.toList());
     }

@@ -6,8 +6,10 @@ package ru.otus.persistence;
  */
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceException;
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
+import javax.persistence.spi.ProviderUtil;
 import java.util.Map;
 
 public class MyPersistenceProvider implements PersistenceProvider {
@@ -27,7 +29,7 @@ public class MyPersistenceProvider implements PersistenceProvider {
      */
     @Override
     public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
-        return new MyEntityManagerFactory();
+        return new MyEntityManagerFactory(emName);
     }
 
     /**
@@ -43,6 +45,55 @@ public class MyPersistenceProvider implements PersistenceProvider {
      */
     @Override
     public EntityManagerFactory createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
+        return null;
+    }
+
+    /**
+     * Create database schemas and/or tables and/or create DDL
+     * scripts as determined by the supplied properties.
+     * <p>
+     * Called by the container when schema generation is to
+     * occur as a separate phase from creation of the entity
+     * manager factory.
+     *
+     * @param info metadata for use by the persistence provider
+     * @param map  properties for schema generation; these may also include provider-specific properties
+     * @throws PersistenceException if insufficient or inconsistent configuration information is
+     *                              provided or if schema generation otherwise fails.
+     */
+    @Override
+    public void generateSchema(PersistenceUnitInfo info, Map map) {
+
+    }
+
+    /**
+     * Create database schemas and/or tables and/or create DDL
+     * scripts as determined by the supplied properties.
+     * Called by the Persistence class when schema generation is to
+     * occur as a separate phase from creation of the entity
+     * manager factory.
+     *
+     * @param persistenceUnitName the name of the persistence unit
+     * @param map                 properties for schema generation; these may also contain provider-specific properties. The value of
+     *                            these properties override any values that may have been configured elsewhere.
+     * @return true if schema was generated, otherwise false
+     * @throws PersistenceException if insufficient or inconsistent configuration information is
+     *                              provided or if schema generation otherwise fails.
+     */
+    @Override
+    public boolean generateSchema(String persistenceUnitName, Map map) {
+        return false;
+    }
+
+    /**
+     * Return the utility interface implemented by the persistence
+     * provider.
+     *
+     * @return ProviderUtil interface
+     * @since Java Persistence 2.0
+     */
+    @Override
+    public ProviderUtil getProviderUtil() {
         return null;
     }
 }

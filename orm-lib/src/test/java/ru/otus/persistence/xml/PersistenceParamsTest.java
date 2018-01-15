@@ -48,6 +48,7 @@ class PersistenceParamsTest {
 
         expectedClasses.add("ru.otus.classes.UserDataSet");
         expectedClasses.add("ru.otus.classes.Address");
+        expectedClasses.add("ru.otus.classes.Phone");
 
         assertEquals(expectedClasses, classes);
     }

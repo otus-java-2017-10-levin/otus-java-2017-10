@@ -11,10 +11,6 @@ abstract class GenericDAO<T> {
         this.manager = manager;
     }
 
-    public void save(T user) {
-        manager.persist(user);
-        manager.flush();
-    }
 
     public <R> T load(R id) {
         return manager.find(daoClass, id);

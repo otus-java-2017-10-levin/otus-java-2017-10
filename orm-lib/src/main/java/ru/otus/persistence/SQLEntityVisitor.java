@@ -38,7 +38,8 @@ public class SQLEntityVisitor implements EntityVisitor {
                     try {
                         Object value = Objects.requireNonNull(f.getFieldValue(entity));
                         if (f.contains(ManyToOne.class)) {
-                            statement.setLong(pos++, structure.getId());
+                            long id = (long) annotationManager.getId(f.getType()).getFieldValue(value);
+                            statement.setLong(pos++, id);
                         } else if (!f.contains(OneToOne.class) &&
                                 !f.contains(OneToMany.class) &&
                                 !f.contains(annotationManager.getIdAnnotation())) {
@@ -52,10 +53,15 @@ public class SQLEntityVisitor implements EntityVisitor {
                         e.printStackTrace();
                     }
                 }
-                statement.addBatch();
-                int id[] = statement.executeBatch();
+//                statement.addBatch();
+                statement.execute();
+                ResultSet generatedKeys = statement.getGeneratedKeys();
+                long id = -1;
+                if (generatedKeys.next()) {
+                    id = generatedKeys.getLong(1);
+                }
                 try {
-                    idField.setFieldValue(entity, id[0]);
+                    idField.setFieldValue(entity, id);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -66,6 +72,7 @@ public class SQLEntityVisitor implements EntityVisitor {
 
         long id = (long) idField.getFieldValue(entity);
         structure.setId(id);
+        System.out.println(structure.getEntity());
         return id;
     }
 
@@ -80,7 +87,7 @@ public class SQLEntityVisitor implements EntityVisitor {
         try {
             try (DBConnection connection = dbManager.getConnection()) {
 
-                String selectQuery = QueryFactory.getSelectQuery(annotationManager, primaryKey, entityClass);
+                String selectQuery = QueryFactory.getSelectQuery(annotationManager, entityClass, annotationManager.getId(entityClass), primaryKey);
                 map = connection.execQuery(selectQuery, result -> {
                     result.next();
                     return readResultLine(result);

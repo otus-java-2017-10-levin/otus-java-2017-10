@@ -13,17 +13,13 @@ import java.sql.SQLException;
 
 class App {
 
-    private final String jpa = "otusJPAH2";
-    private final EntityManagerFactory factory = Persistence.createEntityManagerFactory(jpa);
-    private final PersistenceParams params = new PersistenceParams(jpa, "META-INF/persistence.xml");
+    private final EntityManagerFactory factory = JpaUtil.getEntityManagerFactory();
 
     public static void main(String[] args) throws SQLException {
         new App().run();
     }
 
-    private void run() throws SQLException {
-
-        startServer();
+    private UserDataSet createUser() {
         UserDataSet user = new UserDataSet("Flow");
         Address address = new Address("100");
         user.setAddress(address);
@@ -32,12 +28,22 @@ class App {
         user.addPhone(Phone.of(user, "100"));
         user.addPhone(Phone.of(user, "200"));
         user.addPhone(Phone.of(user, "300"));
+        return user;
+    }
 
-        UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager(params.getParameters()));
-        dao.save(user);
+    private void run() throws SQLException {
+        final int cycles = 1000;
+        UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager());
 
-        UserDataSet fromDB = dao.load(user.getId());
-        System.out.println(fromDB);
+        startServer();
+
+        for (int i=0; i<cycles; i++) {
+            UserDataSet user = createUser();
+            dao.save(user);
+
+            UserDataSet fromDB = dao.load(user.getId());
+            System.out.println(fromDB);
+        }
         factory.close();
     }
 

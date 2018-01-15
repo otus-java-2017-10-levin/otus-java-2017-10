@@ -3,7 +3,7 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0">
 
-    <persistence-unit name="otusJPAH2">
+    <persistence-unit name="otusJPAH2Test">
         <provider>ru.otus.persistence.MyPersistenceProvider</provider>
         <class>ru.otus.classes.UserDataSet</class>
         <class>ru.otus.classes.Address</class>

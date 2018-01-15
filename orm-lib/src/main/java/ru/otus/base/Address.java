@@ -2,11 +2,13 @@ package ru.otus.base;
 
 import lombok.*;
 
+import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
 
 @Setter
 @Getter
+@Entity
 public class Address extends DataSet {
     private String address;
 

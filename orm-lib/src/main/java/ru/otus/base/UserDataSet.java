@@ -9,6 +9,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@Entity
 public class UserDataSet extends DataSet {
     private String name;
     private int age;

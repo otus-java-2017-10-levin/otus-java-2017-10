@@ -2,12 +2,14 @@ package ru.otus.base;
 
 import lombok.*;
 
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor(staticName = "of")
+@Entity
 public class Phone extends DataSet {
 
     @NonNull

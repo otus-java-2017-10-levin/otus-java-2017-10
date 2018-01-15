@@ -1,5 +1,6 @@
 package ru.otus.dao;
 
+import ru.otus.base.Phone;
 import ru.otus.base.UserDataSet;
 
 import javax.persistence.EntityManager;
@@ -10,10 +11,14 @@ public class UserDataSetDAO extends GenericDAO<UserDataSet> {
         super(UserDataSet.class, manager);
     }
 
-    @Override
     public void save(UserDataSet user) {
-        manager.persist(user);
+//        manager.getTransaction().begin();
         manager.persist(user.getAddress());
+        manager.persist(user);
+        for (Phone ph : user.getPhones()) {
+            manager.persist(ph);
+        }
         manager.flush();
+//        manager.getTransaction().commit();
     }
 }

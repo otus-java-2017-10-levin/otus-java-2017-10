@@ -21,5 +21,8 @@ public interface AnnotatedClass {
     AnnotatedField getField(@NotNull String fieldName);
 
     @NotNull
+    List<AnnotatedField> getFields(@NotNull List<Class<? extends Annotation>> annotation);
+
+    @NotNull
     List<AnnotatedField> getFields(@NotNull Class<? extends Annotation> annotation);
 }
