@@ -86,6 +86,4 @@ class QueryFactoryTest {
                 "PHONE.ID AS PHONE_ID FROM PHONE WHERE PHONE.ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }
-
-    //TODO: create test selecting complex object from db via foreign key. Ex. load UserDataSets as ManyToOne
 }

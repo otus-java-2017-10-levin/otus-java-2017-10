@@ -32,10 +32,11 @@ class App {
     }
 
     private void run() throws SQLException {
-        final int cycles = 1000;
+        final int cycles = 3;
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager());
 
         startServer();
+
 
         for (int i=0; i<cycles; i++) {
             UserDataSet user = createUser();
@@ -49,6 +50,5 @@ class App {
 
     private void startServer() throws SQLException {
         Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
-
     }
 }

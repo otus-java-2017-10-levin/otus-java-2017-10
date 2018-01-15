@@ -2,23 +2,30 @@ package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.otus.jdbc.DBConnection;
 import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PersisterImpl implements Persister {
 
     private final AnnotationManager annotationManager;
     private final EntityVisitor visitor;
+    private final Map<Class<?>, DBConnection> connections = new HashMap<>();
+    private final DbManager dbManager;
 
     private PersisterImpl(AnnotationManager annotationManager, DbManager dbManager) {
         this.annotationManager = annotationManager;
-        this.visitor = new SQLEntityVisitor(annotationManager, dbManager);
+        this.visitor = new SQLEntityVisitor(annotationManager);
+        this.dbManager = dbManager;
+
     }
 
     @Override
@@ -32,19 +39,24 @@ public class PersisterImpl implements Persister {
     }
 
     private long writeObject(@NotNull Object object) throws IllegalAccessException {
+        Class<?> entityClass = object.getClass();
+        if (!connections.containsKey(entityClass)) {
+            connections.put(entityClass, dbManager.getConnection(entityClass.getSimpleName()));
+        }
 
-        AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(object.getClass());
+        AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(entityClass);
 
         EntityStructure entityStructure = new EntityStructure(object, annotatedClass);
 
-        return entityStructure.save(visitor);
+        return entityStructure.save(visitor, connections.get(entityClass));
     }
 
     @Override
     public void updateKeys(@NotNull Object object) throws IllegalAccessException {
-        AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(object.getClass());
+        Class<?> entityClass = object.getClass();
+        AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(entityClass);
 
-        ForeignKeys key = new ForeignKeys(getId(object), object.getClass());
+        ForeignKeys key = new ForeignKeys(getId(object), entityClass);
 
         for (AnnotatedField field: annotatedClass.getFields(Arrays.asList(OneToOne.class, ManyToOne.class))) {
             Object value = field.getFieldValue(object);
@@ -56,7 +68,7 @@ public class PersisterImpl implements Persister {
             key.addKey(field.getName(), id);
         }
         if (key.getKeys().size() != 0)
-            key.save(visitor);
+            key.save(visitor, connections.get(entityClass));
     }
 
     private long getId(@NotNull Object object) throws IllegalAccessException {
@@ -66,7 +78,28 @@ public class PersisterImpl implements Persister {
 
     @Override
     public <T> @Nullable T find(@NotNull Class<T> entityClass, long primaryKey) {
-        return visitor.visit(entityClass, primaryKey);
+        if (!connections.containsKey(entityClass)) {
+            connections.put(entityClass, dbManager.getConnection(entityClass.getSimpleName()));
+        }
+
+        return visitor.visit(entityClass, primaryKey, connections.get(entityClass));
+    }
+
+    /**
+     * Commit changes to db
+     */
+    @Override
+    public void commit() throws Exception {
+        for (Map.Entry<Class<?>, DBConnection> entry: connections.entrySet()) {
+            entry.getValue().commit();
+        }
+    }
+
+    @Override
+    public void rollback() throws Exception {
+        for (Map.Entry<Class<?>, DBConnection> entry: connections.entrySet()) {
+            entry.getValue().commit();
+        }
     }
 
 

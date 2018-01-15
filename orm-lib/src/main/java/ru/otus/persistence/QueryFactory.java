@@ -92,12 +92,14 @@ class QueryFactory {
 
         state = State.DROP;
         String DROP = "DROP TABLE %s IF EXISTS";
+//        String DROP = "DROP TABLE IF EXISTS %s";
         return String.format(DROP, manager.getAnnotatedClass(entityClass).getSimpleName()).toUpperCase();
     }
 
     public static String getFKey(@NotNull Constraint constraint) {
         state = State.NONE;
         String ALTER = "alter table %s add constraint %s foreign key (%s) references %s";
+//        String ALTER = "alter table %s add constraint %s foreign key (%s) references %s (%s)";
         String constraintName = "FK" + constraint.getTable().getSimpleName()
                 + constraint.getForeignTable().getSimpleName();
 

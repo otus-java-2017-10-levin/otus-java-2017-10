@@ -23,6 +23,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>6.0.6</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>javax.persistence</groupId>-->
             <!--<artifactId>persistence-api</artifactId>-->

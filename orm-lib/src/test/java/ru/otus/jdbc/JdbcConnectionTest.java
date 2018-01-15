@@ -14,7 +14,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
 
     private final String INSERT = "insert into user (name) values ('Flow')";
     private final String TABLE_NAME = "user";
-    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).getConnection();
+    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).getConnection("test");
 
     JdbcConnectionTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());

@@ -28,7 +28,12 @@ class MyEntityManagerFactory implements EntityManagerFactory {
 
     @Override
     public EntityManager createEntityManager(Map map) {
-        EntityManager manager = new MyEntityManager(map);
+        EntityManager manager = null;
+        try {
+            manager = new MyEntityManager(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         managers.add(manager);
         return manager;
     }

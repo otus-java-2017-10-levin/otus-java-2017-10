@@ -5,8 +5,13 @@ import java.sql.*;
 class JdbcConnection implements  DBConnection {
 
     private final Connection connection;
-    JdbcConnection(Connection connection) {
+    private final String name;
+    private boolean autoCommit = false;
+    JdbcConnection(Connection connection, String name) throws SQLException {
         this.connection = connection;
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+        connection.setAutoCommit(autoCommit);
+        this.name = name;
     }
 
     @Override
@@ -23,7 +28,6 @@ class JdbcConnection implements  DBConnection {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void execQuery(String query, ExecutionHandler handler) {
@@ -44,5 +48,19 @@ class JdbcConnection implements  DBConnection {
             ResultSet result = stmt.getResultSet();
             return handler.handle(result);
         }
+    }
+
+    @Override
+    public void commit() throws SQLException {
+        if (!connection.isClosed()) {
+            connection.commit();
+            System.out.println("connection "+name+" committed");
+        }
+    }
+
+    @Override
+    public void rollback() throws SQLException {
+        if (!connection.isClosed())
+            connection.rollback();
     }
 }

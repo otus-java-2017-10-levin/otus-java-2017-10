@@ -12,13 +12,12 @@ public class UserDataSetDAO extends GenericDAO<UserDataSet> {
     }
 
     public void save(UserDataSet user) {
-//        manager.getTransaction().begin();
+        manager.getTransaction().begin();
         manager.persist(user.getAddress());
         manager.persist(user);
         for (Phone ph : user.getPhones()) {
             manager.persist(ph);
         }
-        manager.flush();
-//        manager.getTransaction().commit();
+        manager.getTransaction().commit();
     }
 }

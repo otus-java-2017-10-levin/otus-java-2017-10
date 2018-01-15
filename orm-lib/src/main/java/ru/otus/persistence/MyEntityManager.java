@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
 import java.lang.annotation.Annotation;
+import java.sql.SQLException;
 import java.util.*;
 
 @SuppressWarnings("ALL")
@@ -28,8 +29,9 @@ class MyEntityManager implements EntityManager {
 
     private FlushModeType flushModeType = FlushModeType.COMMIT;
     private Persister persister;
+    private EntityTransaction currentTransaction;
 
-    MyEntityManager(Map persistenceParams) {
+    MyEntityManager(Map persistenceParams) throws Exception {
         PersistenceParams persistenceParams1 = new PersistenceParams(persistenceParams);
         manager = DbManagerFactory.createDataBaseManager(persistenceParams1.getConnectionData());
 
@@ -42,12 +44,19 @@ class MyEntityManager implements EntityManager {
             e.printStackTrace();
         }
         isOpen = true;
-        try (DBConnection connection = manager.getConnection()) {
+
+        DBConnection connection = null;
+        try {
+            connection = manager.getConnection("create db");
             dropTables(connection);
             createTables(connection);
             addConstraints(connection);
+            connection.commit();
         } catch (Exception e) {
+            connection.rollback();
             e.printStackTrace();
+        } finally {
+            connection.close();
         }
 
         createPersister();
@@ -74,8 +83,6 @@ class MyEntityManager implements EntityManager {
         objects.put(entityClass, set);
     }
 
-    // if this object is instance of annotated class
-
     private void checkEntity(Object entity) {
         if (!annotationManager.contains(entity.getClass()))
             throw new IllegalArgumentException("is not an entity");
@@ -83,7 +90,7 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -140,7 +147,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -188,7 +195,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -244,21 +251,27 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode, Map<String, Object> properties) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public <T> T getReference(Class<T> entityClass, Object primaryKey) {
-        return null;
+        throw new UnsupportedOperationException();
     }
-
 
     @Override
     public void flush() {
         if (!isOpen)
             throw new IllegalStateException();
 
-        saveObjects();
+        if (currentTransaction == null || !currentTransaction.isActive())
+            throw new IllegalStateException("Please setup a transactin");
+
+        try {
+            saveObjects();
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
     }
 
     @Override
@@ -274,7 +287,6 @@ class MyEntityManager implements EntityManager {
     @Override
     public void lock(Object entity, LockModeType lockMode) {
         throw new UnsupportedOperationException();
-
     }
 
     /**
@@ -324,7 +336,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public void lock(Object entity, LockModeType lockMode, Map<String, Object> properties) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -354,7 +366,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public void refresh(Object entity, Map<String, Object> properties) {
-
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -392,7 +404,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public void refresh(Object entity, LockModeType lockMode) {
-
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -438,7 +450,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public void refresh(Object entity, LockModeType lockMode, Map<String, Object> properties) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -461,7 +473,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public void detach(Object entity) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -482,7 +494,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public LockModeType getLockMode(Object entity) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -498,7 +510,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public void setProperty(String propertyName, Object value) {
-
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -511,7 +523,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public Map<String, Object> getProperties() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
 
@@ -532,7 +544,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> TypedQuery<T> createQuery(CriteriaQuery<T> criteriaQuery) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -545,7 +557,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(CriteriaUpdate updateQuery) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -558,7 +570,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(CriteriaDelete deleteQuery) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -578,7 +590,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
 
@@ -605,7 +617,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> TypedQuery<T> createNamedQuery(String name, Class<T> resultClass) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
 
@@ -636,7 +648,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createNamedStoredProcedureQuery(String name) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -656,7 +668,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(String procedureName) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -680,7 +692,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -704,7 +716,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -741,7 +753,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> T unwrap(Class<T> cls) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -754,27 +766,38 @@ class MyEntityManager implements EntityManager {
         if (!isOpen)
             throw new IllegalStateException();
 
-        saveObjects();
         manager.close();
         isOpen = false;
     }
 
-    private void saveObjects() {
-        for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
-            entry.getValue().forEach(object -> {
-                if (persister.save(object) == -1)
-                    throw new IllegalStateException("id is -1");
-            });
-        }
+    private void saveObjects() throws SQLException {
+        try {
+            for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
+                entry.getValue().forEach(object -> {
+                    if (persister.save(object) == -1)
+                        throw new IllegalStateException("id is -1");
+                });
+            }
+            persister.commit();
 
-        for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
-            entry.getValue().forEach(object -> {
-                try {
-                    persister.updateKeys(object);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            });
+            for (Map.Entry<Class<?>, Set<Object>> entry : objects.entrySet()) {
+                entry.getValue().forEach(object -> {
+                    try {
+                        persister.updateKeys(object);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            persister.commit();
+
+        } catch (Exception e) {
+            try {
+                persister.rollback();
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
         }
 
         objects.clear();
@@ -809,9 +832,6 @@ class MyEntityManager implements EntityManager {
             connection.execQuery(QueryFactory.getFKey(new ConstraintImpl(ac, foreignClass, f.getName())));
         }
     }
-    // alter table UserDataSet add constraint foreign key (address_id) references AddressDataSet
-    // ALTER TABLE USERDATASET ADD CONSTRAINT FOREIGN KEY (PHONE) REFERENCES PHONESDATASET
-
 
     @Override
     public boolean isOpen() {
@@ -820,7 +840,10 @@ class MyEntityManager implements EntityManager {
 
     @Override
     public EntityTransaction getTransaction() {
-        throw new UnsupportedOperationException();
+        if (currentTransaction == null)
+            currentTransaction = new MyEntityTransaction(this);
+
+        return currentTransaction;
     }
 
     /**
@@ -833,7 +856,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public EntityManagerFactory getEntityManagerFactory() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -847,7 +870,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public CriteriaBuilder getCriteriaBuilder() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -861,7 +884,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public Metamodel getMetamodel() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -873,7 +896,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> EntityGraph<T> createEntityGraph(Class<T> rootType) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -886,7 +909,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public EntityGraph<?> createEntityGraph(String graphName) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -899,7 +922,7 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public EntityGraph<?> getEntityGraph(String graphName) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -912,6 +935,6 @@ class MyEntityManager implements EntityManager {
      */
     @Override
     public <T> List<EntityGraph<? super T>> getEntityGraphs(Class<T> entityClass) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

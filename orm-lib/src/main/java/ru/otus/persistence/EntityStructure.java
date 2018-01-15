@@ -1,6 +1,7 @@
 package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
+import ru.otus.jdbc.DBConnection;
 import ru.otus.persistence.annotations.AnnotatedClass;
 
 public class EntityStructure implements VisitableEntity {
@@ -17,13 +18,13 @@ public class EntityStructure implements VisitableEntity {
     }
 
     @Override
-    public long save(@NotNull final EntityVisitor entityVisitor) throws IllegalAccessException {
-        return entityVisitor.visit(this);
+    public long save(@NotNull final EntityVisitor entityVisitor, @NotNull DBConnection connection) throws IllegalAccessException {
+        return entityVisitor.visit(this, connection);
     }
 
     @Override
-    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id) {
-        return entityVisitor.visit(entityClass, id);
+    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id, @NotNull DBConnection connection) {
+        return entityVisitor.visit(entityClass, id, connection);
     }
 
     public Object getEntity() {

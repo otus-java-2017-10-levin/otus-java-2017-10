@@ -2,6 +2,7 @@ package ru.otus.persistence;
 
 
 import org.jetbrains.annotations.NotNull;
+import ru.otus.jdbc.DBConnection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +34,13 @@ public class ForeignKeys implements VisitableEntity {
     }
 
     @Override
-    public long save(@NotNull final EntityVisitor visitableEntity) {
-        visitableEntity.visit(this);
+    public long save(@NotNull final EntityVisitor visitableEntity, @NotNull DBConnection connection) {
+        visitableEntity.visit(this, connection);
         return 0;
     }
 
     @Override
-    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id) {
+    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id, @NotNull DBConnection connection) {
         throw new UnsupportedOperationException();
     }
 }

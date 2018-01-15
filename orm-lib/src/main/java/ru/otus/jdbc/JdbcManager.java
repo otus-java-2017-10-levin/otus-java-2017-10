@@ -2,9 +2,7 @@ package ru.otus.jdbc;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class JdbcManager implements DbManager {
 
@@ -26,8 +24,8 @@ class JdbcManager implements DbManager {
     }
 
     @Override
-    public DBConnection getConnection() throws IllegalArgumentException {
-        DBConnection con = getConnection(connectionData);
+    public DBConnection getConnection(String name) {
+        DBConnection con = getConnection(connectionData, name);
         connections.add(con);
         return con;
     }
@@ -37,23 +35,43 @@ class JdbcManager implements DbManager {
         if (!isOpen)
             throw new IllegalStateException();
 
-        for (DBConnection connection : connections) {
+
+        for (DBConnection connection: connections) {
             try {
                 connection.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        isOpen = false;
     }
 
-    private DBConnection getConnection(Map<String, String> data) {
+    @Override
+    public void commitAll() throws SQLException {
+        if (!isOpen)
+            throw new IllegalStateException();
+
+        for (DBConnection connection: connections) {
+                connection.commit();
+        }
+    }
+
+    @Override
+    public void rollbackAll() throws SQLException {
+        if (!isOpen)
+            throw new IllegalStateException();
+
+        for (DBConnection connection: connections) {
+            connection.rollback();
+        }
+    }
+
+    private DBConnection getConnection(Map<String, String> data, String name) {
         try {
 
             Class.forName(data.get(DB_DRIVER));
             return new JdbcConnection(DriverManager.getConnection(data.get(DB_URL),
                     data.get(DB_USER),
-                    data.get(DB_PASSWORD)));
+                    data.get(DB_PASSWORD)), name);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }

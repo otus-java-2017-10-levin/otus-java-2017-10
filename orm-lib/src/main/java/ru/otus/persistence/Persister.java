@@ -30,4 +30,11 @@ public interface Persister {
     @Nullable
     <T> T find(@NotNull Class<T> entityClass,
                long primaryKey);
+
+    /**
+     * Commit changes to db
+     */
+    void commit() throws Exception;
+
+    void rollback() throws Exception;
 }
