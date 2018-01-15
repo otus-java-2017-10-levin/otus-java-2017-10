@@ -22,11 +22,6 @@ public class EntityStructure implements VisitableEntity {
         return entityVisitor.visit(this, connection);
     }
 
-    @Override
-    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id, @NotNull DBConnection connection) {
-        return entityVisitor.visit(entityClass, id, connection);
-    }
-
     public Object getEntity() {
         return entity;
     }

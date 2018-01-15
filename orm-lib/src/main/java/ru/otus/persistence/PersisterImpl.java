@@ -84,9 +84,6 @@ public class PersisterImpl implements Persister {
         return visitor.visit(entityClass, primaryKey, connections.get(entityClass));
     }
 
-    /**
-     * Commit changes to db
-     */
     @Override
     public void commit() throws Exception {
         for (Map.Entry<Class<?>, DBConnection> entry: connections.entrySet()) {

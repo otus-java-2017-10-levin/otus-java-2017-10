@@ -38,9 +38,4 @@ public class ForeignKeys implements VisitableEntity {
         visitableEntity.visit(this, connection);
         return 0;
     }
-
-    @Override
-    public <T> T load(@NotNull EntityVisitor entityVisitor, @NotNull Class<T> entityClass, long id, @NotNull DBConnection connection) {
-        throw new UnsupportedOperationException();
-    }
 }
