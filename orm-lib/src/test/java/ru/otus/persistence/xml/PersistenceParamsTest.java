@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersistenceParamsTest {
 
-    private final String persistenceUnit = "otusJPAH2";
+    private final String persistenceUnit = "otusJPAH2Test";
     private final String persistencePath = "persistenceTest.xml";
 
     @Test

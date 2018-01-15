@@ -5,13 +5,11 @@ import java.sql.*;
 class JdbcConnection implements  DBConnection {
 
     private final Connection connection;
-    private final String name;
-    private boolean autoCommit = false;
-    JdbcConnection(Connection connection, String name) throws SQLException {
+
+    JdbcConnection(Connection connection) throws SQLException {
         this.connection = connection;
         connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-        connection.setAutoCommit(autoCommit);
-        this.name = name;
+        connection.setAutoCommit(false);
     }
 
     @Override
@@ -54,7 +52,6 @@ class JdbcConnection implements  DBConnection {
     public void commit() throws SQLException {
         if (!connection.isClosed()) {
             connection.commit();
-            System.out.println("connection "+name+" committed");
         }
     }
 

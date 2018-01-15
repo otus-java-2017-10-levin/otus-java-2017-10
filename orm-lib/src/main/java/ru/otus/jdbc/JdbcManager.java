@@ -24,8 +24,8 @@ class JdbcManager implements DbManager {
     }
 
     @Override
-    public DBConnection getConnection(String name) {
-        DBConnection con = getConnection(connectionData, name);
+    public DBConnection getConnection() {
+        DBConnection con = getConnection(connectionData);
         connections.add(con);
         return con;
     }
@@ -45,33 +45,13 @@ class JdbcManager implements DbManager {
         }
     }
 
-    @Override
-    public void commitAll() throws SQLException {
-        if (!isOpen)
-            throw new IllegalStateException();
-
-        for (DBConnection connection: connections) {
-                connection.commit();
-        }
-    }
-
-    @Override
-    public void rollbackAll() throws SQLException {
-        if (!isOpen)
-            throw new IllegalStateException();
-
-        for (DBConnection connection: connections) {
-            connection.rollback();
-        }
-    }
-
-    private DBConnection getConnection(Map<String, String> data, String name) {
+    private DBConnection getConnection(Map<String, String> data) {
         try {
 
             Class.forName(data.get(DB_DRIVER));
             return new JdbcConnection(DriverManager.getConnection(data.get(DB_URL),
                     data.get(DB_USER),
-                    data.get(DB_PASSWORD)), name);
+                    data.get(DB_PASSWORD)));
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }

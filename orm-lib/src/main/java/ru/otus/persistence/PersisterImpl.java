@@ -9,7 +9,6 @@ import ru.otus.persistence.annotations.AnnotatedField;
 
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class PersisterImpl implements Persister {
     private long writeObject(@NotNull Object object) throws IllegalAccessException {
         Class<?> entityClass = object.getClass();
         if (!connections.containsKey(entityClass)) {
-            connections.put(entityClass, dbManager.getConnection(entityClass.getSimpleName()));
+            connections.put(entityClass, dbManager.getConnection());
         }
 
         AnnotatedClass annotatedClass = annotationManager.getAnnotatedClass(entityClass);
@@ -79,7 +78,7 @@ public class PersisterImpl implements Persister {
     @Override
     public <T> @Nullable T find(@NotNull Class<T> entityClass, long primaryKey) {
         if (!connections.containsKey(entityClass)) {
-            connections.put(entityClass, dbManager.getConnection(entityClass.getSimpleName()));
+            connections.put(entityClass, dbManager.getConnection());
         }
 
         return visitor.visit(entityClass, primaryKey, connections.get(entityClass));
@@ -98,10 +97,9 @@ public class PersisterImpl implements Persister {
     @Override
     public void rollback() throws Exception {
         for (Map.Entry<Class<?>, DBConnection> entry: connections.entrySet()) {
-            entry.getValue().commit();
+            entry.getValue().rollback();
         }
     }
-
 
     public static class Builder implements PersisterBuilder {
 

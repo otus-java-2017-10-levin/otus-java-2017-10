@@ -47,7 +47,7 @@ class MyEntityManager implements EntityManager {
 
         DBConnection connection = null;
         try {
-            connection = manager.getConnection("create db");
+            connection = manager.getConnection();
             dropTables(connection);
             createTables(connection);
             addConstraints(connection);
@@ -265,7 +265,7 @@ class MyEntityManager implements EntityManager {
             throw new IllegalStateException();
 
         if (currentTransaction == null || !currentTransaction.isActive())
-            throw new IllegalStateException("Please setup a transactin");
+            throw new IllegalStateException("Please setup a transaction");
 
         try {
             saveObjects();
@@ -456,6 +456,11 @@ class MyEntityManager implements EntityManager {
     @Override
     public void clear() {
         objects.clear();
+        try {
+            persister.rollback();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

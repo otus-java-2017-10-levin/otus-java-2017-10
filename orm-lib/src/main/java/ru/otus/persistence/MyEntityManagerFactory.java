@@ -12,16 +12,16 @@ import java.util.Map;
 class MyEntityManagerFactory implements EntityManagerFactory {
 
     private final List<EntityManager> managers = new ArrayList<>();
-    private final String XML = "META-INF/persistence.xml";
     private boolean isOpen = true;
     private final String persistenceUnit;
 
-    public MyEntityManagerFactory(String persistenceUnit) {
+    MyEntityManagerFactory(String persistenceUnit) {
         this.persistenceUnit = persistenceUnit;
     }
 
     @Override
     public EntityManager createEntityManager() {
+        String XML = "META-INF/persistence.xml";
         PersistenceParams params = new PersistenceParams(persistenceUnit, XML);
         return createEntityManager(params.getParameters());
     }

@@ -52,8 +52,10 @@ class MyEntityManagerTest extends H2DatabaseTest {
         set.addPhone(Phone.of(set, "300"));
 
         assertEquals(0, set.getId());
+        em.getTransaction().begin();
         em.persist(set);
         em.persist(address);
+        em.getTransaction().commit();
         em.close();
 
         checkTables("USERDATASET");
@@ -90,18 +92,21 @@ class MyEntityManagerTest extends H2DatabaseTest {
             Address address = new Address("100");
             user.setAddress(address);
             address.setUser(user);
+            em.getTransaction().begin();
             em.persist(user);
             em.persist(address);
-            em.flush();
+            em.getTransaction().commit();
 
             user.setName("Flow1");
             long id = user.getId();
+            em.getTransaction().begin();
             user = em.find(UserDataSet.class, id);
-            em.close();
+            em.getTransaction().commit();
 
             assertEquals("Flow", user.getName());
             assertEquals(id, user.getId());
             assertEquals("100", user.getAddress().getAddress());
+            em.close();
         }
     }
 

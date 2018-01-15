@@ -5,10 +5,8 @@ import ru.otus.base.Address;
 import ru.otus.base.Phone;
 import ru.otus.base.UserDataSet;
 import ru.otus.dao.UserDataSetDAO;
-import ru.otus.persistence.xml.PersistenceParams;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.sql.SQLException;
 
 class App {
@@ -36,7 +34,6 @@ class App {
         UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager());
 
         startServer();
-
 
         for (int i=0; i<cycles; i++) {
             UserDataSet user = createUser();

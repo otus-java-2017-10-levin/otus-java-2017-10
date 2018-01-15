@@ -13,45 +13,12 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:h2:~/test;TRACE_LEVEL_FILE=2"/>
+                      value="jdbc:h2:~/test"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
         </properties>
     </persistence-unit>
 
-    <persistence-unit name="mysql">
-        <provider>ru.otus.persistence.MyPersistenceProvider</provider>
-        <class>ru.otus.base.UserDataSet</class>
-        <class>ru.otus.base.Address</class>
-        <class>ru.otus.base.Phone</class>
-
-        <properties>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.url"
-                      value="jdbc:mysql://localhost:3306/db_example?useSSL=false"/>
-            <property name="javax.persistence.jdbc.user" value="Flow"/>
-            <property name="javax.persistence.jdbc.password" value="123"/>
-        </properties>
-    </persistence-unit>
-    <persistence-unit name="HibernateMysql">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>ru.otus.base.UserDataSet</class>
-        <class>ru.otus.base.Address</class>
-        <class>ru.otus.base.Phone</class>
-
-        <properties>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.url"
-                      value="jdbc:mysql://localhost:3306/db_example?useSSL=false"/>
-            <property name="javax.persistence.jdbc.user" value="Flow"/>
-            <property name="javax.persistence.jdbc.password" value="123"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-            <property name="hibernate.connection.useSSL" value="false"/>
-            <property name="hibernate.enable_lazy_load_no_trans" value="true"/>
-        </properties>
-    </persistence-unit>
     <persistence-unit name="otusHibernate">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>ru.otus.base.UserDataSet</class>
@@ -61,7 +28,7 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:h2:~/test:TRACE_LEVEL_FILE=3"/>
+                      value="jdbc:h2:~/test"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>

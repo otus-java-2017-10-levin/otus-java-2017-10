@@ -14,7 +14,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
 
     private final String INSERT = "insert into user (name) values ('Flow')";
     private final String TABLE_NAME = "user";
-    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).getConnection("test");
+    private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).getConnection();
 
     JdbcConnectionTest(TestInfo testInfo) {
         super(testInfo.getDisplayName());
@@ -45,6 +45,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
     @Test
     void executeQueryWithoutAnswer() throws Exception {
         connection.execQuery(INSERT);
+        connection.commit();
 
         IDataSet databaseDataSet = getConnection().createDataSet();
         ITable actualTable = databaseDataSet.getTable(TABLE_NAME);

@@ -2,7 +2,6 @@ package ru.otus.persistence;
 
 import org.jetbrains.annotations.NotNull;
 import ru.otus.jdbc.DBConnection;
-import ru.otus.jdbc.DbManager;
 import ru.otus.persistence.annotations.AnnotatedClass;
 import ru.otus.persistence.annotations.AnnotatedField;
 import ru.otus.persistence.caching.CacheUnit;
@@ -70,7 +69,6 @@ public class SQLEntityVisitor implements EntityVisitor {
 
         long id = (long) idField.getFieldValue(entity);
         structure.setId(id);
-        System.out.println(structure.getEntity());
         return id;
     }
 
@@ -82,7 +80,7 @@ public class SQLEntityVisitor implements EntityVisitor {
                 for (Long l : keys.getKeys().values())
                     statement.setLong(pos++, l);
                 statement.setLong(pos, keys.getId());
-                System.out.println(statement.executeUpdate());
+                statement.executeUpdate();
             });
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,17 +1,10 @@
 package ru.otus.jdbc;
 
-import java.sql.SQLException;
-
 /**
  *
  */
 public interface DbManager {
-
-//    DBConnection getConnection() throws IllegalArgumentException;
-
-    DBConnection getConnection(String name);
+    DBConnection getConnection();
 
     void close();
-    void commitAll() throws SQLException;
-    void rollbackAll() throws SQLException;
 }
