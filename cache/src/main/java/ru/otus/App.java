@@ -16,7 +16,6 @@ import javax.cache.spi.CachingProvider;
 
     Формулировка задачи. Необходимо поддержать:
     1. JSR-107
-    1. L1 cache
     2. Eviction policy
     3. Cache statistics
     4. JMX
@@ -27,22 +26,20 @@ public class App
     {
         //resolve a cache manager
         CachingProvider cachingProvider = Caching.getCachingProvider();
+        char c = 'a'+'b';
         CacheManager cacheManager = cachingProvider.getCacheManager();
 //configure the cache
-        MutableConfiguration<String, Integer> config =
-                new MutableConfiguration<String, Integer>()
-                        .setTypes(String.class, Integer.class)
-                        .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(Duration.ONE_HOUR))
+        MutableConfiguration<String, Bigger> config =
+                new MutableConfiguration<String, Bigger>()
+                        .setTypes(String.class, Bigger.class)
+                        .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(Duration.ONE_MINUTE))
                         .setStatisticsEnabled(true);
 //create the cache
-        Cache<String, Integer> cache = cacheManager.createCache("simpleCache", config);
+        Cache<String, Bigger> cache = cacheManager.createCache("simpleCache", config);
 //cache operations
-        String key = "key";
-        Integer value1 = 1;
-        cache.put("key", value1);
-        Integer value2 = cache.get(key);
-        assert value1.equals(1);
-        cache.remove(key);
-        assert cache.get(key) == null;
+        long counter = 0;
+        while (true) {
+            cache.put(""+counter, new Bigger());
+        }
     }
 }

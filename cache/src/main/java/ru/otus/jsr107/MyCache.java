@@ -3,11 +3,10 @@ package ru.otus.jsr107;
 import javax.cache.Cache;
 import javax.cache.CacheException;
 import javax.cache.CacheManager;
-import javax.cache.configuration.CacheEntryListenerConfiguration;
-import javax.cache.configuration.CompleteConfiguration;
-import javax.cache.configuration.Configuration;
+import javax.cache.configuration.*;
 import javax.cache.event.CacheEntryListener;
 import javax.cache.event.CacheEntryRemovedListener;
+import javax.cache.expiry.Duration;
 import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.integration.CacheLoader;
 import javax.cache.integration.CacheWriter;
@@ -15,25 +14,69 @@ import javax.cache.integration.CompletionListener;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 public class MyCache<K, V> implements Cache<K, V> {
     private final String name;
     private final CacheManager cacheManager;
+    private final Configuration<K, V> configuration;
     private boolean isOpen;
+    private ExpiryPolicy policy;
+    private static final long UPDATE_RATE = 1000;
+    private final static TimeUnit UPDATE_UNITS = TimeUnit.MILLISECONDS;
 
-    private final Map<K, SoftReference<V>> cache = new LinkedHashMap<>();
+    private final Map<K, SoftReference<MyEntry<K, V>>> cache = new ConcurrentHashMap<>();
+    private static final ReferenceQueue<Cache.Entry<?,?>> queue = new ReferenceQueue<>();
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 
-    MyCache(String name, CacheManager cacheManager) {
+    <C extends Configuration<K, V>> MyCache(String name, CacheManager cacheManager, C configuration) {
         this.name = name;
         this.cacheManager = cacheManager;
         this.isOpen = true;
+        new CleanUp(cache).start();
+        this.configuration = configuration;
+        setupCache();
+    }
+
+    private <C extends Configuration<K, V>> void setupCache() {
+        CompleteConfiguration<K, V> conf = getConfiguration(MutableConfiguration.class);
+
+        policy = conf.getExpiryPolicyFactory().create();
+    }
+
+    static class CleanUp extends Thread {
+
+        private final Map<?, ?> map;
+
+        CleanUp(Map<?,?> map) {
+            setPriority(Thread.MAX_PRIORITY);
+            setName("GarbageCollectingConcurrentMap-cleanupthread");
+            setDaemon(true);
+            this.map = map;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Reference<? extends Entry<?, ?>> remove = queue.remove();
+                    if (remove != null) {
+                        map.values().remove(remove);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -61,10 +104,21 @@ public class MyCache<K, V> implements Cache<K, V> {
             throw new NullPointerException();
 
         if (cache.containsKey(key)) {
-            return cache.get(key).get();
-        }
+            final MyEntry<K, V> res = cache.get(key).get();
+            if (res == null)
+                return null;
 
+            Duration accessExpiry = policy.getExpiryForAccess();
+            if (accessExpiry != null) {
+                res.setExpiryTime(accessExpiry.getAdjustedTime(System.currentTimeMillis()));
+            }
+            return res.getValue();
+        }
         return null;
+    }
+
+    public long size() {
+        return cache.size();
     }
 
     /**
@@ -163,6 +217,7 @@ public class MyCache<K, V> implements Cache<K, V> {
         throw new UnsupportedOperationException();
     }
 
+
     /**
      * Associates the specified value with the specified key in the cache.
      * <p>
@@ -195,7 +250,49 @@ public class MyCache<K, V> implements Cache<K, V> {
 
         if (isClosed())
             throw new IllegalStateException();
+
+        Duration expiryTime;
+        if (cache.containsKey(key)) {
+            expiryTime = policy.getExpiryForUpdate();
+        } else {
+            expiryTime = policy.getExpiryForCreation();
+        }
+        if (!expiryTime.equals(Duration.ZERO)) {
+            MyEntry<K, V> entry = new MyEntry<>(key, value, addTask(key, cache));
+            entry.setExpiryTime(expiryTime.getAdjustedTime(System.currentTimeMillis()));
+            cache.put(key, new SoftReference<>(entry, queue));
+        }
     }
+
+    private ScheduledFuture addTask(K key, Map<K, SoftReference<MyEntry<K, V>>> cache) {
+        return scheduler.scheduleAtFixedRate(() -> evictCacheEntry(key, cache), UPDATE_RATE, UPDATE_RATE, UPDATE_UNITS);
+    }
+
+    /**
+     * Must cancel the task when key is not exist
+     * If we have value for {@code key}, but ref is {@code null} - value has been garbage collected,
+     * so it will be evicted in background thread.
+     *
+     * @param key -
+     * @param cache  -
+     * @return - true if cache entry has found, else - false
+     */
+    private void evictCacheEntry(K key, Map<K, SoftReference<MyEntry<K, V>>> cache) {
+        SoftReference<MyEntry<K, V>> ref = cache.get(key);
+        if (ref != null) {
+            MyEntry<K, V> entry = ref.get();
+            if (entry != null) {
+                long expiryTime = entry.getExpiryTime();
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - expiryTime > 0) {
+                    ref.enqueue();
+                    ref.clear();
+                    entry.dispose();
+                }
+            }
+        }
+    }
+
 
     /**
      * Associates the specified value with the specified key in this cache,
@@ -341,6 +438,9 @@ public class MyCache<K, V> implements Cache<K, V> {
             throw new NullPointerException();
 
         if (cache.containsKey(key)) {
+            MyEntry<K, V> entry = cache.get(key).get();
+            if (entry != null)
+                entry.dispose();
             cache.remove(key);
             return true;
         }
@@ -603,7 +703,10 @@ public class MyCache<K, V> implements Cache<K, V> {
      *                                  the specified class.
      */
     public <C extends Configuration<K, V>> C getConfiguration(Class<C> clazz) {
-        throw new UnsupportedOperationException();
+        if (clazz == null || !configuration.getClass().isAssignableFrom(clazz))
+            throw new IllegalArgumentException();
+
+        return clazz.cast(configuration);
     }
 
     /**
@@ -762,7 +865,7 @@ public class MyCache<K, V> implements Cache<K, V> {
      *                                  due to the current security settings
      */
     public <T> T unwrap(Class<T> clazz) {
-        throw new UnsupportedOperationException();
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -815,6 +918,13 @@ public class MyCache<K, V> implements Cache<K, V> {
      */
     public Iterator<Entry<K, V>> iterator() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return "MyCache{ size(): " + cache.size() +
+                ", scheduler: " + scheduler +
+        "}" ;
     }
 }
 

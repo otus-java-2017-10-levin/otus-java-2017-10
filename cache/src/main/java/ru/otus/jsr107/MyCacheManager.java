@@ -4,6 +4,7 @@ import javax.cache.Cache;
 import javax.cache.CacheException;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
+import javax.cache.configuration.CompleteConfiguration;
 import javax.cache.configuration.Configuration;
 import javax.cache.management.CacheMXBean;
 import javax.cache.spi.CachingProvider;
@@ -175,7 +176,7 @@ public class MyCacheManager implements CacheManager {
         if (caches.containsKey(cacheName))
             throw new CacheException();
 
-        Cache<K, V> cache = new MyCache<>(cacheName, this);
+        Cache<K, V> cache = new MyCache<>(cacheName, this, configuration);
         caches.put(cacheName, cache);
 
         return cache;
