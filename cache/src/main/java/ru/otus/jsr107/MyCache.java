@@ -52,7 +52,7 @@ public class MyCache<K, V> implements Cache<K, V> {
         stats = new CacheStatisticsMXBeanImpl();
 
 
-//        scheduler.addTask("scheduler-stat", () -> logger.error(this), 20, TimeUnit.SECONDS);
+        scheduler.addTask("scheduler-stat", () -> logger.error(this), 20, TimeUnit.SECONDS);
 
         try {
             registerMXBean();

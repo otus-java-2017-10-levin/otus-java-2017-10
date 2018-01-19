@@ -24,17 +24,18 @@ public class App {
 
         Cache<String, Bigger> cache = cacheManager.createCache("simpleCache", config);
 
-
         Random rnd = new Random();
-        while (true) {
-            int i = rnd.nextInt(10_000_000);
+        int i1 = 300_000;
+        for (int i = 0; i < i1; i++) {
+            String key = (""+i).intern();
+            cache.put(key, new Bigger(1_000));
+        }
 
-            if (i < 2_000_000)
-                cache.put("" + i, new Bigger(1_000_000));
-            else {
-                int ind = i % 2_000_000;
-                cache.get("" + ind);
-            }
+        while (true) {
+            int i = rnd.nextInt(i1);
+            String key = (""+i).intern();
+            cache.get(key);
+
         }
     }
 

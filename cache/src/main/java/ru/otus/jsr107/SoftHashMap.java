@@ -1,6 +1,5 @@
 package ru.otus.jsr107;
 
-import com.sun.istack.internal.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -16,7 +15,6 @@ public class SoftHashMap<K, V> implements Map<K, V> {
     private final ReferenceQueue<V> queue = new ReferenceQueue<>();
 
     @Override
-    @Nullable
     public int size() {
         clean();
         return map.size();
@@ -82,20 +80,21 @@ public class SoftHashMap<K, V> implements Map<K, V> {
      *                              (<a href="{@docRoot}/java/util/Collection.html#optional-restrictions">optional</a>)
      */
     @Override
-    @Nullable
     public V get(Object key) {
         if (key == null)
             throw new IllegalArgumentException();
 
         clean();
 
-        if (map.containsKey(key)) {
+        synchronized (map) {
+            if (map.containsKey(key)) {
 
-            SoftReference<V> ref = map.get(key);
-            if (isGarbageCollected(ref)) {
-                throw new IllegalStateException();
-            } else {
-                return ref.get();
+                SoftReference<V> ref = map.get(key);
+                if (isGarbageCollected(ref)) {
+                    throw new IllegalStateException();
+                } else {
+                    return ref.get();
+                }
             }
         }
         return null;
@@ -107,6 +106,7 @@ public class SoftHashMap<K, V> implements Map<K, V> {
             map.values().remove(poll);
         }
     }
+
     /**
      * Consider {@code ref} is garbage collected if ref.get() is null
      */
@@ -144,6 +144,7 @@ public class SoftHashMap<K, V> implements Map<K, V> {
             throw new NullPointerException();
 
         clean();
+
         if (!map.containsKey(key)) {
             map.put(key, new SoftReference<>(value, queue));
             return null;
@@ -155,6 +156,7 @@ public class SoftHashMap<K, V> implements Map<K, V> {
             map.put(key, new SoftReference<>(value, queue));
             return null;
         }
+
         return ref.get();
     }
 
