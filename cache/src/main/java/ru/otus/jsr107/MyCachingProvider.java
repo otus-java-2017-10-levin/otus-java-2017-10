@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class MyCachingProvider implements CachingProvider {
 
-    private static final String DEFAULT_URI_STRING = "urn:my-cache:jsr107";
+    private static final String DEFAULT_URI_STRING = "my-cache-jsr107";
     private static final URI DEFAULT_URI;
 
     static {

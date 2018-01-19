@@ -1,31 +1,32 @@
 package ru.otus.jsr107;
 
 import javax.cache.Cache;
-import java.util.concurrent.ScheduledFuture;
+import javax.cache.expiry.Duration;
+import java.util.concurrent.TimeUnit;
 
 class MyEntry<K, V> implements Cache.Entry<K, V> {
 
     private K key;
     private V value;
     private long expiryTime;
-    private ScheduledFuture<?> task;
 
-    MyEntry(K key, V value, ScheduledFuture<?> task) {
+    MyEntry(K key, V value) {
         this.key = key;
         this.value = value;
-        this.task = task;
     }
 
-    public void setExpiryTime(long expiryTime) {
-        this.expiryTime = expiryTime;
+    public void setExpiryTime(Duration expiryTime, long defaultValue) {
+        long t;
+        if (expiryTime == null) { // don't change expiry time
+            t = defaultValue;
+        } else {
+            t = expiryTime.getAdjustedTime(TimeUnit.NANOSECONDS.toMillis(System.nanoTime()));
+        }
+        this.expiryTime = t;
     }
 
     public long getExpiryTime() {
         return expiryTime;
-    }
-
-    public void dispose() {
-        task.cancel(false);
     }
 
     /**
