@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SoftHashMapTest {
 
     private final Map<String, Integer> map = new SoftHashMap<>();
+
     @Test
     void putTest() {
         map.put("1", 1);
@@ -20,11 +21,8 @@ class SoftHashMapTest {
     void softRefTest() {
         Map<String, BigObj> objects = new SoftHashMap<>();
 
-        for (int i=0; i< 10000; i++) {
-            objects.put(""+i, new BigObj());
-        }
-
-        System.out.println(objects.size());
+        int i = 0;
+        while (true)
+            objects.put("" + i++, new BigObj());
     }
-
 }

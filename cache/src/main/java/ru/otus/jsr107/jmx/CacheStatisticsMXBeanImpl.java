@@ -59,10 +59,10 @@ public class CacheStatisticsMXBeanImpl implements CacheStatisticsMXBean {
     }
 
     public void addGetTime(final long delta) {
-        if (delta <= 0)
-            throw new IllegalArgumentException();
-
-        getTime += delta;
+//        if (delta <= 0)
+//            throw new IllegalArgumentException();
+//
+//        getTime += delta;
     }
 
     public void addPutTime(final long delta) {

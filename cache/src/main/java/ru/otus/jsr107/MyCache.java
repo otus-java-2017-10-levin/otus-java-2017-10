@@ -39,7 +39,7 @@ public class MyCache<K, V> implements Cache<K, V> {
     private final static TimeUnit UPDATE_UNITS = TimeUnit.MILLISECONDS;
     private CacheStatisticsMXBeanImpl stats;
 
-    private Scheduler scheduler = new Scheduler();
+    private Scheduler scheduler = new Scheduler(100);
 
     private final Map<K, MyEntry<K, V>> cache = new SoftHashMap<>();
 
@@ -52,7 +52,7 @@ public class MyCache<K, V> implements Cache<K, V> {
         stats = new CacheStatisticsMXBeanImpl();
 
 
-        scheduler.addTask("scheduler-stat", () -> logger.error(this), 20, TimeUnit.SECONDS);
+//        scheduler.addTask("scheduler-stat", () -> logger.error(this), 20, TimeUnit.SECONDS);
 
         try {
             registerMXBean();
@@ -254,7 +254,7 @@ public class MyCache<K, V> implements Cache<K, V> {
 
         stats.addCachePut();
         final long time = System.nanoTime();
-        final MyEntry<K, V> entry = new MyEntry<>(key, value);
+        MyEntry<K, V> entry = new MyEntry<>(key, value);
         Duration expiryTime = cache.containsKey(key) ?
                 policy.getExpiryForUpdate() :
                 policy.getExpiryForCreation();
@@ -267,7 +267,7 @@ public class MyCache<K, V> implements Cache<K, V> {
         entry.setExpiryTime(expiryTime, defaultValue);
 
         cache.put(key, entry);
-        scheduler.addTask(key.toString(), () -> evictTask(key), UPDATE_RATE * 10, UPDATE_UNITS);
+        scheduler.addTask(key.toString(), () -> evictTask(key), UPDATE_RATE, UPDATE_UNITS);
         stats.addPutTime(System.nanoTime() - time);
     }
 
@@ -277,7 +277,7 @@ public class MyCache<K, V> implements Cache<K, V> {
         long exp = entry.getExpiryTime();
         long currentTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime());
         if (currentTime - exp > 0) {
-//                            logger.error(String.format("evicting key: %s. Time: %d - %d = %d", key, currentTime, exp, currentTime - exp));
+//            logger.error(String.format("evicting key: %s. Time: %d - %d = %d", key, currentTime, exp, currentTime - exp));
             stats.addCacheEviction();
             cache.remove(key);
             scheduler.removeTask(entry.getKey().toString());
@@ -820,7 +820,7 @@ public class MyCache<K, V> implements Cache<K, V> {
      */
     public void close() {
         isOpen = false;
-        scheduler.close();
+//        scheduler.close();
     }
 
     /**
@@ -919,7 +919,7 @@ public class MyCache<K, V> implements Cache<K, V> {
     @Override
     public String toString() {
         return "MyCache{ size(): " + cache.size() +
-                ",\n scheduler: " + scheduler +
+//                ",\n scheduler: " + scheduler +
                 "}";
     }
 }

@@ -7,13 +7,19 @@ import java.util.concurrent.*;
 
 public class Scheduler {
     private final Map<Integer, ScheduledFuture<?>> map = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(100);
+    private final ScheduledExecutorService scheduler;
 
+
+    public Scheduler(int size) {
+        if (size < 1 || size > 100)
+            throw new IllegalArgumentException();
+        scheduler = Executors.newScheduledThreadPool(size);
+    }
 
     public void addTask(String key, Runnable runnable, long interval, TimeUnit timeUnit) {
 
         if (runnable == null || key == null)
-            throw new  IllegalArgumentException();
+            throw new IllegalArgumentException();
 
         if (timeUnit == TimeUnit.MICROSECONDS || timeUnit == TimeUnit.NANOSECONDS)
             throw new IllegalArgumentException("Time interval must be greater than MICROSECONDS");
@@ -29,12 +35,13 @@ public class Scheduler {
 
     public void removeTask(String key) {
         if (key == null)
-            throw new  IllegalArgumentException();
-        Integer realKey = key.hashCode();
+            throw new IllegalArgumentException();
+        int realKey = key.hashCode();
         if (map.containsKey(realKey)) {
             ScheduledFuture<?> scheduledFuture = map.get(realKey);
             scheduledFuture.cancel(false);
-            while(!scheduledFuture.isDone()) {}
+            while (!scheduledFuture.isDone()) {
+            }
             map.remove(realKey);
         }
     }

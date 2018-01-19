@@ -11,7 +11,7 @@ class SchedulerTest {
     private Logger LOGGER = LogManager.getLogger(SchedulerTest.class.getSimpleName());
     @Test
     void test() {
-        Scheduler scheduler = new Scheduler();
+        Scheduler scheduler = new Scheduler(1);
 
         scheduler.addTask("1", () -> {
             incr();
