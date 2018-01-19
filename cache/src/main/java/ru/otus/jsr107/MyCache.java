@@ -1,7 +1,5 @@
 package ru.otus.jsr107;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import ru.otus.jsr107.jmx.CacheStatisticsMXBeanImpl;
 import ru.otus.jsr107.scheduler.Scheduler;
 
@@ -28,8 +26,6 @@ import java.util.concurrent.*;
 
 public class MyCache<K, V> implements Cache<K, V> {
 
-    private Logger logger = LogManager.getLogger(MyCache.class);
-
     private final String name;
     private final CacheManager cacheManager;
     private final Configuration<K, V> configuration;
@@ -50,9 +46,6 @@ public class MyCache<K, V> implements Cache<K, V> {
         this.configuration = configuration;
         setupCache();
         stats = new CacheStatisticsMXBeanImpl();
-
-
-        scheduler.addTask("scheduler-stat", () -> logger.error(this), 20, TimeUnit.SECONDS);
 
         try {
             registerMXBean();
