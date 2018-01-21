@@ -16,13 +16,4 @@ class SoftHashMapTest {
 
         assertEquals(new Integer(1), map.get("1"));
     }
-
-    @Test
-    void softRefTest() {
-        Map<String, BigObj> objects = new SoftHashMap<>();
-
-        int i = 0;
-        while (true)
-            objects.put("" + i++, new BigObj());
-    }
 }

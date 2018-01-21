@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 class MyEntry<K, V> implements Cache.Entry<K, V> {
 
-    private K key;
-    private V value;
+    private final K key;
+    private final V value;
     private long expiryTime;
 
     MyEntry(K key, V value) {

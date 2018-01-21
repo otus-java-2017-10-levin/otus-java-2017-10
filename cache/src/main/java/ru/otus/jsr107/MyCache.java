@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
-public class MyCache<K, V> implements Cache<K, V> {
+class MyCache<K, V> implements Cache<K, V> {
 
     private final String name;
     private final CacheManager cacheManager;
@@ -33,9 +33,9 @@ public class MyCache<K, V> implements Cache<K, V> {
     private ExpiryPolicy policy;
     private static final long UPDATE_RATE = 100;
     private final static TimeUnit UPDATE_UNITS = TimeUnit.MILLISECONDS;
-    private CacheStatisticsMXBeanImpl stats;
+    private final CacheStatisticsMXBeanImpl stats;
 
-    private Scheduler scheduler = new Scheduler(100);
+    private final Scheduler scheduler = new Scheduler(2);
 
     private final Map<K, MyEntry<K, V>> cache = new SoftHashMap<>();
 
@@ -813,7 +813,7 @@ public class MyCache<K, V> implements Cache<K, V> {
      */
     public void close() {
         isOpen = false;
-//        scheduler.close();
+        scheduler.close();
     }
 
     /**

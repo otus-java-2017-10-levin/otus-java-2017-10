@@ -24,7 +24,7 @@ public class MyCachingProvider implements CachingProvider {
         }
     }
 
-    private Map<ClassLoader, ConcurrentMap<URI, CacheManager>> cacheManagers = new WeakHashMap<>();
+    private final Map<ClassLoader, ConcurrentMap<URI, CacheManager>> cacheManagers = new WeakHashMap<>();
 
     public CacheManager getCacheManager(URI uri, ClassLoader classLoader, Properties properties) {
         uri = uri == null ? getDefaultURI() : uri;

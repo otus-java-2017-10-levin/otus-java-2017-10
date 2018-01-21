@@ -18,8 +18,9 @@ class MyCacheTest {
 
     private MutableConfiguration<String, BigObj> config;
 
-    private CacheManager manager = new MyCachingProvider().getCacheManager();
+    private final CacheManager manager = new MyCachingProvider().getCacheManager();
     private Cache<String, BigObj> objects;
+    private Cache<String, BigObj> objects1;
 
     @Test
     void testExpiryAccessed() throws InterruptedException {
@@ -28,7 +29,7 @@ class MyCacheTest {
                 .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, 5)))
                 .setStatisticsEnabled(true);
 
-        objects = manager.createCache("objects", config);
+        objects = manager.createCache("accessExpiry", config);
 
         for (int i=0; i< 100; i++) {
             objects.put(""+i, new BigObj());
@@ -56,7 +57,7 @@ class MyCacheTest {
                 .setTypes(String.class, BigObj.class)
                 .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, 5)))
                 .setStatisticsEnabled(true);
-        objects = manager.createCache("objects", config);
+        objects = manager.createCache("createdExpire", config);
 
 
         for (int i=0; i< 100; i++) {
@@ -91,7 +92,7 @@ class MyCacheTest {
                 .setTypes(String.class, BigObj.class)
                 .setExpiryPolicyFactory(EternalExpiryPolicy.factoryOf())
                 .setStatisticsEnabled(true);
-        objects = manager.createCache("objects", config);
+        objects = manager.createCache("eternalExpire", config);
 
         for (int i=0; i< 100; i++) {
             objects.put(""+i, new BigObj());
@@ -101,5 +102,22 @@ class MyCacheTest {
 
         assertEquals(100, ((MyCache)objects).size());
         System.out.println(objects);
+    }
+
+    @Test
+    void severalCacheCreate() {
+        config = new MutableConfiguration<String, BigObj>()
+                .setTypes(String.class, BigObj.class)
+                .setExpiryPolicyFactory(EternalExpiryPolicy.factoryOf())
+                .setStatisticsEnabled(true);
+
+        objects = manager.createCache("test1", config);
+        objects1 = manager.createCache("test2", config);
+
+        manager.close();
+
+        // do not close caches
+        assertEquals(false, objects.isClosed());
+        assertEquals(false, objects1.isClosed());
     }
 }

@@ -1,8 +1,6 @@
 package ru.otus.jsr107.scheduler;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.*;
 
 public class Scheduler {
