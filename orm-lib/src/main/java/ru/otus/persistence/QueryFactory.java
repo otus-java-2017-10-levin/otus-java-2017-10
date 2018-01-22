@@ -73,12 +73,8 @@ class QueryFactory {
             if (count++ != 0) {
                 values.append(",");
             }
-//            if (f.contains(manager.getIdAnnotation())) {
-//                values.append("NULL");
-//            }
-//            else {
-                values.append("?");
-//            }
+            values.append("?");
+
         }
 
         return String.format(INSERT,
@@ -131,40 +127,6 @@ class QueryFactory {
         ).toUpperCase();
 
     }
-//
-//    public static String getSelectQuery(AnnotationManager man, long i, Class<?> main) {
-//        AnnotatedClass ac = man.getAnnotatedClass(main);
-//        AnnotatedField id = man.getId(main);
-//        String SELECT = "SELECT %s FROM %s WHERE %s = %s";
-//
-//        state = State.SELECT;
-//
-//        StringBuilder fields = new StringBuilder(getFieldNames(man, main, true));
-//        List<Class<?>> classes = ac.getFields(OneToOne.class).stream().map(AnnotatedField::getType).collect(Collectors.toList());
-//
-//        for (Class<?> cl : classes) {
-//            fields.append(", ").append(getFieldNames(man, cl, true));
-//        }
-//
-//        String join = " left outer join %s on %s = %s";
-//
-//        StringBuilder joiner = new StringBuilder();
-//        for (AnnotatedField f : ac.getFields(OneToOne.class)) {
-//            AnnotatedClass foreign = man.getAnnotatedClass(f.getType());
-//
-//            foreign.getFields(OneToOne.class).stream().filter(field -> field.getType().equals(main)).findFirst().ifPresent(foreignField ->
-//                    joiner.append(String.format(join,
-//                            foreign.getSimpleName(),
-//                            main.getSimpleName() + "." + id.getName(),
-//                            foreign.getSimpleName() + "." + foreignField.getName())));
-//        }
-//
-//        return String.format(SELECT,
-//                fields,
-//                ac.getSimpleName() + joiner,
-//                ac.getSimpleName() + "." + id.getName(),
-//                i).toUpperCase();
-//    }
 
     public static String getSelectQuery(@NotNull final AnnotationManager man,
                                         @NotNull final Class<?> entityClass,
@@ -176,7 +138,8 @@ class QueryFactory {
         state = State.SELECT;
 
         StringBuilder fields = new StringBuilder(getFieldNames(man, entityClass, true));
-        List<Class<?>> classes = ac.getFields(OneToOne.class).stream().map(AnnotatedField::getType).collect(Collectors.toList());
+        final List<AnnotatedField> linkFields = ac.getFields(Arrays.asList(OneToOne.class, ManyToOne.class));
+        final List<Class<?>> classes = linkFields.stream().map(AnnotatedField::getType).collect(Collectors.toList());
 
         for (Class<?> cl : classes) {
             fields.append(", ").append(getFieldNames(man, cl, true));
@@ -185,7 +148,7 @@ class QueryFactory {
         String join = " left outer join %s on %s = %s";
 
         StringBuilder joiner = new StringBuilder();
-        for (AnnotatedField f : ac.getFields(OneToOne.class)) {
+        for (AnnotatedField f : linkFields) {
             AnnotatedClass foreign = man.getAnnotatedClass(f.getType());
 
             foreign.getFields(OneToOne.class).stream().filter(field1 -> field1.getType().equals(entityClass)).findFirst().ifPresent(foreignField ->
@@ -193,7 +156,14 @@ class QueryFactory {
                             foreign.getSimpleName(),
                             entityClass.getSimpleName() + "." + field.getName(),
                             foreign.getSimpleName() + "." + foreignField.getName())));
-        }
+
+            foreign.getFields(OneToMany.class).stream().filter(field1 -> field1.getAnnotation(OneToMany.class).mappedBy().equals(f.getName())).findFirst().ifPresent(foreignField ->
+                    joiner.append(String.format(join,
+                            foreign.getSimpleName(),
+                            f.getFullName("."),
+                            man.getId(foreign.getAnnotatedClass()).getFullName("."))));
+
+    }
 
         return String.format(SELECT,
                 fields,

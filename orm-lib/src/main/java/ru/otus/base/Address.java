@@ -25,7 +25,7 @@ public class Address extends DataSet {
     public String toString() {
         return "Address{" +
                 "address='" + address + '\'' +
-                ", user=" + user.getName() +
+                ", user=" + (user == null ? null : user.getName()) +
                 ", id=" + id +
                 '}';
     }

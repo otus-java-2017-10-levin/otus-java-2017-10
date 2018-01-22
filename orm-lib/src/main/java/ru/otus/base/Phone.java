@@ -22,7 +22,7 @@ public class Phone extends DataSet {
     @Override
     public String toString() {
         return "Phone{" +
-                "owner=" + owner.getName() +
+                "owner=" + (owner == null ? null : owner.getName()) +
                 ", phone='" + phone + '\'' +
                 ", id=" + id +
                 '}';

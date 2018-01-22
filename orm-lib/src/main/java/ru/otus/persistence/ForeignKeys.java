@@ -35,7 +35,7 @@ public class ForeignKeys implements VisitableEntity {
 
     @Override
     public long save(@NotNull final EntityVisitor visitableEntity, @NotNull DBConnection connection) {
-        visitableEntity.visit(this, connection);
+        visitableEntity.save(this, connection);
         return 0;
     }
 }

@@ -4,8 +4,10 @@ import org.h2.tools.Server;
 import ru.otus.base.Address;
 import ru.otus.base.Phone;
 import ru.otus.base.UserDataSet;
+import ru.otus.dao.PhoneDAO;
 import ru.otus.dao.UserDataSetDAO;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.sql.SQLException;
 
@@ -13,7 +15,7 @@ class App {
 
     private final EntityManagerFactory factory = JpaUtil.getEntityManagerFactory();
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, InterruptedException {
         new App().run();
     }
 
@@ -29,9 +31,10 @@ class App {
         return user;
     }
 
-    private void run() throws SQLException {
+    private void run() throws SQLException, InterruptedException {
         final int cycles = 3;
-        UserDataSetDAO dao = new UserDataSetDAO(factory.createEntityManager());
+        final EntityManager entityManager = factory.createEntityManager();
+        UserDataSetDAO dao = new UserDataSetDAO(entityManager);
 
         startServer();
 
@@ -42,7 +45,16 @@ class App {
             UserDataSet fromDB = dao.load(user.getId());
             System.out.println(fromDB);
         }
-        factory.close();
+
+
+        PhoneDAO phoneDAO = new PhoneDAO(entityManager);
+        while (true)
+        for (long i=1; i< 10; i++) {
+            Phone phone = phoneDAO.load(i);
+            System.out.println(phone);
+            Thread.sleep(333);
+        }
+//        factory.close();
     }
 
     private void startServer() throws SQLException {

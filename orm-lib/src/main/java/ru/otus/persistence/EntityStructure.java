@@ -19,7 +19,7 @@ public class EntityStructure implements VisitableEntity {
 
     @Override
     public long save(@NotNull final EntityVisitor entityVisitor, @NotNull DBConnection connection) throws IllegalAccessException {
-        return entityVisitor.visit(this, connection);
+        return entityVisitor.save(this, connection);
     }
 
     public Object getEntity() {

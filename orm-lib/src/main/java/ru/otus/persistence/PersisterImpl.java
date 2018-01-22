@@ -81,7 +81,7 @@ public class PersisterImpl implements Persister {
             connections.put(entityClass, dbManager.getConnection());
         }
 
-        return visitor.visit(entityClass, primaryKey, connections.get(entityClass));
+        return visitor.load(entityClass, primaryKey, connections.get(entityClass));
     }
 
     @Override

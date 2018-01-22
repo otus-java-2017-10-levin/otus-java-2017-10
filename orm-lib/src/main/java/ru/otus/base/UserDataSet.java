@@ -35,7 +35,7 @@ public class UserDataSet extends DataSet {
         return "UserDataSet{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
-                ", address=" + address +
+                ", address=" + (address == null ? null : address.getAddress()) +
                 ", phones=" + phones +
                 ", id=" + id +
                 '}';
