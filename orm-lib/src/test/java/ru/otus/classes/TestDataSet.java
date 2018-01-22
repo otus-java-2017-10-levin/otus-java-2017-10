@@ -5,6 +5,7 @@ import ru.otus.base.DataSet;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
 
+@SuppressWarnings("unused")
 public class TestDataSet extends DataSet {
 
     @Column(name = "age")

@@ -7,11 +7,6 @@ import ru.otus.persistence.caching.CacheUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*
- *  Copyright by Flow on 11.01.2018.
- 
-    Description here
- */
 class CacheUnitTest {
 
     @Test

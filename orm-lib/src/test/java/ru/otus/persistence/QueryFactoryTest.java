@@ -48,11 +48,8 @@ class QueryFactoryTest {
         String actualQuery = QueryFactory.getSelectQuery(man, UserDataSet.class, man.getId(UserDataSet.class), 1);
         String expectedQuery = "SELECT USERDATASET.NAME AS USERDATASET_NAME, USERDATASET.AGE AS USERDATASET_AGE, " +
                 "USERDATASET.ADDRESS AS USERDATASET_ADDRESS, " +
-                "USERDATASET.ID AS USERDATASET_ID, ADDRESS.ADDRESS AS ADDRESS_ADDRESS, " +
-                "ADDRESS.USER AS ADDRESS_USER, " +
-                "ADDRESS.ID AS ADDRESS_ID " +
-                "FROM USERDATASET LEFT OUTER JOIN ADDRESS ON " +
-                "USERDATASET.ID = ADDRESS.USER " +
+                "USERDATASET.ID AS USERDATASET_ID " +
+                "FROM USERDATASET " +
                 "WHERE USERDATASET.ID = 1";
         assertEquals(expectedQuery, actualQuery);
     }

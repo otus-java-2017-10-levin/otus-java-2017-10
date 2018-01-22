@@ -33,8 +33,4 @@ public class UserDataSet extends DataSet {
     public void addPhone(@NotNull Phone phone) {
         phones.add(phone);
     }
-
-    public List<Phone> getPhones() {
-        return phones;
-    }
 }

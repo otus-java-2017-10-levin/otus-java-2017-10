@@ -9,9 +9,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("ALL")
 class QueryFactory {
@@ -253,15 +251,3 @@ class QueryFactory {
         sqlTypes.put(String.class, "VARCHAR(256)");
     }
 }
-
-/*
-SELECT  USERDATASET.NAME AS USERDATASET_NAME,
-        USERDATASET.AGE AS USERDATASET_AGE,
-        USERDATASET.ADDRESS AS USERDATASET_ADDRESS,
-        USERDATASET.ID AS USERDATASET_ID,
-        ADDRESS.ADDRESS AS ADDRESS_ADDRESS,
-        ADDRESS.USER AS ADDRESS_USER,
-        ADDRESS.ID AS ADDRESS_ID
-FROM USERDATASET LEFT OUTER JOIN ADDRESS ON USERDATASET.ID = ADDRESS.USER WHERE USERDATASET.ID = 1
-
- */

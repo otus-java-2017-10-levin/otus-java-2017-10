@@ -9,6 +9,7 @@ import ru.otus.persistence.caching.CacheUnit;
 import javax.cache.Cache;
 import javax.cache.Caching;
 import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.AccessedExpiryPolicy;
 import javax.cache.expiry.CreatedExpiryPolicy;
 import javax.cache.expiry.Duration;
 import javax.persistence.ManyToOne;
@@ -19,7 +20,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class SQLEntityVisitor implements EntityVisitor {
     private static int counter = 0;
@@ -27,7 +27,7 @@ public class SQLEntityVisitor implements EntityVisitor {
     private final AnnotationManager annotationManager;
     private final MutableConfiguration<CacheUnit, Object> config = new MutableConfiguration<CacheUnit, Object>()
             .setTypes(CacheUnit.class, Object.class)
-            .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, 3)))
+            .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, 3)))
             .setStatisticsEnabled(true);
 
     private final Cache<CacheUnit, Object> cache = Caching.getCachingProvider().getCacheManager().createCache("L1-Cache-" + id, config);
@@ -63,7 +63,6 @@ public class SQLEntityVisitor implements EntityVisitor {
                         e.printStackTrace();
                     }
                 }
-//                statement.addBatch();
                 statement.execute();
                 ResultSet generatedKeys = statement.getGeneratedKeys();
                 long id = -1;
@@ -110,9 +109,6 @@ public class SQLEntityVisitor implements EntityVisitor {
             return entityClass.cast(res);
         }
 
-//        List<Class<?>> foreignClasses = annotationManager.getAnnotatedClass(entityClass).getFields(Arrays.asList(OneToOne.class, ManyToOne.class)).stream().map(AnnotatedField::getType).collect(Collectors.toList());
-//        foreignClasses.add(entityClass);
-
         Map<String, Object> map = null;
 
         try {
@@ -146,10 +142,10 @@ public class SQLEntityVisitor implements EntityVisitor {
         return m;
     }
 
-    private <T> List<T> loadObjects(@NotNull final Class<T> entityClass,
-                                    @NotNull final AnnotatedField field,
-                                    final long value,
-                                    DBConnection connection) {
+    private <T> List<T> loadCollection(@NotNull final Class<T> entityClass,
+                                       @NotNull final AnnotatedField field,
+                                       final long value,
+                                       DBConnection connection) {
         List<T> result = new ArrayList<>();
 
         try {
@@ -171,12 +167,12 @@ public class SQLEntityVisitor implements EntityVisitor {
     private void setFKeys(Class<?> entityClass, Map<String, Object> map, DBConnection connection) {
 
         AnnotatedClass ac = annotationManager.getAnnotatedClass(entityClass);
-        final String fullName = annotationManager.getId(entityClass).getFullName("_").toUpperCase();
+        final String fullName = annotationManager.getId(entityClass).getFullName("_");
         final Object object = cache.get(new CacheUnit((Long) map.get(fullName), entityClass));
 
-        for (AnnotatedField f : ac.getFields(OneToOne.class)) {
+        for (AnnotatedField f : ac.getFields(Arrays.asList(OneToOne.class, ManyToOne.class))) {
 
-            Long id = (Long) map.get(f.getFullName("_").toUpperCase());
+            Long id = (Long) map.get(f.getFullName("_"));
             CacheUnit c = new CacheUnit(id, f.getType());
             Object value = cache.get(c);
             if (value == null) {
@@ -184,21 +180,6 @@ public class SQLEntityVisitor implements EntityVisitor {
             }
             try {
                 f.setFieldValue(object, value);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-        for (AnnotatedField f : ac.getFields(ManyToOne.class)) {
-            String name = f.getFullName("_").toUpperCase();
-            long id = (Long) map.get(name);
-            CacheUnit c = new CacheUnit(id, f.getType());
-            Object value = cache.get(c);
-            if (value == null) {
-                value = load(f.getType(), id, connection);
-            }
-            try {
-                f.setFieldValue(object, cache.get(new CacheUnit(id, f.getType())));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -230,12 +211,6 @@ public class SQLEntityVisitor implements EntityVisitor {
         }
     }
 
-    private void cacheObjects(@NotNull List<Class<?>> foreignClass,
-                              @NotNull Map<String, Object> map,
-                              @NotNull DBConnection connection) {
-        foreignClass.forEach(aClass -> cacheObject(aClass, map, connection));
-    }
-
     private void cacheObject(@NotNull Class<?> foreignClass,
                              @NotNull Map<String, Object> map,
                              @NotNull DBConnection connection) {
@@ -261,50 +236,33 @@ public class SQLEntityVisitor implements EntityVisitor {
         return new CacheUnit((Long) value, object.getClass());
     }
 
-    /*
-     *
-     * SELECT USERDATASET.NAME AS USERDATASET_NAME,
-     *        USERDATASET.AGE AS USERDATASET_AGE,
-     *        USERDATASET.ADDRESS AS USERDATASET_ADDRESS,
-     *        USERDATASET.ID AS USERDATASET_ID,
-     *        USERDATASET.NAME AS USERDATASET_NAME,
-     *        USERDATASET.AGE AS USERDATASET_AGE,
-     *        USERDATASET.ADDRESS AS USERDATASET_ADDRESS,
-     *        USERDATASET.ID AS USERDATASET_ID
-     *  FROM USERDATASET WHERE USERDATASET.ID = 1
-
-     * */
     private <T> T buildObject(@NotNull final Class<T> entityClass,
                               @NotNull final Map<String, Object> params,
                               DBConnection connection) {
-        final String idName = annotationManager.getId(entityClass).getFullName("_").toUpperCase();
+        final String idName = annotationManager.getId(entityClass).getFullName("_");
         final CacheUnit key = new CacheUnit((Long) params.get(idName), entityClass);
         if (cache.containsKey(key)) {
             return entityClass.cast(cache.get(key));
         }
         ObjectBuilder<T> builder = new ObjectBuilder<>(entityClass);
-        List<AnnotatedField> fields = annotationManager.getAnnotatedClass(entityClass).getFields();
-        for (AnnotatedField f : fields) {
-            if (f.contains(OneToMany.class)) {
-                String mappedBy = Objects.requireNonNull(f.getAnnotation(OneToMany.class)).mappedBy();
-                if (mappedBy.equals(""))
-                    throw new IllegalStateException();
 
-                final Class<?> componentType = f.getComponentType();
-                if (componentType == null)
-                    throw new IllegalStateException();
+        for (AnnotatedField f : annotationManager.getAnnotatedClass(entityClass).getFields()) {
+            if (f.contains(OneToMany.class)) {
+
+                final Class<?> componentType = Objects.requireNonNull(f.getComponentType());
 
                 AnnotatedClass component = annotationManager.getAnnotatedClass(componentType);
-                Long value = (Long) params.get(idName);
-                Collection<?> col = loadObjects(componentType, component.getField(mappedBy), value, connection);
+                String mappedBy = Objects.requireNonNull(f.getAnnotation(OneToMany.class)).mappedBy();
+                Collection<?> col = loadCollection(componentType, component.getField(mappedBy),
+                                                   (Long) params.get(idName), connection);
                 builder.set(f, col);
-            } else if (f.contains(ManyToOne.class)) {
-
-            } else if (!f.contains(OneToOne.class) && !f.contains(ManyToOne.class)) {
-                String fullName = f.getFullName("_").toUpperCase();
-                if (!params.containsKey(fullName))
-                    throw new IllegalArgumentException();
-                builder.set(f, params.get(fullName));
+            } else if (!f.contains(ManyToOne.class)) {
+                if (!f.contains(OneToOne.class) && !f.contains(ManyToOne.class)) {
+                    String fullName = f.getFullName("_");
+                    if (!params.containsKey(fullName))
+                        throw new IllegalArgumentException();
+                    builder.set(f, params.get(fullName));
+                }
             }
         }
         return builder.build();

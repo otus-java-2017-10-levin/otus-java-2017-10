@@ -3,6 +3,7 @@ package ru.otus.persistence;
 import org.jetbrains.annotations.NotNull;
 import ru.otus.jdbc.DbManager;
 
+@SuppressWarnings("ALL")
 public interface PersisterBuilder {
 
     @NotNull

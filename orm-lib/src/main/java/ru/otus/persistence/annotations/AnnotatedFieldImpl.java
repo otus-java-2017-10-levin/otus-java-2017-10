@@ -49,7 +49,7 @@ final class AnnotatedFieldImpl implements AnnotatedField {
     @NotNull
     @Override
     public String getFullName(String separator) {
-        return this.annotatedClass.getSimpleName()+separator+this.name;
+        return (this.annotatedClass.getSimpleName()+separator+this.name).toUpperCase();
     }
     @NotNull
     @Override
