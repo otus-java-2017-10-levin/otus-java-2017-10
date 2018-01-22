@@ -38,7 +38,7 @@ class App {
 
         startServer();
 
-        for (int i=0; i<cycles; i++) {
+        for (int i = 0; i < cycles; i++) {
             UserDataSet user = createUser();
             dao.save(user);
 
@@ -48,11 +48,18 @@ class App {
 
 
         PhoneDAO phoneDAO = new PhoneDAO(entityManager);
-        while (true)
-        for (long i=1; i< 10; i++) {
-            Phone phone = phoneDAO.load(i);
-            System.out.println(phone);
-            Thread.sleep(333);
+        long totalLoads = 0;
+        long num = 0;
+        while (true) {
+            for (long i = 1; i < 10; i++) {
+                long start = System.nanoTime();
+                Phone phone = phoneDAO.load(i);
+                totalLoads += System.nanoTime() - start;
+                num++;
+                System.out.println(phone);
+                Thread.sleep(333);
+            }
+            System.out.println((double)totalLoads/ num / 1_000_000 + "ms per load");
         }
 //        factory.close();
     }

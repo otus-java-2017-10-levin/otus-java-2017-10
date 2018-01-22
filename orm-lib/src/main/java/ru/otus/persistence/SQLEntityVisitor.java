@@ -30,7 +30,7 @@ public class SQLEntityVisitor implements EntityVisitor {
             .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, 3)))
             .setStatisticsEnabled(true);
 
-    private final Cache<CacheUnit, Object> cache = Caching.getCachingProvider().getCacheManager().createCache("L1-Cache-"+id, config);
+    private final Cache<CacheUnit, Object> cache = Caching.getCachingProvider().getCacheManager().createCache("L1-Cache-" + id, config);
 
     SQLEntityVisitor(AnnotationManager annotationManager) {
         this.annotationManager = annotationManager;
@@ -105,12 +105,13 @@ public class SQLEntityVisitor implements EntityVisitor {
     public <T> T load(@NotNull Class<T> entityClass, long primaryKey, @NotNull DBConnection connection) {
 
         final CacheUnit key = new CacheUnit(primaryKey, entityClass);
-        if (cache.containsKey(key)) {
-            return entityClass.cast(cache.get(key));
+        final Object res = cache.get(key);
+        if (res != null) {
+            return entityClass.cast(res);
         }
 
-        List<Class<?>> foreignClasses = annotationManager.getAnnotatedClass(entityClass).getFields(Arrays.asList(OneToOne.class, ManyToOne.class)).stream().map(AnnotatedField::getType).collect(Collectors.toList());
-        foreignClasses.add(entityClass);
+//        List<Class<?>> foreignClasses = annotationManager.getAnnotatedClass(entityClass).getFields(Arrays.asList(OneToOne.class, ManyToOne.class)).stream().map(AnnotatedField::getType).collect(Collectors.toList());
+//        foreignClasses.add(entityClass);
 
         Map<String, Object> map = null;
 
@@ -129,8 +130,8 @@ public class SQLEntityVisitor implements EntityVisitor {
         if (map == null)
             return null;
 
-        cacheObjects(foreignClasses, map, connection);
-        setFKeys(foreignClasses, map, connection);
+        cacheObject(entityClass, map, connection);
+        setFKeys(entityClass, map, connection);
         return entityClass.cast(cache.get(key));
     }
 
@@ -167,63 +168,66 @@ public class SQLEntityVisitor implements EntityVisitor {
         return result;
     }
 
-    private void setFKeys(List<Class<?>> foreignClasses, Map<String, Object> map, DBConnection connection) {
-        foreignClasses.forEach(aClass -> {
-            AnnotatedClass ac = annotationManager.getAnnotatedClass(aClass);
-            final String fullName = annotationManager.getId(aClass).getFullName("_").toUpperCase();
-            final Object object = cache.get(new CacheUnit((Long)map.get(fullName), aClass));
+    private void setFKeys(Class<?> entityClass, Map<String, Object> map, DBConnection connection) {
 
-            for (AnnotatedField f : ac.getFields(OneToOne.class)) {
+        AnnotatedClass ac = annotationManager.getAnnotatedClass(entityClass);
+        final String fullName = annotationManager.getId(entityClass).getFullName("_").toUpperCase();
+        final Object object = cache.get(new CacheUnit((Long) map.get(fullName), entityClass));
 
-                Long id = (Long) map.get(f.getFullName("_").toUpperCase());
-                CacheUnit c = new CacheUnit(id, f.getType());
-                Object value = cache.get(c);
-                if (value == null) {
-                    value = load(f.getType(), id, connection);
-                }
-                try {
-                    f.setFieldValue(object, value);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+        for (AnnotatedField f : ac.getFields(OneToOne.class)) {
 
+            Long id = (Long) map.get(f.getFullName("_").toUpperCase());
+            CacheUnit c = new CacheUnit(id, f.getType());
+            Object value = cache.get(c);
+            if (value == null) {
+                value = load(f.getType(), id, connection);
             }
-
-            for (AnnotatedField f : ac.getFields(ManyToOne.class)) {
-                String name = annotationManager.getId(f.getType()).getFullName("_").toUpperCase();
-                long id = (Long)map.get(name);
-                try {
-                    f.setFieldValue(object, cache.get(new CacheUnit(id, f.getType())));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+            try {
+                f.setFieldValue(object, value);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
+        }
 
-            for (AnnotatedField f : ac.getFields(OneToMany.class)) {
-                try {
-                    Collection<?> col = (Collection) f.getFieldValue(object);
-                    String mappedBy = Objects.requireNonNull(f.getAnnotation(OneToMany.class)).mappedBy();
-                    if (mappedBy.equals(""))
-                        throw new IllegalStateException();
-
-                    if (col == null)
-                        continue;
-
-                    col.forEach(elem -> {
-                        if (elem == null)
-                            throw new IllegalArgumentException();
-                        AnnotatedField field = annotationManager.getAnnotatedClass(elem.getClass()).getField(mappedBy);
-                        try {
-                            field.setFieldValue(elem, object);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+        for (AnnotatedField f : ac.getFields(ManyToOne.class)) {
+            String name = f.getFullName("_").toUpperCase();
+            long id = (Long) map.get(name);
+            CacheUnit c = new CacheUnit(id, f.getType());
+            Object value = cache.get(c);
+            if (value == null) {
+                value = load(f.getType(), id, connection);
             }
-        });
+            try {
+                f.setFieldValue(object, cache.get(new CacheUnit(id, f.getType())));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (AnnotatedField f : ac.getFields(OneToMany.class)) {
+            try {
+                Collection<?> col = (Collection) f.getFieldValue(object);
+                String mappedBy = Objects.requireNonNull(f.getAnnotation(OneToMany.class)).mappedBy();
+                if (mappedBy.equals(""))
+                    throw new IllegalStateException();
+
+                if (col == null)
+                    continue;
+
+                col.forEach(elem -> {
+                    if (elem == null)
+                        throw new IllegalArgumentException();
+                    AnnotatedField field = annotationManager.getAnnotatedClass(elem.getClass()).getField(mappedBy);
+                    try {
+                        field.setFieldValue(elem, object);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void cacheObjects(@NotNull List<Class<?>> foreignClass,
@@ -257,6 +261,19 @@ public class SQLEntityVisitor implements EntityVisitor {
         return new CacheUnit((Long) value, object.getClass());
     }
 
+    /*
+     *
+     * SELECT USERDATASET.NAME AS USERDATASET_NAME,
+     *        USERDATASET.AGE AS USERDATASET_AGE,
+     *        USERDATASET.ADDRESS AS USERDATASET_ADDRESS,
+     *        USERDATASET.ID AS USERDATASET_ID,
+     *        USERDATASET.NAME AS USERDATASET_NAME,
+     *        USERDATASET.AGE AS USERDATASET_AGE,
+     *        USERDATASET.ADDRESS AS USERDATASET_ADDRESS,
+     *        USERDATASET.ID AS USERDATASET_ID
+     *  FROM USERDATASET WHERE USERDATASET.ID = 1
+
+     * */
     private <T> T buildObject(@NotNull final Class<T> entityClass,
                               @NotNull final Map<String, Object> params,
                               DBConnection connection) {

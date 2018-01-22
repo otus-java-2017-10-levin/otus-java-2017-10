@@ -138,36 +138,33 @@ class QueryFactory {
         state = State.SELECT;
 
         StringBuilder fields = new StringBuilder(getFieldNames(man, entityClass, true));
-        final List<AnnotatedField> linkFields = ac.getFields(Arrays.asList(OneToOne.class, ManyToOne.class));
-        final List<Class<?>> classes = linkFields.stream().map(AnnotatedField::getType).collect(Collectors.toList());
 
-        for (Class<?> cl : classes) {
-            fields.append(", ").append(getFieldNames(man, cl, true));
-        }
+//        final List<AnnotatedField> linkFields = ac.getFields(Arrays.asList(OneToOne.class, ManyToOne.class));
+//        final List<Class<?>> classes = linkFields.stream().map(AnnotatedField::getType).collect(Collectors.toList());
 
-        String join = " left outer join %s on %s = %s";
 
-        StringBuilder joiner = new StringBuilder();
-        for (AnnotatedField f : linkFields) {
-            AnnotatedClass foreign = man.getAnnotatedClass(f.getType());
-
-            foreign.getFields(OneToOne.class).stream().filter(field1 -> field1.getType().equals(entityClass)).findFirst().ifPresent(foreignField ->
-                    joiner.append(String.format(join,
-                            foreign.getSimpleName(),
-                            entityClass.getSimpleName() + "." + field.getName(),
-                            foreign.getSimpleName() + "." + foreignField.getName())));
-
-            foreign.getFields(OneToMany.class).stream().filter(field1 -> field1.getAnnotation(OneToMany.class).mappedBy().equals(f.getName())).findFirst().ifPresent(foreignField ->
-                    joiner.append(String.format(join,
-                            foreign.getSimpleName(),
-                            f.getFullName("."),
-                            man.getId(foreign.getAnnotatedClass()).getFullName("."))));
-
-    }
+//        String join = " left outer join %s on %s = %s";
+//StringBuilder joiner = new StringBuilder();
+//        for (AnnotatedField f : linkFields) {
+//            AnnotatedClass foreign = man.getAnnotatedClass(f.getType());
+//
+//            foreign.getFields(OneToOne.class).stream().filter(field1 -> field1.getType().equals(entityClass)).findFirst().ifPresent(foreignField ->
+//                    joiner.append(String.format(join,
+//                            foreign.getSimpleName(),
+//                            entityClass.getSimpleName() + "." + field.getName(),
+//                            foreign.getSimpleName() + "." + foreignField.getName())));
+//
+//            foreign.getFields(OneToMany.class).stream().filter(field1 -> field1.getAnnotation(OneToMany.class).mappedBy().equals(f.getName())).findFirst().ifPresent(foreignField ->
+//                    joiner.append(String.format(join,
+//                            foreign.getSimpleName(),
+//                            f.getFullName("."),
+//                            man.getId(foreign.getAnnotatedClass()).getFullName("."))));
+//
+//    }
 
         return String.format(SELECT,
                 fields,
-                ac.getSimpleName() + joiner,
+                ac.getSimpleName(),
                 ac.getSimpleName() + "." + field.getName(),
                 id).toUpperCase();
     }
