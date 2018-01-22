@@ -63,6 +63,8 @@ class MyCache<K, V> implements Cache<K, V> {
     }
 
     private <C extends Configuration<K, V>> void setupCache() {
+
+        @SuppressWarnings("unchecked")
         CompleteConfiguration<K, V> conf = getConfiguration(MutableConfiguration.class);
 
         policy = conf.getExpiryPolicyFactory().create();

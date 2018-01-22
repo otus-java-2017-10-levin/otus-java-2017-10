@@ -20,7 +20,6 @@ class MyCacheTest {
 
     private final CacheManager manager = new MyCachingProvider().getCacheManager();
     private Cache<String, BigObj> objects;
-    private Cache<String, BigObj> objects1;
 
     @Test
     void testExpiryAccessed() throws InterruptedException {
@@ -112,7 +111,7 @@ class MyCacheTest {
                 .setStatisticsEnabled(true);
 
         objects = manager.createCache("test1", config);
-        objects1 = manager.createCache("test2", config);
+        Cache<String, BigObj> objects1 = manager.createCache("test2", config);
 
         manager.close();
 
