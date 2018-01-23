@@ -2,9 +2,9 @@ package ru.otus.persistence.annotations;
 
 
 import org.junit.jupiter.api.Test;
-import ru.otus.base.Address;
-import ru.otus.base.UserDataSet;
+import ru.otus.classes.Address;
 import ru.otus.classes.TestDataSet;
+import ru.otus.classes.UserDataSet;
 
 import javax.persistence.Column;
 import javax.persistence.Id;

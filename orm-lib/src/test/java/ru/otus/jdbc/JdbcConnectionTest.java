@@ -4,31 +4,37 @@ import org.dbunit.Assertion;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.jupiter.api.*;
-import ru.otus.base.UserDataSet;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import ru.otus.classes.UserDataSet;
 
 import java.sql.SQLException;
 
+public class JdbcConnectionTest extends H2DatabaseTest {
 
-class JdbcConnectionTest extends H2DatabaseTest {
-
-    private final String INSERT = "insert into user (name) values ('Flow')";
+    private final String INSERT = "insert into USER (name) values ('Flow')";
     private final String TABLE_NAME = "user";
     private final DBConnection connection = DbManagerFactory.createDataBaseManager(JdbcTestParams.properties).getConnection();
 
-    JdbcConnectionTest(TestInfo testInfo) {
-        super(testInfo.getDisplayName());
+//    public JdbcConnectionTest(TestInfo testInfo) {
+//        super(testInfo.getDisplayName());
+//    }
+    public JdbcConnectionTest() {
+        super(JdbcConnectionTest.class.getSimpleName());
     }
 
     @BeforeEach
-    void createTable() {
+    public void createTable() {
         connection.execQuery("DROP TABLE USER IF EXISTS");
         String createUserTable = "create table if not exists user (id bigint auto_increment, name varchar(256), primary key (id))";
         connection.execQuery(createUserTable);
     }
 
     @Test
-    void testSelect() throws SQLException {
+    public void testSelect() throws SQLException {
         connection.execQuery(INSERT);
         UserDataSet set = connection.execQuery("SELECT * FROM "+TABLE_NAME + " WHERE ID = 1", result -> {
             UserDataSet user = new UserDataSet();
@@ -43,7 +49,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
     }
 
     @Test
-    void executeQueryWithoutAnswer() throws Exception {
+    public void executeQueryWithoutAnswer() throws Exception {
         connection.execQuery(INSERT);
         connection.commit();
 
@@ -57,7 +63,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
     }
 
     @Test
-    void executeQueryThatReturnsLong() {
+    public void executeQueryThatReturnsLong() {
         connection.execQuery(INSERT);
 
         try {
@@ -72,7 +78,7 @@ class JdbcConnectionTest extends H2DatabaseTest {
     }
 
     @AfterEach
-    void closeServer() {
+    public void closeServer() {
         connection.execQuery("drop table user if exists");
     }
 

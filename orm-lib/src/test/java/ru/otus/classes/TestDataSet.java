@@ -1,7 +1,5 @@
 package ru.otus.classes;
 
-import ru.otus.base.DataSet;
-
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
 
