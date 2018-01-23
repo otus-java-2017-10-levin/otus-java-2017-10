@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.utils;
 
 import org.h2.tools.Server;
 

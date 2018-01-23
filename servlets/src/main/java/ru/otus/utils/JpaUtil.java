@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.utils;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;

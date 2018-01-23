@@ -32,7 +32,7 @@ public class User extends DataSet {
 
     @Override
     public String toString() {
-        return "UserDataSet{" +
+        return "User{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
                 ", address=" + (address == null ? null : address.getAddress()) +
