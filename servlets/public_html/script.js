@@ -41,7 +41,6 @@ var objectConstructor = {}.constructor;
             return;
         }
             $("#statistics").empty();
-//            jQuery.each(response.model, function(i, val) {
             for(var key in response.model) {
                 var $tr = document.createElement("tr");
                     $td = document.createElement("td");
