@@ -7,6 +7,8 @@ import java.util.Set;
 
 public class AuthUtil {
 
+    public static final int STATUS_OK = 200;
+    public static final int FORBIDDEN = 403;
     private final static Map<String, String> users = new HashMap<>();
     private final static Set<String> hashes = new HashSet<>();
 
@@ -15,9 +17,7 @@ public class AuthUtil {
     }
 
     public static boolean isValidUser(String userName, String pass) {
-        if (userName == null || pass == null)
-            throw new IllegalArgumentException();
-        return pass.equals(users.get(userName));
+        return userName != null && pass != null && pass.equals(users.get(userName));
     }
 
     public static String generateHash(String... args) {
@@ -30,5 +30,9 @@ public class AuthUtil {
 
     public static boolean validateHash(String hash) {
         return hashes.contains(hash);
+    }
+
+    public static void deleteHash(String hash) {
+        hashes.remove(hash);
     }
 }

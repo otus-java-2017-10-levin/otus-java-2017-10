@@ -1,6 +1,8 @@
 package ru.otus.servlets;
 
 import ru.otus.controller.StatisticsController;
+import ru.otus.utils.AuthUtil;
+import ru.otus.view.ResultView;
 import ru.otus.view.StatisticView;
 
 import javax.management.AttributeNotFoundException;
@@ -8,7 +10,6 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,13 +25,23 @@ public class StatServlet extends AbstractBaseServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        final ResultView authorise = authorise(req, resp);
+        if (authorise.getStatus() == AuthUtil.FORBIDDEN) {
+            authorise.setMessage("/index.html");
+            resp.setContentType("application/json;charset=utf-8");
+            resp.getWriter().append(authorise.getView());
+            return;
+        }
+
         try {
             controller.update();
         } catch (AttributeNotFoundException | MBeanException | InstanceNotFoundException | ReflectionException e) {
             resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             e.printStackTrace();
         }
+
+        stat.setStatus(AuthUtil.STATUS_OK);
         resp.getWriter().print(stat.getView());
         resp.setContentType("application/json;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);

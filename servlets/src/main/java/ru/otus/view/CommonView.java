@@ -1,6 +1,9 @@
 package ru.otus.view;
 
 public interface CommonView {
-
-    public String getView();
+    String getView();
+    void setStatus(int status);
+    int getStatus();
+    void setMessage(String message);
+    String getMessage();
 }

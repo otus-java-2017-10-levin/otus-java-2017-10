@@ -6,9 +6,10 @@
     <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
     <script src="/script.js"></script>
 </head>
-<body onload="updateStat()">
+<body onload='setInterval(function(){updateStat()}, 2000 ); updateStat();'>
 <h1>Статистика L1-Cache</h1>
-<p id="stat"></p>
+<p><a id="logout" href="javascript:logout()">Выход</a></p>
+<p>Информация обновляется раз в 2 секунды</p>
 <table id="statistics">
 
 </table>

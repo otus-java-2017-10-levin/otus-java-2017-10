@@ -8,6 +8,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import ru.otus.controller.StatisticsController;
 import ru.otus.model.Statistics;
 import ru.otus.servlets.AuthServlet;
+import ru.otus.servlets.LogoutServlet;
 import ru.otus.servlets.StatServlet;
 import ru.otus.utils.H2Util;
 import ru.otus.view.StatisticView;
@@ -17,7 +18,7 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class App
+class App
 {
     private final static int PORT = 8090;
     private final static String PUBLIC_HTML = "public_html";
@@ -39,6 +40,7 @@ public class App
 
         context.addServlet(new ServletHolder(new StatServlet(controller, view)), "/stat");
         context.addServlet(AuthServlet.class, "/auth");
+        context.addServlet(LogoutServlet.class, "/logout");
 
         Server server = new Server(PORT);
         server.setHandler(new HandlerList(resourceHandler, context));

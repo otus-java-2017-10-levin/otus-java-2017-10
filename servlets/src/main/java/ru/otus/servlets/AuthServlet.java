@@ -1,11 +1,8 @@
 package ru.otus.servlets;
 
-import ru.otus.model.Result;
 import ru.otus.view.ResultView;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,15 +10,11 @@ import java.io.IOException;
 public class AuthServlet extends AbstractBaseServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("/index.html");
-    }
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        final ResultView res = authorise(req, resp);
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final Result res = authorise(req);
-
-        resp.getWriter().append(new ResultView(res).getView());
-
+        res.setMessage("stat.html");
+        resp.setContentType("application/json;charset=utf-8");
+        resp.getWriter().append(res.getView());
     }
 }

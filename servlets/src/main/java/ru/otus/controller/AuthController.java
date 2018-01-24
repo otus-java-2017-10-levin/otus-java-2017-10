@@ -5,11 +5,11 @@ import ru.otus.utils.AuthUtil;
 
 public class AuthController {
 
-    private final Result result;
-
     public AuthController(Result result) {
         this.result = result;
     }
+
+    private final Result result;
 
     public void update(String name, String pass) {
         if (AuthUtil.isValidUser(name, pass)) {
@@ -24,7 +24,7 @@ public class AuthController {
     public void update(String hash) {
         if (AuthUtil.validateHash(hash)) {
             result.setSuccess(true);
-            result.setMessage(hash);
+            result.setMessage("");
         } else {
             result.setMessage("");
             result.setSuccess(false);

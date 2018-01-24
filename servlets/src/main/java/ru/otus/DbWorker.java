@@ -10,7 +10,7 @@ import ru.otus.utils.JpaUtil;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-public class DbWorker implements Runnable {
+class DbWorker implements Runnable {
 
     private final EntityManagerFactory factory = JpaUtil.getEntityManagerFactory();
 
