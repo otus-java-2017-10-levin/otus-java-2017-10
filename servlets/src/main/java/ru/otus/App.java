@@ -48,9 +48,4 @@ class App
         server.start();
         server.join();
     }
-
-    private void run() throws SQLException {
-        H2Util.start("8082");
-
-    }
 }

@@ -20,11 +20,11 @@ public class LogoutServlet extends AbstractBaseServlet {
         }
 
         final Result result = new Result();
-        final ResultView view = new ResultView(result);
-        final LogoutController logoutController = new LogoutController(result);
+//        final ResultView view = new ResultView(result);
+        final LogoutController logoutController = new LogoutController();
 
         logoutController.update(getUserHash(req));
 
-        resp.getWriter().append(view.getView());
+//        resp.getWriter().append(view.getView());
     }
 }

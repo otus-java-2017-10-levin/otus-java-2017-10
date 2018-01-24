@@ -33,9 +33,4 @@ public abstract class AbstractView implements CommonView {
     public int getStatus() {
         return status;
     }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
 }
