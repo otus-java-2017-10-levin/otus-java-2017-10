@@ -1,11 +1,10 @@
 package ru.otus.servlets;
 
-import ru.otus.controller.LogoutController;
-import ru.otus.model.Result;
+import ru.otus.mvc.controller.LogoutController;
+import ru.otus.mvc.model.Result;
 import ru.otus.utils.AuthUtil;
-import ru.otus.view.ResultView;
+import ru.otus.mvc.view.ResultView;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

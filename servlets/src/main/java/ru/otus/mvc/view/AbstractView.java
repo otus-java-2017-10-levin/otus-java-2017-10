@@ -1,7 +1,7 @@
-package ru.otus.view;
+package ru.otus.mvc.view;
 
 import com.google.gson.Gson;
-import ru.otus.model.CommonModel;
+import ru.otus.mvc.model.CommonModel;
 
 @SuppressWarnings("FieldCanBeLocal")
 public abstract class AbstractView implements CommonView {

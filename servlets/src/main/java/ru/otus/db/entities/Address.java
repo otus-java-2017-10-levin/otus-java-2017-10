@@ -1,4 +1,4 @@
-package ru.otus.model.entities;
+package ru.otus.db.entities;
 
 import lombok.Getter;
 import lombok.Setter;

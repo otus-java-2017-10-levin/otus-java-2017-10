@@ -1,6 +1,6 @@
-package ru.otus.controller;
+package ru.otus.mvc.controller;
 
-import ru.otus.model.Statistics;
+import ru.otus.mvc.model.Statistics;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;

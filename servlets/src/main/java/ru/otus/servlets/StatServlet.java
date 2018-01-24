@@ -1,15 +1,14 @@
 package ru.otus.servlets;
 
-import ru.otus.controller.StatisticsController;
+import ru.otus.mvc.controller.StatisticsController;
 import ru.otus.utils.AuthUtil;
-import ru.otus.view.ResultView;
-import ru.otus.view.StatisticView;
+import ru.otus.mvc.view.ResultView;
+import ru.otus.mvc.view.StatisticView;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

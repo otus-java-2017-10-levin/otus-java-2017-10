@@ -1,12 +1,11 @@
 package ru.otus.servlets;
 
 import org.jetbrains.annotations.NotNull;
-import ru.otus.controller.AuthController;
-import ru.otus.model.Result;
+import ru.otus.mvc.controller.AuthController;
+import ru.otus.mvc.model.Result;
 import ru.otus.utils.AuthUtil;
-import ru.otus.view.ResultView;
+import ru.otus.mvc.view.ResultView;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

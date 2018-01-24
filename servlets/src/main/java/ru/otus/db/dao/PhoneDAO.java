@@ -1,6 +1,6 @@
-package ru.otus.controller.dao;
+package ru.otus.db.dao;
 
-import ru.otus.model.entities.Phone;
+import ru.otus.db.entities.Phone;
 
 import javax.persistence.EntityManager;
 

@@ -1,6 +1,6 @@
-package ru.otus.view;
+package ru.otus.mvc.view;
 
-import ru.otus.model.CommonModel;
+import ru.otus.mvc.model.CommonModel;
 
 public final class StatisticView extends AbstractView {
 

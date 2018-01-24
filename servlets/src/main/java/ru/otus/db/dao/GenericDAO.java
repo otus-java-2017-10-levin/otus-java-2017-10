@@ -1,4 +1,4 @@
-package ru.otus.controller.dao;
+package ru.otus.db.dao;
 
 import javax.persistence.EntityManager;
 

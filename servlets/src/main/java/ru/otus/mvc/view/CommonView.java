@@ -1,4 +1,4 @@
-package ru.otus.view;
+package ru.otus.mvc.view;
 
 public interface CommonView {
     String getView();

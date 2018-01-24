@@ -1,6 +1,6 @@
-package ru.otus.controller;
+package ru.otus.mvc.controller;
 
-import ru.otus.model.CommonModel;
+import ru.otus.mvc.model.CommonModel;
 import ru.otus.utils.AuthUtil;
 
 public class LogoutController {

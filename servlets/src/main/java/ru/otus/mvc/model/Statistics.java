@@ -1,4 +1,4 @@
-package ru.otus.model;
+package ru.otus.mvc.model;
 
 import lombok.Data;
 

@@ -1,10 +1,10 @@
 package ru.otus;
 
-import ru.otus.controller.dao.PhoneDAO;
-import ru.otus.controller.dao.UserDAO;
-import ru.otus.model.entities.Address;
-import ru.otus.model.entities.Phone;
-import ru.otus.model.entities.User;
+import ru.otus.db.dao.PhoneDAO;
+import ru.otus.db.dao.UserDAO;
+import ru.otus.db.entities.Address;
+import ru.otus.db.entities.Phone;
+import ru.otus.db.entities.User;
 import ru.otus.utils.JpaUtil;
 
 import javax.persistence.EntityManager;

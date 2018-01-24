@@ -1,6 +1,6 @@
-package ru.otus.controller;
+package ru.otus.mvc.controller;
 
-import ru.otus.model.Result;
+import ru.otus.mvc.model.Result;
 import ru.otus.utils.AuthUtil;
 
 public class AuthController {

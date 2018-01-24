@@ -7,9 +7,9 @@
 
     <persistence-unit name="otusJPAH2">
         <provider>ru.otus.persistence.MyPersistenceProvider</provider>
-        <class>ru.otus.model.entities.User</class>
-        <class>ru.otus.model.entities.Address</class>
-        <class>ru.otus.model.entities.Phone</class>
+        <class>ru.otus.db.entities.User</class>
+        <class>ru.otus.db.entities.Address</class>
+        <class>ru.otus.db.entities.Phone</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
