@@ -7,14 +7,12 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import ru.otus.mvc.controller.StatisticsController;
 import ru.otus.mvc.model.Statistics;
+import ru.otus.mvc.view.StatisticView;
 import ru.otus.servlets.AuthServlet;
 import ru.otus.servlets.LogoutServlet;
 import ru.otus.servlets.StatServlet;
-import ru.otus.utils.H2Util;
-import ru.otus.mvc.view.StatisticView;
 
 import javax.management.ObjectName;
-import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
