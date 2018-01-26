@@ -1,4 +1,4 @@
-package ru.otus.servlets;
+package ru.otus.mvc.servlets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

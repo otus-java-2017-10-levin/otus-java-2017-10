@@ -1,4 +1,4 @@
-package ru.otus.servlets;
+package ru.otus.mvc.servlets;
 
 import ru.otus.mvc.model.Result;
 

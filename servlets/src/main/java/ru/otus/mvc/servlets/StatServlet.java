@@ -1,4 +1,4 @@
-package ru.otus.servlets;
+package ru.otus.mvc.servlets;
 
 import org.eclipse.jetty.http.HttpStatus;
 import ru.otus.mvc.model.Result;

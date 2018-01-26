@@ -5,9 +5,10 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import ru.otus.servlets.AuthServlet;
-import ru.otus.servlets.LogoutServlet;
-import ru.otus.servlets.StatServlet;
+import ru.otus.mvc.servlets.AuthServlet;
+import ru.otus.mvc.servlets.LogoutServlet;
+import ru.otus.mvc.servlets.StatServlet;
+import ru.otus.utils.H2Util;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,6 +20,7 @@ class App
 
     public static void main(String[] args) throws Exception {
 
+        H2Util.start("8082");
         ExecutorService executorService = Executors.newCachedThreadPool();
         executorService.execute(new DbWorker());
 
