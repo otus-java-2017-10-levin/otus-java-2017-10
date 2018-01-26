@@ -1,47 +1,36 @@
 package ru.otus.servlets;
 
-import ru.otus.mvc.controller.StatisticsController;
-import ru.otus.utils.AuthUtil;
-import ru.otus.mvc.view.ResultView;
+import org.eclipse.jetty.http.HttpStatus;
+import ru.otus.mvc.model.Result;
+import ru.otus.mvc.model.Statistics;
 import ru.otus.mvc.view.StatisticView;
+import ru.otus.utils.JpaUtil;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class StatServlet extends AbstractBaseServlet {
 
-    private final StatisticView stat;
-    private final StatisticsController controller;
-
-    public StatServlet(StatisticsController controller, StatisticView stat) {
-        this.stat = stat;
-        this.controller = controller;
-    }
+    public StatServlet() {}
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        final ResultView authorise = authorise(req, resp);
-        if (authorise.getStatus() == AuthUtil.FORBIDDEN) {
+        final Result authorise = authorise(req, resp);
+        final Statistics stats = new Statistics();
+
+        if (authorise.getResult() == HttpStatus.FORBIDDEN_403) {
             authorise.setMessage("/index.html");
             resp.setContentType("application/json;charset=utf-8");
-            resp.getWriter().append(authorise.getView());
+            resp.getWriter().append(authorise.getView().toJson());
             return;
         }
 
-        try {
-            controller.update();
-        } catch (AttributeNotFoundException | MBeanException | InstanceNotFoundException | ReflectionException e) {
-            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            e.printStackTrace();
-        }
+        JpaUtil.updateCacheStatistic(stats);
 
-        stat.setStatus(AuthUtil.STATUS_OK);
-        resp.getWriter().print(stat.getView());
+        StatisticView view = stats.getView();
+        view.setStatus(HttpStatus.OK_200);
+        resp.getWriter().print(view.toJson());
         resp.setContentType("application/json;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
     }

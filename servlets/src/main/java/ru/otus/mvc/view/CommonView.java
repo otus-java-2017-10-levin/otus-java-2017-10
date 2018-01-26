@@ -1,7 +1,6 @@
 package ru.otus.mvc.view;
 
-interface CommonView {
-    String getView();
+public interface CommonView {
     void setStatus(int status);
     int getStatus();
     void setMessage(String message);

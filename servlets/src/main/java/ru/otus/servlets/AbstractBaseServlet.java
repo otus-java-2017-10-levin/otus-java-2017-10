@@ -1,65 +1,76 @@
 package ru.otus.servlets;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
-import ru.otus.mvc.controller.AuthController;
+import org.jetbrains.annotations.Nullable;
 import ru.otus.mvc.model.Result;
 import ru.otus.utils.AuthUtil;
-import ru.otus.mvc.view.ResultView;
 
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.util.Arrays;
 
 @SuppressWarnings("WeakerAccess")
-public class AbstractBaseServlet extends HttpServlet {
+class AbstractBaseServlet extends HttpServlet {
 
     protected static final String USER_HASH = "user.hash";
     private static final String LOGIN = "login";
     private static final String PASSWORD = "pass";
-    private final Result logined = new Result();
-    private final ResultView view = new ResultView(logined);
 
     protected HttpSession getSession(HttpServletRequest req) {
-        final HttpSession session = req.getSession();
-        return session;
+        return req.getSession();
     }
 
+    @NotNull
     protected String getUserHash(HttpSession session) {
+        if (session == null)
+            return "";
+
         final String attribute = (String)session.getAttribute(USER_HASH);
-        return attribute;
+        return attribute == null ? "" : attribute;
     }
 
-    ResultView authorise(HttpServletRequest req, HttpServletResponse resp) {
-        final AuthController controller = new AuthController(logined);
-
+    protected Result authorise(HttpServletRequest req, HttpServletResponse resp) {
         final HttpSession session = getSession(req);
 
-        System.out.println(session.getId());
-        controller.update(getUserHash(session));
-
-        if (logined.isSuccess()) {
-            view.setMessage("already signed in");
-            view.setStatus(AuthUtil.STATUS_OK);
-            return view;
-        }
+        final Result logined = login(getUserHash(session));
+        if (logined.getResult() == HttpStatus.OK_200)
+            return logined;
 
         final String user = req.getParameter(LOGIN);
         final String pass = req.getParameter(PASSWORD);
-        controller.update(user, pass);
+        Result result = login(user, pass);
 
-        if (logined.isSuccess()) {
-            view.setMessage("sign in successfully");
-            view.setStatus(AuthUtil.STATUS_OK);
-            session.setAttribute(USER_HASH, logined.getMessage());
-        } else {
-            view.setStatus(AuthUtil.FORBIDDEN);
-            view.setMessage("Authentication failed");
+        if (result.getResult() == HttpStatus.OK_200) {
+            session.setAttribute(USER_HASH, result.getMessage());
         }
-        return view;
+
+        return result;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.sendRedirect("/index.html");
+    }
+
+    @NotNull
+    private Result login(@Nullable String name, @Nullable String pass) {
+        return AuthUtil.isValidUser(name, pass)
+            ? new Result(HttpStatus.OK_200, AuthUtil.generateHash(name, pass))
+            : new Result(HttpStatus.FORBIDDEN_403, "Authentication failed");
+
+    }
+
+    @NotNull
+    private Result login(@Nullable String hash) {
+        return AuthUtil.validateHash(hash)
+                ? new Result(HttpStatus.OK_200, "already signed in")
+                : new Result(HttpStatus.UNAUTHORIZED_401, "already signed in");
+    }
+
+    @NotNull
+    protected Result logout(HttpServletRequest req) {
+        AuthUtil.logout(getUserHash(getSession(req)));
+
+        return new Result(HttpStatus.OK_200, "");
     }
 }

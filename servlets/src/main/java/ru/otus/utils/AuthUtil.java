@@ -1,14 +1,13 @@
 package ru.otus.utils;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class AuthUtil {
-
-    public static final int STATUS_OK = 200;
-    public static final int FORBIDDEN = 403;
     private final static Map<String, String> users = new HashMap<>();
     private final static Set<String> hashes = new HashSet<>();
 
@@ -16,7 +15,7 @@ public class AuthUtil {
         users.put("sa", "");
     }
 
-    public static boolean isValidUser(String userName, String pass) {
+    public static boolean isValidUser(@Nullable String userName, @Nullable String pass) {
         return userName != null && pass != null && pass.equals(users.get(userName));
     }
 
@@ -29,10 +28,17 @@ public class AuthUtil {
     }
 
     public static boolean validateHash(String hash) {
-        return hashes.contains(hash);
+        return hash != null && hashes.contains(hash);
     }
 
-    public static void deleteHash(String hash) {
-        hashes.remove(hash);
+    private static void deleteHash(String hash) {
+        if (hash != null)
+            hashes.remove(hash);
+    }
+
+    public static void logout(String userHash) {
+        if (AuthUtil.validateHash(userHash)) {
+            AuthUtil.deleteHash(userHash);
+        }
     }
 }

@@ -10,13 +10,14 @@ public abstract class AbstractView implements CommonView {
     private int status;
     private String message;
 
-    AbstractView(CommonModel model) {
+    AbstractView(CommonModel model, int status, String message) {
         this.model = model;
+        this.status = status;
+        this.message = message;
     }
 
-    @Override
-    public String getView() {
-        return gson.toJson(this);
+    AbstractView(CommonModel model) {
+        this.model = model;
     }
 
     @Override
@@ -33,4 +34,9 @@ public abstract class AbstractView implements CommonView {
     public int getStatus() {
         return status;
     }
+
+    public String toJson() {
+        return gson.toJson(this);
+    }
+
 }
