@@ -1,7 +1,7 @@
 function login() {
         $.ajax({
           type: 'POST',
-          url: "/auth",
+          url: "auth",
           success: function(response) {
               if (response.status == 200) {
                   window.location = response.message;
@@ -34,7 +34,7 @@ function updateStat() {
 var objectConstructor = {}.constructor;
     $.ajax({
         type: 'POST',
-        url: "/stat",
+        url: "stat",
         success: function(response) {
         if (response.status === 403) {
             window.location = response.message;
@@ -54,6 +54,6 @@ var objectConstructor = {}.constructor;
 function logout() {
 $.ajax({
         type: 'POST',
-        url: "/logout"
+        url: "logout"
       });
 }

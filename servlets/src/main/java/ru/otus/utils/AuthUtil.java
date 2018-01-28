@@ -10,6 +10,9 @@ import java.util.Set;
 public class AuthUtil {
     private final static Map<String, String> users = new HashMap<>();
     private final static Set<String> hashes = new HashSet<>();
+    public static final int FORBIDDEN_403 = 403;
+    public static final int OK_200 = 200;
+    public static final int UNAUTHORIZED_401 = 401;
 
     static {
         users.put("sa", "");

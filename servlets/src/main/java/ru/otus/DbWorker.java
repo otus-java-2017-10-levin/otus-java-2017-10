@@ -8,12 +8,10 @@ import ru.otus.db.entities.User;
 import ru.otus.utils.JpaUtil;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
-class DbWorker implements Runnable {
+public class DbWorker implements Runnable {
 
-    private final EntityManagerFactory factory = JpaUtil.getEntityManagerFactory();
-
+    private final JpaUtil jpa;
     private User createUser() {
         User user = new User("Flow");
         Address address = new Address("100");
@@ -26,10 +24,16 @@ class DbWorker implements Runnable {
         return user;
     }
 
+    public DbWorker(JpaUtil jpa) {
+        this.jpa = jpa;
+    }
+
     @Override
     public void run() {
         final int cycles = 3;
-        final EntityManager entityManager = factory.createEntityManager();
+
+        final EntityManager entityManager = jpa.getFactory().createEntityManager();
+
         UserDAO dao = new UserDAO(entityManager);
 
         for (int i = 0; i < cycles; i++) {
