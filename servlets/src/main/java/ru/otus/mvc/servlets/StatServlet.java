@@ -2,7 +2,6 @@ package ru.otus.mvc.servlets;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.otus.DbWorker;
 import ru.otus.DbWorkerConfig;
 import ru.otus.mvc.model.Result;
 import ru.otus.mvc.model.Statistics;
