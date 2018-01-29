@@ -50,5 +50,6 @@ public class DbWorker implements Runnable {
                 phoneDAO.load(i);
             }
         }
+        entityManager.close();
     }
 }

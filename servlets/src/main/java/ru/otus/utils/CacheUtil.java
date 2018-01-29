@@ -3,8 +3,6 @@ package ru.otus.utils;
 import ru.otus.mvc.model.Statistics;
 
 import javax.management.*;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.lang.management.ManagementFactory;
 
 public final class CacheUtil {
