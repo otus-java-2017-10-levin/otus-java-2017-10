@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 public class DbWorker implements Runnable {
 
     private final JpaUtil jpa;
+    private static EntityManager entityManager;
     private User createUser() {
         User user = new User("Flow");
         Address address = new Address("100");
@@ -26,13 +27,14 @@ public class DbWorker implements Runnable {
 
     public DbWorker(JpaUtil jpa) {
         this.jpa = jpa;
+        entityManager = jpa.getFactory().createEntityManager();
     }
 
     @Override
     public void run() {
         final int cycles = 3;
 
-        final EntityManager entityManager = jpa.getFactory().createEntityManager();
+
 
         UserDAO dao = new UserDAO(entityManager);
 
@@ -52,4 +54,10 @@ public class DbWorker implements Runnable {
         }
         entityManager.close();
     }
+
+    public void close() {
+        if (entityManager != null)
+            entityManager.close();
+    }
+
 }

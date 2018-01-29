@@ -32,7 +32,6 @@
         </plugins>
     </build>
     <repositories>
-
         <repository>
             <id>in-project</id>
             <name>In project repo</name>
@@ -41,19 +40,16 @@
     </repositories>
 
     <dependencies>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
