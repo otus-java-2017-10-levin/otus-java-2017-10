@@ -45,7 +45,7 @@ public class DbWorker implements Runnable {
         }
 
         PhoneDAO phoneDAO = new PhoneDAO(entityManager);
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             for (long i = 1; i < 10; i++) {
                 phoneDAO.load(i);
             }
