@@ -1,19 +1,27 @@
 package ru.otus;
 
-
-import org.openjdk.jmh.annotations.Benchmark;
+import ru.otus.sort.SortManager;
 
 public class App
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        int[] arr = {5,4,3,2,1,0};
+        new ParallelSorterImpl(SortManager.getSorter(SortManager.SortType.INSERTION)).sort(arr);
+        printArray(arr);
     }
 
-    @Benchmark
-    public int measureName() {
-        int a = 10;
-        int b = -11;
-        return a+b;
+    private static <T> void printArray(T[] arr) {
+        for (T t: arr) {
+            System.out.print(t + " ");
+        }
+        System.out.println();
+    }
+
+    private static void printArray(int[] arr) {
+        for (int t: arr) {
+            System.out.print(t + " ");
+        }
+        System.out.println();
     }
 }

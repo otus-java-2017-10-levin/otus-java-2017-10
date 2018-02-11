@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.sort;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -14,13 +14,13 @@ import java.util.Comparator;
 final class SelectionSort implements SortStrategy {
 
     @Override
-    public void sort(@NotNull int[] arr) {
-        final int length = arr.length;
+    public void sort(@NotNull int[] arr, int from, int to) {
+        final int length = to - from;
         if (length < 2)
             return;
 
-        for (int i=0; i < length-1; i++) {
-            for (int j = i+1; j<= length-1; j++) {
+        for (int i=from; i < to-1; i++) {
+            for (int j = i+1; j<= to-1; j++) {
                 int min = j;
                 if (arr[min] > arr[j] )
                     min = j;
@@ -32,22 +32,22 @@ final class SelectionSort implements SortStrategy {
     }
 
     @Override
-    public <T extends Comparable> void sort(@NotNull T[] arr) {
-        sort0(arr, Comparator.naturalOrder());
+    public <T extends Comparable> void sort(@NotNull T[] arr, int from, int to) {
+        sort0(arr, Comparator.naturalOrder(), from, to);
     }
 
     @Override
-    public <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator) {
-        sort0(arr, comparator);
+    public <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int from, int to) {
+        sort0(arr, comparator, from, to);
     }
 
-    private <T> void sort0(T[] arr, Comparator<T> comparator) {
-        final int length = arr.length;
+    private <T> void sort0(T[] arr, Comparator<T> comparator, int from, int to) {
+        final int length = to - from;
         if (length < 2)
             return;
 
-        for (int i = 0; i < length - 1; i++) {
-            for (int j = i + 1; j <= length - 1; j++) {
+        for (int i = from; i < to - 1; i++) {
+            for (int j = i + 1; j <= to - 1; j++) {
                 int min = j;
                 if (comparator.compare(arr[min], arr[j]) > 0)
                     min = j;

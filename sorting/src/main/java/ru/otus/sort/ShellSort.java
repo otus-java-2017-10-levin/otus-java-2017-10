@@ -1,9 +1,8 @@
-package ru.otus;
+package ru.otus.sort;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.function.Function;
 
 /**
  * Modification of selection sort
@@ -12,18 +11,18 @@ import java.util.function.Function;
 public class ShellSort implements SortStrategy {
 
     @Override
-    public <T extends Comparable> void sort(@NotNull T[] arr) {
-        sort0(arr, Comparator.naturalOrder());
+    public <T extends Comparable> void sort(@NotNull T[] arr, int from, int to) {
+        sort0(arr, Comparator.naturalOrder(), from, to);
     }
 
     @Override
-    public <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator) {
-        sort0(arr, comparator);
+    public <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int from, int to) {
+        sort0(arr, comparator, from, to);
     }
 
     @Override
-    public void sort(@NotNull int[] arr) {
-        final int N = arr.length;
+    public void sort(@NotNull int[] arr, int from, int to) {
+        final int N = to - from;
 
         if (N < 2)
             return;
@@ -43,8 +42,8 @@ public class ShellSort implements SortStrategy {
         }
     }
 
-    private <T> void sort0(T[] arr, Comparator<T> cmp) {
-        final int N = arr.length;
+    private <T> void sort0(T[] arr, Comparator<T> cmp, int from, int to) {
+        final int N = to - from;
 
         if (N < 2)
             return;

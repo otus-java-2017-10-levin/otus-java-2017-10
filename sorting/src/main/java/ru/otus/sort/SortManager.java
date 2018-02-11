@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.sort;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -7,7 +7,7 @@ import java.util.Map;
 
 public final class SortManager {
 
-    enum SortType {
+    public enum SortType {
         SELECTION,
         INSERTION,
         SHELL,
