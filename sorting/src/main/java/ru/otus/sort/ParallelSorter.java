@@ -1,6 +1,4 @@
-package ru.otus;
-
-import ru.otus.sort.SortStrategy;
+package ru.otus.sort;
 
 import java.util.Comparator;
 
@@ -46,5 +44,5 @@ public interface ParallelSorter {
      * Sort array of primitive ints with the specified algorithm
      * @param arr - array to sort
      */
-    void sort(int[] arr) throws Exception;
+    void sort(int[] arr);
 }

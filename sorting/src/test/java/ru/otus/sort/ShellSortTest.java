@@ -10,31 +10,30 @@ import java.util.Comparator;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ShellSortTest {
-    private final SortStrategy sort = SortManager.getSorter(SortManager.SortType.SHELL);
+    private static final int SIZE = 1_000;
+    private SortStrategy sort = new ShellSort();
 
     @Test
     void intTest() {
-        int[] original = {5, 4, 3, 2, 1, 0};
-        int[] expected = {0, 1, 2, 3, 4, 5};
+        int[] original = Generator.generateArray(SIZE);
         sort.sort(original);
-        assertArrayEquals(expected, original);
+        assertEquals(true, SortUtils.isSorted(original, true));
     }
 
     @Test
     void sortObjects() {
-        Integer[] original = {5, 4, 3, 2, 1, 0};
-        Integer[] expected = {0, 1, 2, 3, 4, 5};
+        Integer[] original = Generator.generateObjectArray(SIZE);
 
         sort.sort(original);
-        assertArrayEquals(expected, original);
+        assertEquals(true, SortUtils.isSortedObj(original, true));
     }
 
     @Test
     void testSortWithComparator() {
-        Integer[] original = {5, 4, 3, 2, 1, 0};
+        Integer[] original = Generator.generateObjectArray(SIZE);
         sort.sort(original, Comparator.reverseOrder());
 
-        assertArrayEquals(new Integer[]{5, 4, 3, 2, 1, 0}, original);
+        assertEquals(true, SortUtils.isSortedObj(original, false));
     }
 
     @Test
@@ -60,9 +59,9 @@ class ShellSortTest {
         @Test
         void partialSort() {
             int[] original = {5, 4, 3, 2, 1, 0};
-            int[] expected = {3, 4, 5, 2, 1, 0};
+            int[] expected = {5, 4, 3, 0, 1, 2};
 
-            sort.sort(original, 0, 3);
+            sort.sort(original, 3, 6);
             assertArrayEquals(expected, original);
         }
 
@@ -78,10 +77,10 @@ class ShellSortTest {
         @Test
         void partialSort2() {
             int[] original = {5, 4, 33, 2, 1, 0};
-            int[] expected = {4, 5, 33, 2, 1, 0};
+            int[] expected = {5, 1, 2, 4, 33, 0};
 
 
-            sort.sort(original, 0, 2);
+            sort.sort(original, 1, 5);
             assertArrayEquals(expected, original);
         }
 

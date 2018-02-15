@@ -7,20 +7,12 @@ import java.util.Map;
 
 public final class SortManager {
 
-    public enum SortType {
-        SELECTION,
-        INSERTION,
-        SHELL,
-        MERGE,
-        QSORT
-    }
-
     @NotNull
-    public static SortStrategy getSorter(SortType type) {
+    public static ParallelSorter getSorter(SortType type) {
         if (!sorters.containsKey(type))
             throw new IllegalArgumentException("SortType " + type+" is not supported");
 
-        return sorters.get(type);
+        return new ParallelSorterImpl(sorters.get(type));
     }
 
     private static final Map<SortType, SortStrategy> sorters = new HashMap<>();

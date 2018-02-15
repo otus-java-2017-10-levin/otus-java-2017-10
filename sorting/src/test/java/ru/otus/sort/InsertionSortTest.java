@@ -2,39 +2,35 @@ package ru.otus.sort;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import ru.otus.sort.SortManager;
-import ru.otus.sort.SortStrategy;
 
 import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InsertionSortTest {
-    private final SortStrategy sort = SortManager.getSorter(SortManager.SortType.INSERTION);
+    private static final int SIZE = 1_000;
+    private SortStrategy sort = new InsertionSort();
 
     @Test
     void intTest() {
-        int[] original = {5, 4, 3, 2, 1, 0};
-        int[] expected = {0, 1, 2, 3, 4, 5};
+        int[] original = Generator.generateArray(SIZE);
         sort.sort(original);
-        assertArrayEquals(expected, original);
+        assertEquals(true, SortUtils.isSorted(original, true));
     }
 
     @Test
     void sortObjects() {
-        Integer[] original = {5, 4, 3, 2, 1, 0};
-        Integer[] expected = {0, 1, 2, 3, 4, 5};
-
+        Integer[] original = Generator.generateObjectArray(SIZE);
         sort.sort(original);
-        assertArrayEquals(expected, original);
+        assertEquals(true, SortUtils.isSortedObj(original, true));
     }
 
     @Test
     void testSortWithComparator() {
-        Integer[] original = {5, 4, 3, 2, 1, 0};
+        Integer[] original = Generator.generateObjectArray(SIZE);
         sort.sort(original, Comparator.reverseOrder());
 
-        assertArrayEquals(new Integer[]{5, 4, 3, 2, 1, 0}, original);
+        assertEquals(true, SortUtils.isSortedObj(original, false));
     }
 
     @Test

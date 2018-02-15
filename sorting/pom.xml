@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ru.otus</groupId>
-  <artifactId>caching</artifactId>
+  <artifactId>sorting</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>caching</name>
+  <name>sorting</name>
   <url>http://otus.ru</url>
 
   <properties>
