@@ -1,4 +1,2 @@
-JMH S 19 ru.otus.MyBenchmark S 55 ru.otus.generated.MyBenchmark_mergeNearlySorted_jmhTest S 17 mergeNearlySorted S 11 AverageTime E A 1 1 1 E I 2 10 T 3 1 s E I 2 10 T 3 1 s E I 1 5 E E E E E M 2 5 count 1 4 1000 5 delta 1 1 5 U 12 MICROSECONDS E E 
-JMH S 19 ru.otus.MyBenchmark S 52 ru.otus.generated.MyBenchmark_mergeFewUnique_jmhTest S 14 mergeFewUnique S 11 AverageTime E A 1 1 1 E I 2 10 T 3 1 s E I 2 10 T 3 1 s E I 1 5 E E E E E M 2 5 count 1 4 1000 9 uniqueNum 1 1 5 U 12 MICROSECONDS E E 
+JMH S 19 ru.otus.MyBenchmark S 49 ru.otus.generated.MyBenchmark_qsortRandom_jmhTest S 11 qsortRandom S 11 AverageTime E A 1 1 1 E I 2 10 T 3 1 s E I 2 10 T 3 1 s E I 1 5 E E E E E M 1 5 count 1 4 1000 U 12 MICROSECONDS E E 
 JMH S 19 ru.otus.MyBenchmark S 49 ru.otus.generated.MyBenchmark_mergeRandom_jmhTest S 11 mergeRandom S 11 AverageTime E A 1 1 1 E I 2 10 T 3 1 s E I 2 10 T 3 1 s E I 1 5 E E E E E M 1 5 count 1 4 1000 U 12 MICROSECONDS E E 
-JMH S 19 ru.otus.MyBenchmark S 51 ru.otus.generated.MyBenchmark_mergeReversed_jmhTest S 13 mergeReversed S 11 AverageTime E A 1 1 1 E I 2 10 T 3 1 s E I 2 10 T 3 1 s E I 1 5 E E E E E M 1 5 count 1 4 1000 U 12 MICROSECONDS E E 

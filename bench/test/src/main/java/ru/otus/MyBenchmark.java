@@ -1,8 +1,8 @@
 package ru.otus;
 
 import org.openjdk.jmh.annotations.*;
-import ru.otus.sort.ParallelSorter;
 import ru.otus.sort.SortManager;
+import ru.otus.sort.SortStrategy;
 import ru.otus.sort.SortType;
 
 import java.util.Arrays;
@@ -18,36 +18,44 @@ import java.util.concurrent.TimeUnit;
 public class MyBenchmark {
 
     @Benchmark
+    public int[] qsortRandom(RandomData d) {
+        SortStrategy sort = SortManager.getSorter(SortType.QSORT);
+        int[] c = Arrays.copyOf(d.arr, d.arr.length);
+        sort.sort(c);
+        return c;
+    }
+
+    @Benchmark
     public int[] mergeRandom(RandomData d) {
-        ParallelSorter sort = SortManager.getSorter(SortType.MERGE);
+        SortStrategy sort = SortManager.getSorter(SortType.MERGE);
         int[] c = Arrays.copyOf(d.arr, d.arr.length);
         sort.sort(c);
         return c;
     }
 
-    @Benchmark
-    public int[] mergeNearlySorted(NearlySortedData d) {
-        ParallelSorter sort = SortManager.getSorter(SortType.MERGE);
-        int[] c = Arrays.copyOf(d.arr, d.arr.length);
-        sort.sort(c);
-        return c;
-    }
-
-    @Benchmark
-    public int[] mergeReversed(ReversedData d) {
-        ParallelSorter sort = SortManager.getSorter(SortType.MERGE);
-        int[] c = Arrays.copyOf(d.arr, d.arr.length);
-        sort.sort(c);
-        return c;
-    }
-
-    @Benchmark
-    public int[] mergeFewUnique(FewUniqueData d) {
-        ParallelSorter sort = SortManager.getSorter(SortType.MERGE);
-        int[] c = Arrays.copyOf(d.arr, d.arr.length);
-        sort.sort(c);
-        return c;
-    }
+//    @Benchmark
+//    public int[] qsortNearlySorted(NearlySortedData d) {
+//        SortStrategy sort = SortManager.getSorter(SortType.QSORT);
+//        int[] c = Arrays.copyOf(d.arr, d.arr.length);
+//        sort.sort(c);
+//        return c;
+//    }
+//
+//    @Benchmark
+//    public int[] qsortReversed(ReversedData d) {
+//        SortStrategy sort = SortManager.getSorter(SortType.QSORT);
+//        int[] c = Arrays.copyOf(d.arr, d.arr.length);
+//        sort.sort(c);
+//        return c;
+//    }
+//
+//    @Benchmark
+//    public int[] qsortFewUnique(FewUniqueData d) {
+//        SortStrategy sort = SortManager.getSorter(SortType.QSORT);
+//        int[] c = Arrays.copyOf(d.arr, d.arr.length);
+//        sort.sort(c);
+//        return c;
+//    }
 
     @State(Scope.Thread)
     public static class RandomData {

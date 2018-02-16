@@ -10,7 +10,7 @@ import java.util.Comparator;
  *
  * Contains methods for partial sort. This is useful when sorting array in several threads
  */
-interface SortStrategy {
+public interface SortStrategy {
 
     /**
      * Sort array of objects.
