@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
-
 final class InsertionSort implements SortStrategy {
     @Override
     public <T extends Comparable> void sort(@NotNull T[] arr, int lo, int hi) {
