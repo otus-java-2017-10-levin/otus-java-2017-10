@@ -3,8 +3,11 @@ dontinline,*.*_avgt_jmhStub
 dontinline,*.*_sample_jmhStub
 dontinline,*.*_ss_jmhStub
 dontinline,*.*_thrpt_jmhStub
-inline,ru/otus/MyBenchmark$Data.setup
-inline,ru/otus/MyBenchmark.insertionSort4
-inline,ru/otus/MyBenchmark.insertionSortSingle
-inline,ru/otus/MyBenchmark.shellSort4
-inline,ru/otus/MyBenchmark.shellSortSingle
+inline,ru/otus/MyBenchmark$FewUniqueData.setup
+inline,ru/otus/MyBenchmark$NearlySortedData.setup
+inline,ru/otus/MyBenchmark$RandomData.setup
+inline,ru/otus/MyBenchmark$ReversedData.setup
+inline,ru/otus/MyBenchmark.mergeFewUnique
+inline,ru/otus/MyBenchmark.mergeNearlySorted
+inline,ru/otus/MyBenchmark.mergeRandom
+inline,ru/otus/MyBenchmark.mergeReversed

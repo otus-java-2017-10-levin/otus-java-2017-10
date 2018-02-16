@@ -9,27 +9,47 @@ public final class MergeSort implements SortStrategy {
     private final SortStrategy insertionSort = new InsertionSort();
 
     @Override
-    public <T extends Comparable> void sort(@NotNull T[] arr, int from, int to) {
-        sort(arr, Comparator.naturalOrder(), from, to);
+    public <T extends Comparable> void sort(@NotNull T[] arr, int lo, int hi)  {
+        sort(arr, Comparator.naturalOrder(), lo, hi);
     }
 
     @Override
-    public <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int from, int to) {
-        final int N = to - from;
+    public <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int lo, int hi) {
+        final int N = hi - lo;
+        int middle = N / 2;
         if (N > INSERTION_THRESHOLD) {
-            sort(arr, comparator, from, from+N / 2);
-            sort(arr, comparator, from+N / 2, to);
+            Thread threadA = new Thread(() -> sort(arr, comparator, lo, lo + middle - 1));
+            Thread threadB = new Thread(() -> sort(arr, comparator, lo + middle, hi));
+            threadA.start(); threadB.start();
+            try {
+                threadA.join();
+                threadB.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            SortUtils.merge2Arrays(arr, comparator, lo, lo + middle, hi);
+        } else {
+            insertionSort.sort(arr, comparator, lo, hi);
         }
-        SortUtils.merge2Arrays(arr, comparator, from, from+N/2, to);
     }
 
     @Override
-    public void sort(@NotNull int[] arr, int from, int to) {
-        final int N = to - from;
+    public void sort(@NotNull int[] arr, int lo, int hi) {
+        final int N = hi - lo + 1;
+        int middle = N / 2;
         if (N > INSERTION_THRESHOLD) {
-            sort(arr, from, from+N / 2);
-            sort(arr, from+N / 2, to);
+            Thread threadA = new Thread(() -> sort(arr, lo, lo + middle-1));
+            Thread threadB = new Thread(() -> sort(arr, lo + middle, hi));
+            threadA.start(); threadB.start();
+            try {
+                threadA.join();
+                threadB.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            SortUtils.merge2Arrays(arr, lo, lo + middle, hi);
+        } else {
+            insertionSort.sort(arr, lo, hi);
         }
-        SortUtils.merge2Arrays(arr, from, from+N/2, to);
     }
 }

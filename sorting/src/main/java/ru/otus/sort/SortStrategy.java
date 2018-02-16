@@ -19,7 +19,7 @@ interface SortStrategy {
      * @param <T> - comparable type
      */
     default <T extends Comparable> void sort(@NotNull T[] arr) {
-        sort(arr, 0, arr.length);
+        sort(arr, 0, arr.length-1);
     }
 
     /**
@@ -33,7 +33,7 @@ interface SortStrategy {
      * @param <T> - type of array elements
      */
     default <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator) {
-        sort(arr, comparator, 0, arr.length);
+        sort(arr, comparator, 0, arr.length-1);
     }
 
     /**
@@ -41,26 +41,26 @@ interface SortStrategy {
      * @param arr - array of ints
      */
     default void sort(@NotNull int[] arr) {
-        sort(arr, 0, arr.length);
+        sort(arr, 0, arr.length-1);
     }
 
 
     /*  P A R T I A L   A R R A Y   S O R T */
 
     /**
-     * Sort the part of array including {@code from} index excluding {@code to} index
+     * Sort the part of array including {@code lo} index excluding {@code hi} index
      * If array contains null element, then the NullPointerException will be thrown
      *
      * Restrictions:
-     * 0 <= {@code from} < array length
-     * {@code from} < {@code to} <= array length
+     * 0 <= {@code lo} < array length
+     * {@code lo} < {@code hi} <= array length
      *
-     * @param arr - array to sort
+     * @param arr - array hi sort
      * @param <T> - comparable type
-     * @param from - from index (inclusive)
-     * @param to - to index (exclusive)
+     * @param lo - lo index (inclusive)
+     * @param hi - hi index (inclusive)
      */
-    <T extends Comparable> void sort(@NotNull T[] arr, int from, int to);
+    <T extends Comparable> void sort(@NotNull T[] arr, int lo, int hi);
 
     /**
      * Sort object array with comparator
@@ -69,27 +69,27 @@ interface SortStrategy {
      * or greater then non-null {@link Comparator#nullsLast(Comparator)}.
      *
      * Restrictions:
-     * 0 <= {@code from} < array length
-     * {@code from} < {@code to} <= array length
+     * 0 <= {@code lo} < array length
+     * {@code lo} < {@code hi} <= array length
      *
-     * @param arr - array to sort
+     * @param arr - array hi sort
      * @param comparator - comparator
      * @param <T> - type of array elements
-     * @param from - from index (inclusive)
-     * @param to - to index (exclusive)
+     * @param lo - lo index (inclusive)
+     * @param hi - hi index (inclusive)
      */
-    <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int from, int to);
+    <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int lo, int hi);
 
     /**
      * Sort array of primitives
      *
      * Restrictions:
-     * 0 <= {@code from} < array length
-     * {@code from} < {@code to} <= array length
+     * 0 <= {@code lo} < array length
+     * {@code lo} < {@code hi} <= array length
      *
      * @param arr - array of ints
-     * @param from - from index (inclusive)
-     * @param to - to index (exclusive)
+     * @param lo - lo index (inclusive)
+     * @param hi - hi index (inclusive)
      */
-    void sort(@NotNull int[] arr, int from, int to);
+    void sort(@NotNull int[] arr, int lo, int hi);
 }
