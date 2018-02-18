@@ -2,24 +2,22 @@ package ru.otus.sort;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@SuppressWarnings("WeakerAccess")
 public final class SortManager {
 
+    @SuppressWarnings("unused")
     @NotNull
-    public static SortStrategy getSorter(SortType type) {
-        if (!sorters.containsKey(type))
-            throw new IllegalArgumentException("SortType " + type+" is not supported");
+    public static SortStrategy getSorter(SortType type, int insertionThreshold) {
 
-        return sorters.get(type);
-    }
+        if (type == SortType.INSERTION)
+            return new InsertionSort();
+        if(type == SortType.PARALLEL_MERGE)
+            return new ParallelMergeSort(insertionThreshold);
+        if (type == SortType.MERGE)
+            return new MergeSort(insertionThreshold);
+        if(type == SortType.QSORT)
+            return new QuickSort(insertionThreshold);
 
-    private static final Map<SortType, SortStrategy> sorters = new HashMap<>();
-
-    static {
-        sorters.put(SortType.INSERTION, new InsertionSort());
-        sorters.put(SortType.MERGE, new MergeSort());
-        sorters.put(SortType.QSORT, new QuickSort());
+        return new ParallelQuickSort(insertionThreshold);
     }
 }

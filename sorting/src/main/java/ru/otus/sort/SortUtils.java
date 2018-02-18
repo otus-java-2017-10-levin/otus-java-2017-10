@@ -33,39 +33,6 @@ final class SortUtils {
         arr[a1] = tmp;
     }
 
-    public static void swap(@NotNull int[] arr, int a1, int a2) {
-        int tmp = arr[a2];
-        arr[a2] = arr[a1];
-        arr[a1] = tmp;
-    }
-
-    /**
-     * Merge two sorted subarrays into sorted array
-     * Return result in {@code arr}
-     * @param arr - array with two subarrays
-     * @param from - first element of the first sub array
-     * @param middle - first element of the second array
-     * @param to - element number after the last element of the second array
-     */
-    public static void merge2Arrays(@NotNull int[] arr, int from, int middle, int to) {
-        int i=from, j=middle;
-        int[] res = new int[to-from+1];
-
-        int counter = 0;
-        while (i < middle || j <= to) {
-            int val;
-            if (i == middle) {
-                val = arr[j++];
-            } else if (j == to+1) {
-                val = arr[i++];
-            }else
-                val = arr[i] < arr[j] ? arr[i++] : arr[j++];
-
-            res[counter++] = val;
-        }
-        System.arraycopy(res, 0, arr, from, res.length);
-    }
-
     /**
      * Merge two sorted subarrays into sorted array
      * Create tmp array through reflection
@@ -96,5 +63,4 @@ final class SortUtils {
         }
         System.arraycopy(res, 0, arr, from, res.length);
     }
-
 }

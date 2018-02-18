@@ -13,27 +13,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SortStrategyTest {
 
     private static final int SIZE = 10_000;
+    private final int MAX = 1_000;
 
+    @SuppressWarnings("UnusedReturnValue")
     private static Stream<Arguments> sortedArgumentsProvider() {
         return Stream.of(
                 Arguments.of(new InsertionSort()),
+                Arguments.of(new ParallelQuickSort()),
                 Arguments.of(new QuickSort()),
+                Arguments.of(new ParallelMergeSort()),
                 Arguments.of(new MergeSort())
                 );
     }
 
-    @ParameterizedTest
-    @MethodSource("sortedArgumentsProvider")
-    void intTest(SortStrategy sort) {
-        int[] original = Generator.generateArray(SIZE);
-        sort.sort(original);
-        assertEquals(true, SortUtils.isSorted(original, true));
-    }
 
     @ParameterizedTest
     @MethodSource("sortedArgumentsProvider")
     void sortObjects(SortStrategy sort) {
-        Integer[] original = Generator.generateObjectArray(SIZE);
+        Integer[] original = Generator.generateRandom(SIZE, MAX);
         sort.sort(original);
         assertEquals(true, SortUtils.isSortedObj(original, true));
     }
@@ -41,7 +38,7 @@ class SortStrategyTest {
     @ParameterizedTest
     @MethodSource("sortedArgumentsProvider")
     void testSortWithComparator(SortStrategy sort) {
-        Integer[] original = Generator.generateObjectArray(SIZE);
+        Integer[] original = Generator.generateRandom(SIZE, MAX);
         sort.sort(original, Comparator.reverseOrder());
 
         assertEquals(true, SortUtils.isSortedObj(original, false));
@@ -67,36 +64,6 @@ class SortStrategyTest {
         assertArrayEquals(expected, original);
     }
 
-    @ParameterizedTest
-    @MethodSource("sortedArgumentsProvider")
-    void partialSort(SortStrategy sort) {
-        int[] original = {5, 4, 3, 2, 1, 0};
-        int[] expected = {3, 4, 5, 2, 1, 0};
-
-        sort.sort(original, 0, 2);
-        assertArrayEquals(expected, original);
-    }
-
-    @ParameterizedTest
-    @MethodSource("sortedArgumentsProvider")
-    void partialSort1(SortStrategy sort) {
-        int[] original = {5, 4, 3, 2, 1, 0};
-        int[] expected = {0, 1, 2, 3, 4, 5};
-
-        sort.sort(original, 0, original.length-1);
-        assertArrayEquals(expected, original);
-    }
-
-    @ParameterizedTest
-    @MethodSource("sortedArgumentsProvider")
-    void partialSort2(SortStrategy sort) {
-        int[] original = {5, 4, 33, 2, 1, 0};
-        int[] expected = {4, 5, 33, 2, 1, 0};
-
-
-        sort.sort(original, 0, 2);
-        assertArrayEquals(expected, original);
-    }
 
     @ParameterizedTest
     @MethodSource("sortedArgumentsProvider")
@@ -114,7 +81,7 @@ class SortStrategyTest {
         Integer[] original = new Integer[]{5, 4, 3, 2, 1, 0};
         Integer[] expected = new Integer[]{0, 1, 2, 3, 4, 5};
 
-        sort.sort(original, 0, original.length-1);
+        sort.sort(original, 0, original.length - 1);
         assertArrayEquals(expected, original);
     }
 

@@ -1,7 +1,10 @@
 package ru.otus.sort;
 
+@SuppressWarnings("unused")
 public enum SortType {
     INSERTION,
     MERGE,
-    QSORT
+    PARALLEL_MERGE,
+    QSORT,
+    PARALLEL_QSORT
 }

@@ -6,15 +6,15 @@ import java.util.Comparator;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
-public final class MergeSort implements SortStrategy {
+public final class ParallelMergeSort implements SortStrategy {
     private final int INSERTION_THRESHOLD;
     private final SortStrategy insertionSort = new InsertionSort();
 
-    public MergeSort() {
+    public ParallelMergeSort() {
         INSERTION_THRESHOLD = 47;
     }
 
-    public MergeSort(int INSERTION_THRESHOLD) {
+    public ParallelMergeSort(int INSERTION_THRESHOLD) {
         this.INSERTION_THRESHOLD = INSERTION_THRESHOLD;
     }
 

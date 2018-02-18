@@ -5,15 +5,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.concurrent.*;
 
-final class QuickSort implements SortStrategy {
+final class ParallelQuickSort implements SortStrategy {
     private static final SortStrategy sorter = new InsertionSort();
     private final int INSERTION_THRESHOLD;
 
-    public QuickSort() {
+    public ParallelQuickSort() {
         INSERTION_THRESHOLD = 47;
     }
 
-    public QuickSort(int INSERTION_THRESHOLD) {
+    public ParallelQuickSort(int INSERTION_THRESHOLD) {
         this.INSERTION_THRESHOLD = INSERTION_THRESHOLD;
     }
 

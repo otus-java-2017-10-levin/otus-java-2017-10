@@ -18,7 +18,7 @@ public interface SortStrategy {
      * @param arr - array to sort
      * @param <T> - comparable type
      */
-    default <T extends Comparable> void sort(@NotNull T[] arr) {
+    default <T extends Comparable<T>> void sort(@NotNull T[] arr) {
         sort(arr, 0, arr.length-1);
     }
 
@@ -34,14 +34,6 @@ public interface SortStrategy {
      */
     default <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator) {
         sort(arr, comparator, 0, arr.length-1);
-    }
-
-    /**
-     * Sort array of primitives
-     * @param arr - array of ints
-     */
-    default void sort(@NotNull int[] arr) {
-        sort(arr, 0, arr.length-1);
     }
 
 
@@ -60,7 +52,7 @@ public interface SortStrategy {
      * @param lo - lo index (inclusive)
      * @param hi - hi index (inclusive)
      */
-    <T extends Comparable> void sort(@NotNull T[] arr, int lo, int hi);
+    <T extends Comparable<T>> void sort(@NotNull T[] arr, int lo, int hi);
 
     /**
      * Sort object array with comparator
@@ -79,17 +71,4 @@ public interface SortStrategy {
      * @param hi - hi index (inclusive)
      */
     <T> void sort(@NotNull T[] arr, @NotNull Comparator<T> comparator, int lo, int hi);
-
-    /**
-     * Sort array of primitives
-     *
-     * Restrictions:
-     * 0 <= {@code lo} < array length
-     * {@code lo} < {@code hi} <= array length
-     *
-     * @param arr - array of ints
-     * @param lo - lo index (inclusive)
-     * @param hi - hi index (inclusive)
-     */
-    void sort(@NotNull int[] arr, int lo, int hi);
 }
