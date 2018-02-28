@@ -22,7 +22,7 @@ public class DbWorkerConfig {
     @Bean
     @Scope("singleton")
     public DbWorker dbWorker() {
-        return new DbWorker(jpaUtil());
+        return new DbWorker();
     }
 
 }

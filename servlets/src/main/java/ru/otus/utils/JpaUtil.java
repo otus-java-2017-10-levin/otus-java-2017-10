@@ -6,9 +6,9 @@ import javax.persistence.Persistence;
 public class JpaUtil {
 
     private final static String name = "otusJPAH2";
-    private EntityManagerFactory factory;
+    private static EntityManagerFactory factory;
 
-    public EntityManagerFactory getFactory() {
+    public static EntityManagerFactory getFactory() {
         if (factory == null)
             factory = Persistence.createEntityManagerFactory(name);
 
