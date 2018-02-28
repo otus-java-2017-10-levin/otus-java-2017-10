@@ -27,6 +27,5 @@ public final class CacheUtil {
         } catch (MBeanException | AttributeNotFoundException | ReflectionException | InstanceNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 }
