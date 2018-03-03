@@ -33,6 +33,7 @@ public class RpcServer {
         });
 
         session.addFilter(topic, message -> {
+            System.out.println("Incoming message: " + message);
             final String body = message.getBody();
 
             final String action = message.getHeader().getAttibute("action").orElseThrow(IllegalAccessError::new);

@@ -25,4 +25,9 @@ public class DbWorkerConfig {
         return new DbWorker();
     }
 
+    @Bean
+    @Scope("singleton")
+    public RpcServer rpcWorker() {
+        return new RpcServer();
+    }
 }
