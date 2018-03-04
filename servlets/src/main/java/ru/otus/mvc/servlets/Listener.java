@@ -1,5 +1,7 @@
 package ru.otus.mvc.servlets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.otus.DbWorker;
@@ -8,24 +10,23 @@ import ru.otus.RpcServer;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class Listener implements ServletContextListener {
+class Listener implements ServletContextListener {
 
+    private static final Logger log = LoggerFactory.getLogger(Listener.class);
     private final ApplicationContext context = new AnnotationConfigApplicationContext(DbWorkerConfig.class);
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        final ExecutorService executorService = Executors.newFixedThreadPool(2);
-        executorService.execute(() -> {
-            try {
-                context.getBean(RpcServer.class).init();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        executorService.execute(context.getBean(DbWorker.class));
+        log.info("Starting rpc server");
+
+       context.getBean(RpcServer.class).start();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        context.getBean(DbWorker.class).start();
     }
 
     @Override

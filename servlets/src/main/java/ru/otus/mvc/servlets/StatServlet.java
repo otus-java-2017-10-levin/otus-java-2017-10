@@ -2,7 +2,6 @@ package ru.otus.mvc.servlets;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.otus.DbWorker;
 import ru.otus.DbWorkerConfig;
 import ru.otus.mvc.model.Result;
 import ru.otus.mvc.model.Statistics;
@@ -22,7 +21,7 @@ public class StatServlet extends AbstractBaseServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final Result authorise = authorise(req, resp);
-        final Statistics stats = new Statistics();
+        Statistics stats;
 
         if (authorise.getResult() == AuthUtil.FORBIDDEN_403) {
             authorise.setMessage("index.html");
@@ -31,7 +30,7 @@ public class StatServlet extends AbstractBaseServlet {
             return;
         }
 
-        context.getBean(CacheUtil.class).updateCacheStatistic(stats);
+        stats = context.getBean(CacheUtil.class).getCacheStatistic();
 
         StatisticView view = stats.getView();
         view.setStatus(AuthUtil.OK_200);

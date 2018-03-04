@@ -14,6 +14,7 @@ import java.util.List;
 
 public class UserTypeAdapter extends TypeAdapter<User> {
 
+    @SuppressWarnings("SameParameterValue")
     private void writeSafeNull(JsonWriter out, String name, String value) throws IOException {
         if (name == null) {
             out.nullValue();

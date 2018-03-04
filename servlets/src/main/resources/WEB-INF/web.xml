@@ -43,7 +43,5 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
         <welcome-file>stat.html</welcome-file>
-        <welcome-file>js/jquery-1.11.3.js</welcome-file>
-        <welcome-file>js/script.js</welcome-file>
     </welcome-file-list>
 </web-app>

@@ -7,8 +7,8 @@ import ru.otus.db.entities.User;
 
 public class GsonUtil {
 
+    private static final GsonBuilder builder = new GsonBuilder();
     private static Gson gson;
-    private static GsonBuilder builder = new GsonBuilder();
 
     public static String toJson(Object object) {
         if (gson == null) {
@@ -16,5 +16,13 @@ public class GsonUtil {
             gson = builder.create();
         }
         return gson.toJson(object);
+    }
+
+    public static <T> T fromJson(String json, Class<T> cl) {
+        if (gson == null) {
+            builder.registerTypeAdapter(User.class, new UserTypeAdapter());
+            gson = builder.create();
+        }
+        return gson.fromJson(json, cl);
     }
 }

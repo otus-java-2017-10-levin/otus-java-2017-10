@@ -8,7 +8,7 @@ import ru.otus.utils.AuthUtil;
 import javax.servlet.http.*;
 import java.io.IOException;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 class AbstractBaseServlet extends HttpServlet {
 
     protected static final String USER_HASH = "user.hash";
