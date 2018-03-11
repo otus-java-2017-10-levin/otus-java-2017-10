@@ -113,6 +113,9 @@ public final class Server extends AbstractMessageProcessor {
         final String topic = item.getHeader().getTopic();
 
         final TopicSubscription subscriptions = subscribers.get(topic);
+        if (subscriptions == null)
+            return false;
+
         final Optional<AbstractMessageSubscription> next = subscriptions.next();
         if (next.isPresent()) {
             next.get().submit(item);
