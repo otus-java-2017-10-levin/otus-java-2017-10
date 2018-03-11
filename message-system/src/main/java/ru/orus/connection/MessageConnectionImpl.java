@@ -3,6 +3,7 @@ package ru.orus.connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.orus.core.AbstractMessageProcessor;
+import ru.orus.messages.Messages;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,8 +20,8 @@ class MessageConnectionImpl implements MessageConnection {
     @Override
     public MessageSession getSession() {
         final MessageSessionImpl messageSession = new MessageSessionImpl();
-        worker.subscribe(messageSession);
-        messageSession.subscribe(worker);
+        worker.subscribe(Messages.getSystemChannelName(), messageSession);
+        messageSession.subscribe(Messages.getSystemChannelName(), worker);
         sessions.add(messageSession);
         log.info("Created new session for worker " + worker);
         return messageSession;

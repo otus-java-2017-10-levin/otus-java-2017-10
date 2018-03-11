@@ -3,6 +3,7 @@ package ru.orus;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
+import ru.orus.core.Server;
 
 import java.io.IOException;
 

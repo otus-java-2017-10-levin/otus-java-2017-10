@@ -1,11 +1,15 @@
 package ru.orus.core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.Socket;
 
-public class WorkerFactory {
+public final class WorkerFactory {
+    private WorkerFactory() {}
 
-    public static AbstractMessageProcessor getWorker(Socket socket) {
-        final MessageWorkerImpl worker = new MessageWorkerImpl(socket);
+    @NotNull
+    public static AbstractMessageProcessor getWorker(@NotNull Socket socket) {
+        final MessageWorker worker = new MessageWorker(socket);
         worker.init();
         return worker;
     }

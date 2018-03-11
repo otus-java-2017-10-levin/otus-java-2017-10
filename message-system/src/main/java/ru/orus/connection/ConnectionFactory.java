@@ -4,8 +4,6 @@ import ru.orus.core.WorkerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @SuppressWarnings("unused")
 public final class ConnectionFactory {

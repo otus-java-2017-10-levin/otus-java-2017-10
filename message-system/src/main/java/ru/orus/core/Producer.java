@@ -1,5 +1,8 @@
 package ru.orus.core;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface Producer<T> {
-    void submit(T item);
+
+    boolean submit(@NotNull T item);
 }

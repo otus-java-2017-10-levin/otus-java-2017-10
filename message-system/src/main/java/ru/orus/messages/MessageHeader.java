@@ -1,8 +1,11 @@
 package ru.orus.messages;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.orus.common.Validation;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,20 +17,24 @@ class MessageHeader implements Header, Serializable {
     private final String idString;
     private final String replyTo;
     private final Map<String, String> attributes = new HashMap<>();
+    private final Message.Type type;
 
     @SuppressWarnings("unused")
-    MessageHeader(String topic, String idString, String replyTo) {
+    MessageHeader(@NotNull String topic, @Nullable String idString, @Nullable String replyTo, Message.Type type) {
         Validation.validateNonNull(topic);
         this.topic = topic;
         this.idString = idString;
         this.replyTo = replyTo;
+        this.type = type;
     }
 
+    @NotNull
     @Override
     public String getTopic() {
         return topic;
     }
 
+    @NotNull
     @Override
     public String getId() {
         return idString;
@@ -35,18 +42,29 @@ class MessageHeader implements Header, Serializable {
 
     @Override
     public Optional<String> getReplyTo() {
-        return Optional.of(replyTo);
+        return Optional.ofNullable(replyTo);
     }
 
     @Override
-    public void addAttribute(String name, String value) {
+    public void addAttribute(@NotNull String name, @NotNull String value) {
         Validation.validateNonNull("", name, value);
         attributes.put(name, value);
     }
 
     @Override
-    public Optional<String> getAttribute(String name) {
+    public Optional<String> getAttribute(@NotNull String name) {
         return Optional.of(attributes.get(name));
+    }
+
+    @NotNull
+    @Override
+    public Map<String, String> getAttributes() {
+        return Collections.unmodifiableMap(attributes == null ? new HashMap<>() : attributes);
+    }
+
+    @Override
+    public Message.Type getType() {
+        return type;
     }
 
     @Override
@@ -56,6 +74,7 @@ class MessageHeader implements Header, Serializable {
                 ", idString='" + idString + '\'' +
                 ", replyTo='" + replyTo + '\'' +
                 ", attributes=" + attributes +
+                ", type=" + type +
                 '}';
     }
 }
