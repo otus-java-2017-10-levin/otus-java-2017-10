@@ -41,8 +41,10 @@ public class UserTypeAdapter extends TypeAdapter<User> {
         out.name("phones");
         out.beginArray();
         final List<Phone> phones = value.getPhones();
-        for (Phone phone : phones) {
-            writePhone(out, phone);
+        if (phones != null) {
+            for (Phone phone : phones) {
+                writePhone(out, phone);
+            }
         }
         out.endArray();
         out.endObject();
@@ -50,15 +52,19 @@ public class UserTypeAdapter extends TypeAdapter<User> {
 
     private void writePhone(JsonWriter out, Phone phone) throws IOException {
         out.beginObject();
-        out.name("id").value(phone.getId());
-        out.name("phone").value(phone.getPhone());
+        if (phone != null) {
+            out.name("id").value(phone.getId());
+            out.name("phone").value(phone.getPhone());
+        }
         out.endObject();
     }
 
     private void writeAddress(JsonWriter out, Address address) throws IOException {
         out.beginObject();
-        out.name("id").value(address.getId());
-        out.name("address").value(address.getAddress());
+        if (address != null) {
+            out.name("id").value(address.getId());
+            out.name("address").value(address.getAddress());
+        }
         out.endObject();
     }
 

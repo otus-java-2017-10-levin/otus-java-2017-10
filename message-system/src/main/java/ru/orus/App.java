@@ -1,20 +1,13 @@
 package ru.orus;
 
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
-import ru.orus.core.Server;
+import ru.orus.core.SimpleServer;
 
 import java.io.IOException;
 
 class App {
 
-    public static void main(String[] args) throws IOException {
-        Configurator.setRootLevel(Level.DEBUG);
-//        for (int i =0; i < 100; i++) {
-            final Server server = new Server(5050);
-            server.start();
-//            server.stop();
-//        }
+    public static void main(String[] args) throws IOException, InterruptedException {
+        final SimpleServer server = new SimpleServer(5050);
+        server.start();
     }
 }

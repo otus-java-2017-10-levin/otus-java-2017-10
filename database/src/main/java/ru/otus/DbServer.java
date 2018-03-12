@@ -7,24 +7,22 @@ import ru.orus.connection.MessageSession;
 import ru.orus.messages.Header;
 import ru.orus.messages.Message;
 import ru.orus.messages.Messages;
-import ru.otus.db.dao.UserDAO;
 import ru.otus.db.entities.User;
 import ru.otus.utils.GsonUtil;
-import ru.otus.utils.JpaUtil;
+import ru.otus.db.DbService;
 import ru.otus.utils.MSUtil;
 
-import javax.persistence.EntityManager;
 import java.io.IOException;
 
-public class DBService {
-    private static final Logger log = LoggerFactory.getLogger(DBService.class);
+public class DbServer {
+    private static final Logger log = LoggerFactory.getLogger(DbServer.class);
     private static final String topic = "basic";
     private MessageSession session;
-    private EntityManager entityManager;
+    private DbService dbService;
 
     public static void main(String[] args) {
         try {
-            new DBService().init();
+            new DbServer().init();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,8 +30,9 @@ public class DBService {
 
     private void init() throws IOException {
         MessageConnection localhost = MSUtil.getConnection();
-        entityManager = JpaUtil.getFactory().createEntityManager();
+        dbService = new DbService();
         session = localhost.getSession();
+
 
         session.declareTopic(topic);
         session.subscribe(topic);
@@ -114,14 +113,14 @@ public class DBService {
 
 
     private long saveUser(User user) {
-        UserDAO dao = new UserDAO(entityManager);
-        dao.save(user);
+        dbService.save(user, User.class);
         return user.getId();
     }
 
-    private <T> String loadUser(long id) {
-        UserDAO dao = new UserDAO(entityManager);
-        final User load = dao.load(id);
-        return GsonUtil.toJson(load);
+    private String loadUser(long id) {
+        final User load = dbService.read(id, User.class);
+        final String s = GsonUtil.toJson(load);
+        log.debug(s);
+        return s;
     }
 }

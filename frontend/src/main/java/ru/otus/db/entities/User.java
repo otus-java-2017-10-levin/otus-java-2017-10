@@ -14,10 +14,11 @@ public class User extends DataSet {
     private String name;
     private int age;
 
-    @OneToOne
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", fetch =  FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Phone> phones = new ArrayList<>();
 
     public User() {}

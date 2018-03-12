@@ -1,5 +1,6 @@
 package ru.orus.connection;
 
+import ru.orus.core.MessageWorker;
 import ru.orus.core.WorkerFactory;
 
 import java.io.IOException;
@@ -16,7 +17,8 @@ public final class ConnectionFactory {
                 if (!isConnected) {
                     final int PORT = 5050;
                     Socket socket = new Socket(uri, PORT);
-                    this.connection = new MessageConnectionImpl(WorkerFactory.getWorker(socket));
+                    final MessageWorker worker = WorkerFactory.getWorker(socket);
+                    this.connection = new SimpleMessageConnection(worker);
                     isConnected = true;
                 }
             }

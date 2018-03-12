@@ -8,12 +8,12 @@ import java.io.Serializable;
  *  Simple message interface
  *
  */
+@SuppressWarnings("unused")
 public interface Message<T> extends Serializable {
 
     enum Type {
         SYSTEM,
-        STRING,
-        COMMAND
+        STRING
     }
 
     @NotNull

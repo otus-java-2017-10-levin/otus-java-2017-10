@@ -5,7 +5,7 @@
             <PatternLayout pattern="%d %-5p [%t] %C{2} %x - %m%n"/>
         </Console>
 
-        <RollingFile name="DIALY" fileName="daily.log" filePattern="%d{ddMMyyyy-HHmm}_daily.log">
+        <RollingFile name="DAILY" fileName="daily.log" filePattern="%d{ddMMyyyy-HHmm}_daily.log">
             <PatternLayout pattern="%d [%7r] %5p - %c - %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>

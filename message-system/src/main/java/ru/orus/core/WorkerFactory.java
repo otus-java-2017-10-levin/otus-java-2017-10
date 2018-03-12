@@ -4,13 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;
 
-public final class WorkerFactory {
-    private WorkerFactory() {}
+public class WorkerFactory {
 
-    @NotNull
-    public static AbstractMessageProcessor getWorker(@NotNull Socket socket) {
-        final MessageWorker worker = new MessageWorker(socket);
-        worker.init();
-        return worker;
+    public static MessageWorker getWorker(@NotNull Socket socket) {
+        return new ClientSocket(socket);
     }
 }

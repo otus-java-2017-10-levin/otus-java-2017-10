@@ -1,18 +1,29 @@
 package ru.otus.db.dao;
 
-import javax.persistence.EntityManager;
+import org.hibernate.Session;
+import ru.otus.db.entities.DataSet;
 
-abstract class GenericDAO<T> {
+public class GenericDAO<T> {
     private final Class<T> daoClass;
-    final EntityManager manager;
+    private final Session manager;
 
-    GenericDAO(Class<T> daoClass, EntityManager manager) {
+    private GenericDAO(Class<T> daoClass, Session manager) {
         this.daoClass = daoClass;
         this.manager = manager;
     }
 
+    public static <T extends DataSet> GenericDAO<T> of(Class<T> daoClass, Session manager) {
+        if (daoClass == null || manager == null)
+            throw new IllegalArgumentException();
+
+        return new GenericDAO<>(daoClass, manager);
+    }
 
     public <R> T load(R id) {
         return manager.find(daoClass, id);
+    }
+
+    public void save(T object) {
+        manager.save(object);
     }
 }

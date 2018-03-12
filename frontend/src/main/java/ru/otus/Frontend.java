@@ -14,6 +14,7 @@ import ru.otus.utils.GsonUtil;
 import ru.otus.utils.MSUtil;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Frontend {
@@ -48,6 +49,7 @@ public class Frontend {
         session = localhost.getSession();
 
         session.declareTopic(basic);
+
         final int cycles = 3;
 
         for (int i = 0; i < cycles; i++) {
@@ -63,6 +65,7 @@ public class Frontend {
         while (true) {
             try {
                 load(1, User.class);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -70,7 +73,7 @@ public class Frontend {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private <T extends DataSet> T load(long id, Class<T> cl) throws InterruptedException {
+    private <T extends DataSet> Optional<T> load(long id, Class<T> cl) throws InterruptedException {
         final String reply = Messages.getRandomId();
 
         session.subscribe(reply);
@@ -82,21 +85,28 @@ public class Frontend {
                 .addAttribute("class", User.class.getCanonicalName())
                 .build();
 
-        final ArrayBlockingQueue<T> response = new ArrayBlockingQueue<>(1);
+        final ArrayBlockingQueue<Optional<T>> response = new ArrayBlockingQueue<>(1);
         session.addFilter(reply, message -> {
             log.info("incoming message: " + message);
             if (head.getId().equals(message.getId())) {
                 try {
-                    response.add(GsonUtil.fromJson((String)message.getBody(), cl));
+                    final String body = (String) message.getBody();
+                    if ("null".equals(body)) {
+                        response.add(Optional.empty());
+                        return;
+                    }
+                    response.add(Optional.of(GsonUtil.fromJson(body, cl)));
 
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException e ) {
                     log.error("", e);
                 }
             }
         });
 
         session.sendMessage(""+id, head);
-        return response.take();
+        final Optional<T> take = response.take();
+        session.unsubscribe(reply);
+        return take;
     }
 
     private void save(User user) throws InterruptedException {
@@ -104,7 +114,7 @@ public class Frontend {
         session.subscribe(reply);
 
         final Header head = new Messages.BasicProperties.Builder()
-                .topic("basic")
+                .topic(basic)
                 .replyTo(reply)
                 .id(Messages.getRandomId())
                 .addAttribute("action", "save")
@@ -125,6 +135,8 @@ public class Frontend {
         });
 
         session.sendMessage(GsonUtil.toJson(user), head);
-        user.setId(response.take());
+        final Long take = response.take();
+        session.unsubscribe(reply);
+        user.setId(take);
     }
 }

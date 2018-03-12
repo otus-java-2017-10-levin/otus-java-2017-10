@@ -1,7 +1,6 @@
 package ru.orus.messages;
 
 import ru.orus.common.Validation;
-import ru.orus.core.Command;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +9,7 @@ import java.util.UUID;
 /*
  *  @author Flow
  */
-@SuppressWarnings("ALL")
-public class Messages {
-    private static final String SYSTEM = "system";
+public final class Messages {
 
     public static class BasicProperties {
         public static class Builder {
@@ -82,20 +79,7 @@ public class Messages {
         return StringMessage.of(message, header);
     }
 
-    public static Message<Command> newMessage(Command message, Header header) {
-        return CommandMessage.of(message, header);
-    }
-
-    public static Message<String> newSystemMessage(String message, Header header) {
-        return SystemMessage.of(message, header);
-    }
-
-
     public static String getRandomId() {
         return UUID.randomUUID().toString();
-    }
-
-    public static final String getSystemChannelName() {
-        return SYSTEM;
     }
 }

@@ -2,7 +2,9 @@ package ru.otus.db.entities;
 
 import lombok.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @EqualsAndHashCode(callSuper = true)
@@ -13,7 +15,7 @@ import javax.persistence.ManyToOne;
 public class Phone extends DataSet {
 
     @NonNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private User owner;
 
     @NonNull

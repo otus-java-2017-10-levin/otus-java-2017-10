@@ -3,9 +3,6 @@ package ru.orus.connection;
 import ru.orus.messages.Header;
 import ru.orus.messages.Message;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -22,13 +19,13 @@ import java.util.function.Consumer;
 public interface MessageSession {
 
     /**
-     * Bind queue for session.
+     * Bind topic for session.
      *
-     * @param topicName - name of queue
-     * @throws IllegalStateException - if topicName is already set
+     * @param topic - name of queue
+     * @throws IllegalStateException - if topic is already set
      * @throws IllegalStateException - when queue is closed
      */
-    void declareTopic(String topicName);
+    void declareTopic(String topic);
 
     /**
      * Sends message to queue (specified in {@link MessageSession#declareTopic(String)}.
@@ -51,20 +48,6 @@ public interface MessageSession {
      */
     void sendMessage(String message, Header props);
 
-
-    /**
-     * Sends message to server and wait for reply at most {@code timeout} units of {@code units}
-     * Reply message must have the same message id as an original message.
-     * Server can reply to channel different from message topic.
-     * This is specified by {@link ru.orus.messages.Messages.BasicProperties.Builder#replyTo(String)} method.
-     * That means that session should be subcribed for replyTo channel.
-     * @param message - message to send
-     * @param props - message header
-     * @param units - time units
-     * @param timeout - time amount
-     * @return - reply from server.
-     */
-    Future<Message<?>> sendMessage(String message, Header props, TimeUnit units, long timeout);
     /**
      * Set consumer for incoming messages.
      *
@@ -77,6 +60,12 @@ public interface MessageSession {
      * @param topic - topic name
      */
     void subscribe(String topic);
+
+    /**
+     * Stop receiving messages from message server for {@code topic}
+     * @param topic - topic to unsubscribe
+     */
+    void unsubscribe(String topic);
 
     String getTopic();
 
